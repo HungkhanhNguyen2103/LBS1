@@ -1,0 +1,611 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: white;
+}
+
+header {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    background-color: #ffffff;
+
+}
+.post-detail{}
+
+.post-detail img{}
+
+.post-detail h3{}
+
+.input-container {
+    display: flex;
+    align-items: center;
+}
+
+    .input-container input {
+        padding: 8px;
+        font-size: 14px;
+        border: 1px solid #ddd;
+        border-radius: 4px 0 0 4px;
+        outline: none;
+        flex: 1;
+    }
+
+    .input-container button {
+        padding: 8px 12px;
+        font-size: 14px;
+        background-color: #333;
+        color: #fff;
+        border: none;
+        border-radius: 0 4px 4px 0;
+        cursor: pointer;
+    }
+
+        .input-container button:hover {
+            background-color: #555;
+        }
+.toggle-buttons {
+    margin-bottom: 20px;
+}
+
+.toggle-button {
+    background-color: #f5f5f5;
+    border: 1px solid #ccc;
+    padding: 10px 20px;
+    margin: 0 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+    .toggle-button:hover {
+        background-color: #ddd;
+    }
+
+.menu-horizontal {
+    position: fixed;
+    z-index:1;
+    top: 0;
+    right: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #00000054;
+}
+.menu-horizontal i{
+    cursor:pointer;
+    position:fixed;
+    z-index:2;
+    right:20px;
+    top:20px;
+}
+
+.icon-list-menu{
+    cursor:pointer;
+    display:none;
+}
+
+.menu-horizontal-hidden {
+    width: 0% !important;
+    transition: 0.4s;
+}
+
+.menu-horizontal ul {
+    display: block;
+    position: fixed;
+    width: 40%;
+    height: 100%;
+    top: 0;
+    right: 0;
+    background-color: white;
+    padding-top: 1rem;
+    padding-left:8px;
+    transition: 0.4s;
+}
+
+        .menu-horizontal ul li{
+            padding: 8px;
+        }
+
+#li-5 {
+    border-bottom: 1px solid #8080808a;
+    margin-right: 8px;
+    padding-bottom:12px;
+}
+
+
+
+.menu-horizontal-btn {
+    position: fixed !important;
+    width: 40%;
+    top: 16.5rem;
+    padding-left: 16px;
+    right: 0 !important;
+    transition: 0.4s;
+}
+
+.background-image {
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    background-color: #0000005c;
+}
+
+@media only screen and (max-width: 900px) {
+    .container-1{
+        display:block !important;
+    }
+    .image-1{
+        width:100% !important;
+    }
+    .price-1{
+        text-align:center !important;
+    }
+    .booking-1{
+        text-align:center !important;
+        margin:0 auto;
+    }
+    #price-2{
+        justify-content:center !important;
+    }
+}
+@media only screen and (max-width: 475px){
+    .image-1 {
+        display:none !important;
+    }
+}
+
+@media only screen and (max-width: 440px) {
+    .container-1{
+        width:auto !important;
+    }
+}
+
+@media only screen and (max-width: 625px) {
+    h3.title {
+        margin-left:5rem !important;
+    }
+    .articles{
+        margin-left:5rem !important;
+    }
+}
+
+
+@media only screen and (max-width: 390px) {
+    h3.title {
+        margin-left: 2rem !important;
+    }
+
+    .articles {
+        margin-left: 2rem !important;
+    }
+}
+
+@media only screen and (max-width: 625px) {
+    .footer-links-1{
+        display:none !important;
+    }
+}
+
+@media only screen and (max-width: 464px) {
+    .form-feedback {
+        width:auto !important;
+    }
+}
+
+
+@media only screen and (max-width: 950px) {
+    .menu-vertical{
+                display:none!important;
+            }
+            .icon-list-menu{
+                display:block;
+            }
+        }
+
+@media only screen and (max-width: 550px) {
+    .menu-horizontal ul{
+        width:50%;
+    }
+
+    .menu-horizontal-btn{
+        width:50%;
+    }
+}
+
+@media only screen and (max-width: 450px) {
+    .menu-horizontal ul {
+        width: 60%;
+    }
+
+    .menu-horizontal-btn {
+        width: 60%;
+    }
+}
+
+.card {
+    display: inline-block;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    width: 250px;
+    margin: 10px;
+    padding: 20px;
+    text-align: center;
+    transition: transform 0.3s ease;
+}
+
+.basic .card-button, .premium .card-button {
+    background-color: #333;
+    color: white;
+}
+
+.container-1 {
+    width: 80%;
+    padding: 20px;
+    display: flex;
+    margin: 4rem auto;
+}
+
+.image-1 {
+    width: 70%;
+    margin-right: 4rem;
+    display:flex;
+    align-items:center;
+}
+
+    .image-1 img {
+        width: 100%;
+        border-radius: 5rem;
+        border: 1px solid #80808085;
+    }
+
+.content-1 {
+    flex: 2;
+    display: flex;
+    margin-top:3rem;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.price-1 {
+    font-size: 24px;
+    color: #000;
+    margin-bottom: 10px;
+    font-weight:700;
+}
+
+.description-1 {
+    color: #555;
+    border: 1px solid #5555554d;
+    padding: 13px;
+    border-radius: 10px;
+    width: 80%;
+    overflow-x: auto;
+    margin: 0 auto;
+}
+
+    .description-1 span {
+        display: block;
+        font-size: larger;
+        font-weight: 700;
+    }
+
+    .booking-1 {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .booking-1 select, .booking-1 button {
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        font-size: 16px;
+    }
+
+    .booking-1 button {
+        background-color: #000;
+        color: #fff;
+        cursor: pointer;
+    }
+
+        .booking-1 button:hover {
+            background-color: #444;
+        }
+
+.image {
+    flex: 1;
+    max-width: 150px;
+}
+
+.form-feedback {
+    width: 400px;
+    margin: 0 auto;
+    background-color: white;
+    padding: 15px;
+    border-radius: 10px;
+}
+
+    .form-feedback label{
+        font-weight:600;
+        float:left;
+    }
+
+    .image img {
+        width: 100%;
+        border-radius: 10px;
+    }
+
+.standard {
+    background-color: #333 !important;
+    color: white;
+}
+
+    .standard .card-button {
+        background-color: #ddd;
+        color: #333;
+    }
+
+.price {
+    font-size: 24px;
+    margin: 10px 0;
+}
+
+    .price span {
+        font-size: 16px;
+    }
+
+::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+    border-radius: 10px;
+    background-color: #F5F5F5;
+}
+
+::-webkit-scrollbar {
+    width: 3px;
+    background-color: #F5F5F5;
+}
+
+::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
+    background-color: #555;
+}
+
+
+.description {
+    font-size: 14px;
+    margin-bottom: 20px;
+    height:4rem;
+    overflow-y:auto
+}
+
+.card-button {
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+    .card-button:hover {
+        background-color: #555;
+    }
+
+.rating-box{
+    display:flex;
+}
+
+.fa-star{
+    margin-right:4px;
+}
+
+.checked{
+    color:orange;
+}
+
+.articles-question {
+    width: 20rem;
+    margin: 0 auto;
+    margin-bottom: 4rem;
+}
+
+    .articles-question h3{
+        font-size:18px;
+        text-align:center;
+    }
+
+    .logo img {
+        height: 40px;
+    }
+
+.nav-links {
+    list-style: none;
+    display: flex;
+    gap: 15px;
+    margin: 0;
+    padding: 0;
+}
+
+.nav-links a {
+    text-decoration: none;
+    color: #333;
+    font-weight: 500;
+    padding: 8px 12px;
+    border-radius: 5px;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.nav-links a.active,
+.nav-links a:hover {
+    background-color: #e0e0e0;
+    color: #000;
+}
+
+.auth-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.auth-buttons .sign-in,
+.auth-buttons .register {
+    border: 1px solid #333;
+    background-color: transparent;
+    color: #333;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.auth-buttons .register {
+    background-color: #333;
+    color: #fff;
+}
+
+.auth-buttons .sign-in:hover {
+    background-color: #e0e0e0;
+}
+
+.auth-buttons .register:hover {
+    background-color: #555;
+}
+
+.hero {
+    text-align: center;
+    padding: 60px 20px;
+    background-image: url(/images/banner.png);
+    background-size:cover;
+    background-position:center;
+    margin-left:5px;
+    color: #333;
+}
+
+.hero h1 {
+    font-size: 28px;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.cta-button {
+    background-color: #007BFF;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.cta-button:hover {
+    background-color: #0056b3;
+}
+
+.articles {
+    display: flex;
+    justify-content: flex-start;
+    gap: 100px;
+    margin: 60px;
+    margin-left:13rem;
+}
+.articles-home {
+    flex-wrap: wrap;
+    margin-top:2rem !important;
+}
+
+article {
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    width: 500px;
+    text-align: center;
+}
+
+.post {
+    width: 300px !important;
+    box-shadow: none !important;
+    border: 2px solid #80808061 !important;
+    border-radius: 4px !important;
+    text-align:left;
+}
+
+.post h5{
+    margin-left:15px;
+    font-weight:500;
+}
+
+h3.title{
+    margin-left:13rem;
+    margin-top:3rem;
+}
+
+article img {
+    width: 100%;
+    height: 13rem;
+}
+
+article h2 {
+    padding: 10px;
+    font-size: 18px;
+    color: #333;
+}
+
+    article p{
+        padding-left:10px;
+        cursor:pointer;
+    }
+
+    footer {
+        background-color: #ffffff;
+        padding: 20px 0;
+        box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
+        text-align: center;
+    }
+
+.footer-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 0 20px;
+}
+
+.footer-logo img {
+    height: 40px;
+    margin-bottom: 10px;
+}
+
+.footer-links {
+    list-style: none;
+    display: flex;
+    gap: 15px;
+    padding: 0;
+    margin: 0;
+}
+
+.footer-links a {
+    text-decoration: none;
+    color: #333;
+    font-weight: 500;
+    padding: 8px 12px;
+    border-radius: 5px;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.footer-links a.active,
+.footer-links a:hover {
+    background-color: #e0e0e0;
+    color: #000;
+}
+
+.contact-info {
+    font-size: 14px;
+    color: #333;
+    line-height: 1.6;
+}

@@ -1,0 +1,31 @@
+﻿@{
+    Layout = "~/Views/Account/_AccountLayout.cshtml";
+}
+@model AccountModel
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-4">
+        <div class="login-wrap p-0">
+            <h3 class="mb-4 text-center">Thông tin tài khoản</h3>
+            <form asp-action="UpdateInformation" method="post" class="signin-form">
+                <div class="form-group">
+                    <input asp-for="UserName" value="@Model.UserName" disabled type="text" class="form-control" placeholder="Tài khoản" required>
+                </div>
+                <div class="form-group">
+                    <input asp-for="Email" value="@Model.Email" disabled type="email" class="form-control" placeholder="Email" required>
+                </div>
+                <div class="form-group">
+                    <input asp-for="FullName" value="@Model.FullName" autofocus type="text" class="form-control" placeholder="Họ tên" required>
+                </div>
+                <div class="form-group">
+                    <input asp-for="PhoneNumber" value="@Model.PhoneNumber" type="text" class="form-control" placeholder="Số điện thoại" required>
+                </div>
+                <div class="form-group">
+                    <button type="submit" class="form-control btn btn-primary submit px-3">Cập nhật thông tin</button>
+                </div>
+                <div class="social d-flex text-center">
+                    <a href="/" class="px-2 py-2 ml-md-1 rounded"><span class="ion-logo-twitter mr-2"></span> Trở về trang chủ</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,196 @@
+﻿@{
+    var jwtToken = ViewContext.HttpContext.Request.Cookies["token"];
+    if (string.IsNullOrEmpty(jwtToken) && User.Identity.IsAuthenticated)
+    {
+        ViewContext.HttpContext.Response.Redirect("/Account/Logout");
+    }
+    else if (!string.IsNullOrEmpty(jwtToken) && !User.Identity.IsAuthenticated)
+    {
+        ViewContext.HttpContext.Response.Redirect("/Account/VerifyToken");
+    }
+    else if (User.Identity.IsAuthenticated)
+    {
+        if (User.FindFirst("ResetPassword").Value == "1")
+        {
+            ViewContext.HttpContext.Response.Redirect("/Account/ChangeAccount");
+        }
+    }
+}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
+    <link rel="stylesheet" href="~/css/layoutHome.css" asp-append-version="true">
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" asp-append-version="true">
+    <link rel="icon" type="image/png" href="~/images/layoutHome/logo.png" asp-append-version="true">
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <div style="cursor:pointer" onclick="window.location.href='/'" class="logo">
+                <img src="~/images/layoutHome/logo.png" alt="Logo" />
+            </div>
+            <ul id="nav-links" class="menu-vertical nav-links d-none">
+                <li><a href="/" id="home-cls">Trang chủ</a></li>
+                <li><a href="/Home/AboutUs" id="aboutUs-cls">Giới thiệu</a></li>
+                <li><a href="/Home/Sharing" id="shared-cls">Góc chia sẻ</a></li>
+                <li><a href="/Home/ServiceView" id="serviceview-cls">Dịch vụ</a></li>
+                <li><a href="/Home/UserQuestion" id="feedback-cls">Chính sách khách hàng</a></li>
+            </ul>
+            @if (User.Identity.IsAuthenticated)
+            {
+                <div class="dropdown menu-vertical">
+                    <button class="btn dropdown-toggle" type="button" data-toggle="dropdown" aria-expanded="false">
+                        @User.Identity.Name
+                    </button>
+                    <div style="right:30px;position:fixed" class="dropdown-menu">
+                        @if (bool.Parse(User.FindFirst("EmailConfirm").Value) == false)
+                        {
+                            <a style="color:#ff0000b0;font-weight:700" class="dropdown-item" href="/Account/EmailReConfirm"><div class="d-flex" style="align-items:center"><i style="font-size:9px;margin-right:5px" class="fas fa-circle"></i> Xác thực thông tin </div></a>
+                            <hr style="margin:5px 0" />
+                        }
+                        <a class="dropdown-item" href="/Account/AccountInformation">Thông tin cá nhân</a>
+                        <a class="dropdown-item" href="/Account/ChangeAccount">Đổi mật khẩu</a>
+                        <a class="dropdown-item" href="/Home/UserQuestionListView">Câu hỏi người dùng</a>
+                        <a class="dropdown-item" href="/Home/ServiceOrderHistory">Lịch sử đặt dịch vụ</a>
+                        <a class="dropdown-item" href="/Account/Logout">Đăng xuất</a>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="auth-buttons menu-vertical">
+                    <button onclick="window.location.href = '/Account/Login'" class="sign-in">Đăng nhập</button>
+                    <button onclick="window.location.href = '/Account/Register'" class="register">Đăng ký</button>
+                </div>
+            }
+            <div onclick="showListMenu()" class="icon-list-menu">
+                <i class="fas fa-list-ul"></i>
+            </div>
+        </nav>
+        <div class="@ViewData["HiddenBanner"] hero d-none">
+            <h1>Bạn đang cần tìm người lắng nghe bản thân mình</h1>
+            <button onclick="window.location.href='/Home/ServiceView'" class="cta-button">Đặt lịch ngay</button>
+        </div>
+        <div class="menu-horizontal-hidden menu-horizontal menu-horizontal-cls">
+            <i id="hide-menu" onclick="hideListMenu()" class="d-none fas fa-times"></i>
+            <ul id="nav-links-1" class="menu-horizontal-cls d-none menu-horizontal-hidden nav-links">
+                <li><a href="/" id="home-cls-2">Trang chủ</a></li>
+                <li><a href="/Home/AboutUs" id="aboutUs-cls-2">Giới thiệu</a></li>
+                <li><a href="/Home/Sharing" id="shared-cls-2">Góc chia sẻ</a></li>
+                <li><a href="/Home/ServiceView" id="serviceview-cls-2">Dịch vụ</a></li>
+                <li id="li-5"><a href="/Home/UserQuestion" id="feedback-cls-2">Chính sách khách hàng</a></li>
+            </ul>
+            @if (User.Identity.IsAuthenticated)
+            {
+                <div class="dropdown menu-horizontal-btn menu-horizontal-cls menu-horizontal-hidden">
+                    <button class="btn dropdown-toggle" type="button" data-toggle="dropdown" aria-expanded="false">
+                        @User.Identity.Name
+                    </button>
+                    <div style="left:-5rem" class="dropdown-menu">
+                        <a class="dropdown-item" href="/Account/AccountInformation">Thông tin cá nhân</a>
+                        <a class="dropdown-item" href="/Home/UserQuestionListView">Câu hỏi người dùng</a>
+                        <a class="dropdown-item" href="/Home/ServiceOrderHistory">Lịch sử đặt dịch vụ</a>
+                        <a class="dropdown-item" href="/Account/Logout">Đăng xuất</a>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="auth-buttons menu-horizontal-btn menu-horizontal-cls menu-horizontal-hidden">
+                    <button onclick="window.location.href = '/Account/Login'" class="sign-in">Đăng nhập</button>
+                    <button onclick="window.location.href = '/Account/Register'" class="register">Đăng ký</button>
+                </div>
+            }
+        </div>
+    </header>
+    @RenderBody()
+    <footer class="d-none">
+        <div class="footer-content">
+            <div style="cursor:pointer" onclick="window.location.href='https://www.facebook.com/profile.php?id=61566101507963&mibextid=ZbWKwL'" class=" footer-logo">
+                <img src="~/images/layoutHome/facebook.png" alt="Facebook Logo" />
+            </div>
+            <ul class="footer-links-1 footer-links mb-5">
+                <li><a href="/" id="home-cls-1">Trang chủ</a></li>
+                <li><a href="/Home/AboutUs" id="aboutUs-cls-1">Giới thiệu</a></li>
+                <li><a href="/Home/Sharing" id="shared-cls-1">Góc chia sẻ</a></li>
+                <li><a href="/Home/ServiceView" id="serviceview-cls-1">Dịch vụ</a></li>
+                <li><a href="/Home/UserQuestion" id="feedback-cls-1">Chính sách khách hàng</a></li>
+            </ul>
+            <div class="contact-info">
+                <p>Địa chỉ liên hệ: Hà Nội, Việt Nam</p>
+                <p>SĐT: 035 741 1874</p>
+                <p>Website: <a href="http://lweys.online/">lweys.online</a></p>
+            </div>
+        </div>
+    </footer>
+    <script src="~/lib/jquery/dist/jquery.js" asp-append-version="true"></script>
+    <script src="~/js/popper.js" asp-append-version="true"></script>
+    <script src="~/js/bootstrap.min.js" asp-append-version="true"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr" asp-append-version="true"></script>
+    <script type="text/javascript">
+        //showListMenu();
+        $(window).on("resize", function () {
+            // console.log(screen.width)
+            if (screen.width > 950) {
+                hideListMenu();
+            }
+        });
+
+
+        ActiveNav();
+        function ActiveNav() {
+            var ul = document.getElementById("nav-links");
+            var items = ul.getElementsByTagName("a");
+            for (var i = 0; i < items.length; ++i) {
+                if (items[i].classList.contains('active')) {
+                    document.getElementById(`${items[i].id}-1`).classList.add("active");
+                    document.getElementById(`${items[i].id}-2`).classList.add("active");
+                }
+            }
+        }
+
+        flatpickr("#datetimepicker", {
+            static: true,
+            enableTime: true,
+            dateFormat: "Y-m-d H:i",
+            monthSelectorType: "static",
+            minDate: "today",
+            time_24hr: true,
+            minuteIncrement: 30,
+            defaultDate: "today",
+            inline: true
+
+        });
+
+        function sendQuestion() {
+            let val = document.getElementById('question-id').value;
+            window.location.href = "/Home/UserQuestion?message=" + val;
+        }
+
+        function showListMenu() {
+            $(".menu-horizontal-cls").each(function () {
+                $(this).removeClass('menu-horizontal-hidden');
+            });
+            $("#hide-menu").removeClass("d-none");
+        }
+
+        function hideListMenu() {
+            $("#hide-menu").addClass("d-none");
+            $(".menu-horizontal-cls").each(function () {
+                $(this).addClass('menu-horizontal-hidden');
+            });
+
+        }
+
+    </script>
+    @await Component.InvokeAsync("Notyf")
+    @RenderSection("Scripts", required: false)
+</body>
+</html>

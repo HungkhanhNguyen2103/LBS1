@@ -1,0 +1,57 @@
+﻿@{
+	var jwtToken = ViewContext.HttpContext.Request.Cookies["token"];
+	if (string.IsNullOrEmpty(jwtToken) && User.Identity.IsAuthenticated)
+	{
+		ViewContext.HttpContext.Response.Redirect("/Account/Logout");
+	}
+	else if (!string.IsNullOrEmpty(jwtToken) && !User.Identity.IsAuthenticated)
+	{
+		ViewContext.HttpContext.Response.Redirect("/Account/VerifyToken");
+	}
+	else if (User.Identity.IsAuthenticated && string.IsNullOrEmpty(jwtToken))
+	{
+		if (User.FindFirst("ResetPassword").Value == "1")
+		{
+			ViewContext.HttpContext.Response.Redirect("/Account/ChangeAccount");
+		}
+	}
+}
+<!doctype html>
+<html lang="en">
+<head>
+	<title>LBS Management</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet">
+
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+
+	<link rel="stylesheet" href="~/css/style.css" asp-append-version="true">
+	<link rel="icon" type="image/png" href="~/images/layoutHome/logo.png" asp-append-version="true">
+
+</head>
+<body class="img js-fullheight">
+	<div class="background-image"></div>
+	<section class="ftco-section">
+		<div class="container container1">
+			<div class="d-none row justify-content-center">
+				<div class="col-md-6 text-center mb-5">
+					@* <h2 class="heading-section">LWEYS</h2> *@
+				</div>
+			</div>
+			@RenderBody()
+		</div>
+	</section>
+	<script src="~/lib/jquery/dist/jquery.min.js"></script>
+	<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+	<script src="~/js/site.js" asp-append-version="true"></script>
+	<script src="~/js/popper.js" asp-append-version="true"></script>
+	<script src="~/js/main.js" asp-append-version="true"></script>
+	@await Component.InvokeAsync("Notyf")
+	@RenderSection("Scripts", required: false)
+</body>
+</html>
+
