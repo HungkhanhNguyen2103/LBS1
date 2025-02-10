@@ -1,0 +1,178 @@
+﻿@using Repositories
+@using Microsoft.Extensions.Configuration
+@{
+    var claims = User;
+    var jwtToken = ViewContext.HttpContext.Request.Cookies["token"];
+    if(string.IsNullOrEmpty(jwtToken) && User.Identity.IsAuthenticated)
+    {
+        ViewContext.HttpContext.Response.Redirect("/Account/Logout");
+    }
+}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>
+        @ViewData["Title"]
+    </title>
+    <!--     Fonts and icons     -->
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700,900|Roboto+Slab:400,700" asp-append-version="true" />
+    <!-- Nucleo Icons -->
+    <link href="~/css/nucleo-icons.css" rel="stylesheet" asp-append-version="true" />
+    <!-- Font Awesome Icons -->
+    <script src="https://kit.fontawesome.com/42d5adcbca.js" asp-append-version="true" crossorigin="anonymous"></script>
+    <!-- Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+    <!-- CSS Files -->
+    <link href="https://cdn.datatables.net/2.1.8/css/dataTables.dataTables.min.css" asp-append-version="true" rel="stylesheet" />
+    <link id="pagestyle" href="~/css/material-dashboard.css?v=3.1.0" asp-append-version="true" rel="stylesheet" />
+    <link rel="icon" type="image/png" href="~/images/layoutHome/logo.png" asp-append-version="true">
+</head>
+
+<body class="g-sidenav-show  bg-gray-200">
+    <aside class="sidenav navbar navbar-vertical navbar-expand-xs border-0 border-radius-xl my-3 fixed-start ms-3   bg-gradient-dark" id="sidenav-main">
+        <div class="sidenav-header">
+            <i class="fas fa-times p-3 cursor-pointer text-white opacity-5 position-absolute end-0 top-0 d-none d-xl-none" aria-hidden="true" id="iconSidenav"></i>
+            <a class="navbar-brand m-0" href="/Admin">
+                <img src="~/images/layoutHome/logo.png" class="navbar-brand-img h-100" alt="main_logo">
+                <span class="ms-1 font-weight-bold text-white">LBS</span>
+            </a>
+        </div>
+        <hr class="horizontal light mt-0 mb-2">
+        @if(claims != null)
+        {
+            <div class="collapse navbar-collapse  w-auto " id="sidenav-collapse-main">
+                <ul class="navbar-nav">
+                    @if (claims.IsInRole("Admin"))
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link text-white " id="DashboardId" href="/Admin">
+                                <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
+                                    <i class="material-icons opacity-10">dashboard</i>
+                                </div>
+                                <span class="nav-link-text ms-1">Trang chủ</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-white" id="ListPostCategoryId" href="/Admin/ListPostCategory">
+                                <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
+                                    <i class="material-icons opacity-10">table_view</i>
+                                </div>
+                                <span class="nav-link-text ms-1">Thể loại bài viết</span>
+                            </a>
+                        </li>
+                    }
+                    @if (claims.IsInRole("Staff") || claims.IsInRole("Admin"))
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link text-white" id="ListPostId" href="/Admin/ListPost">
+                                <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
+                                    <i class="material-icons opacity-10">table_view</i>
+                                </div>
+                                <span class="nav-link-text ms-1">Bài viết</span>
+                            </a>
+                        </li>
+                    }
+                    @if (claims.IsInRole("Admin"))
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link text-white" id="ListServiceId" href="/Admin/ListService">
+                                <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
+                                    <i class="material-icons opacity-10">table_view</i>
+                                </div>
+                                <span class="nav-link-text ms-1">Gói dịch vụ</span>
+                            </a>
+                        </li>
+                    }
+                    @if (claims.IsInRole("Admin") || claims.IsInRole("Staff"))
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link text-white" id="ListServiceOrderId" href="/Admin/ListServiceOrder">
+                                <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
+                                    <i class="material-icons opacity-10">table_view</i>
+                                </div>
+                                <span class="nav-link-text ms-1">Đặt Dịch vụ</span>
+                            </a>
+                        </li>
+                    }
+                    @if (claims.IsInRole("Staff") || claims.IsInRole("Admin"))
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link text-white" id="ListFeedbackId" href="/Admin/ListFeedback">
+                                <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
+                                    <i class="material-icons opacity-10">table_view</i>
+                                </div>
+                                <span class="nav-link-text ms-1">Đánh giá</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-white" id="QuestionViewId" href="/Admin/UserQuestionView">
+                                <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
+                                    <i class="material-icons opacity-10">table_view</i>
+                                </div>
+                                <span class="nav-link-text ms-1">Câu hỏi người dùng</span>
+                            </a>
+                        </li>
+                    }
+                    @if (claims.IsInRole("Admin"))
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link text-white" id="AccountViewId" href="/Admin/ListAccountView">
+                                <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
+                                    <i class="material-icons opacity-10">table_view</i>
+                                </div>
+                                <span class="nav-link-text ms-1">Quản lý người dùng</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-white" id="AboutUsId" href="/Admin/AboutUs">
+                                <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
+                                    <i class="material-icons opacity-10">receipt_long</i>
+                                </div>
+                                <span class="nav-link-text ms-1">Về chúng tôi</span>
+                            </a>
+                        </li>
+                    }
+                </ul>
+            </div>
+        }
+    </aside>
+    <main class="main-content position-relative max-height-vh-100 h-100 border-radius-lg ">
+        <!-- Navbar -->
+        <nav class="navbar navbar-main navbar-expand-lg px-0 mx-4 shadow-none border-radius-xl" id="navbarBlur" data-scroll="true">
+            <div class="container-fluid py-1 px-3">
+                <div class="collapse navbar-collapse mt-sm-0 mt-2 me-md-0 me-sm-4" id="navbar">
+                    <div class="ms-md-auto pe-md-3 d-flex align-items-center">
+                        <div style="display:none" class="input-group input-group-outline">
+                            <label class="form-label">Type here...</label>
+                            <input type="text" class="form-control">
+                        </div>
+                    </div>
+                    <div class="dropdown">
+                        <button class="btn dropdown-toggle" type="button" data-toggle="dropdown" aria-expanded="false">
+                            <i class="fa fa-user me-sm-1"></i> @User.Identity.Name
+                        </button>
+                        <div class="dropdown-menu">
+                            <a class="dropdown-item" href="/Account/AccountInformation">Thông tin cá nhân</a>
+                            <a class="dropdown-item" href="/Account/ChangeAccount">Đổi mật khẩu</a>
+                            <a class="dropdown-item" href="/Account/Logout">Đăng xuất</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+        <!-- End Navbar -->
+        <div class="container-fluid py-4">
+              @RenderBody()
+        </div>
+    </main>
+    <script src="~/lib/jquery/dist/jquery.js" asp-append-version="true"></script>
+    <script src="~/js/popper.js" asp-append-version="true"></script>
+    <script src="~/js/bootstrap.min.js" asp-append-version="true"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await Component.InvokeAsync("Notyf")
+    @RenderSection("Scripts", required: false)
+</body>
+</html>

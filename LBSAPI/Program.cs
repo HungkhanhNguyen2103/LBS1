@@ -3,15 +3,22 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Repositories.Repository;
 using Repositories;
+using Repositories.IRepository;
 
 var builder = WebApplication.CreateBuilder(args);
 
+
+var mongoSettings = builder.Configuration.GetSection("MongoSettings").Get<MongoSettings>();
+
+builder.Services.AddSingleton<LBSMongoDBContext>(sp =>
+    new LBSMongoDBContext(mongoSettings.ConnectionString, mongoSettings.DatabaseName));
 
 builder.Services.AddDbContext<LBSDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("LBSConnection")));
 
 
 builder.Services.AddSingleton<EmailSender, EmailSender>();
 builder.Services.AddScoped<IAccountRepository, AccountRepository>();
+builder.Services.AddScoped<IBookRepository, BookRepository>();
 
 // For Identity
 builder.Services.AddIdentity<Account, IdentityRole>()

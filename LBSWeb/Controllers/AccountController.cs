@@ -194,6 +194,7 @@ namespace LBSWeb.Controllers
         public async Task<IActionResult> Login(AccountModel account)
         {
             var res = await _accountService.Login(account);
+
             if (!res.IsSussess) _notyf.Error(res.Message);
             else
             {

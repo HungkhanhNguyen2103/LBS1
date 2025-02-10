@@ -15,18 +15,21 @@ namespace BusinessObject
 
             // Config Identity
             builder.Entity<Account>().ToTable("Account").HasKey(x => x.Id);
-            //builder.Entity<Post>().ToTable("Post").HasKey(x => x.Id);
-            //builder.Entity<PostCategory>().ToTable("PostCategory").HasKey(x => x.Id);
-            //builder.Entity<AboutUs>().ToTable("AboutUs").HasKey(x => x.Id);
-            //builder.Entity<Service>().ToTable("Service").HasKey(x => x.Id);
-            //builder.Entity<ServiceOrder>().ToTable("ServiceOrder").HasKey(x => x.Id);
-            //builder.Entity<ServiceOrderHistory>().ToTable("ServiceOrderHistory").HasKey(x => x.Id);
-            //builder.Entity<UserQuestion>().ToTable("UserQuestion").HasKey(x => x.Id);
-            //builder.Entity<Feedbacks>().ToTable("Feedbacks").HasKey(x => x.Id);
             builder.Entity<TemplateEmail>().ToTable("TemplateEmail").HasKey(x => x.Id);
-
+            builder.Entity<Book>().ToTable("Book").HasKey(x => x.Id);
+            builder.Entity<UserBook>().ToTable("UserBook").HasKey(x => x.Id);
+            builder.Entity<UserTranscation>().ToTable("UserTranscation").HasKey(x => x.Id);
+            builder.Entity<UserTranscationBook>().ToTable("UserTranscationBook").HasKey(x => x.Id);
+            builder.Entity<Category>().ToTable("Category").HasKey(x => x.Id);
+            builder.Entity<Comment>().ToTable("Comment").HasKey(x => x.Id);
         }
 
         public virtual DbSet<TemplateEmail> TemplateEmails { get; set; }
+        public virtual DbSet<Book> Books { get; set; }
+        public virtual DbSet<UserBook> UserBooks { get; set; }
+        public virtual DbSet<UserTranscation> UserTranscations { get; set; }
+        public virtual DbSet<UserTranscationBook> UserTranscationBooks { get; set; }
+        public virtual DbSet<Category> Categories { get; set; }
+        public virtual DbSet<Comment> Comments { get; set; }
     }
 }
