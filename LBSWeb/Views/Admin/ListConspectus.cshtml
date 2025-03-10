@@ -1,0 +1,104 @@
+﻿@{
+    Layout = "~/Views/Admin/_AdminLayout.cshtml";
+}
+@model Conspectus
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Xsrf
+@functions {
+    public string GetAntiXsrfRequestToken()
+    {
+        return Xsrf.GetAndStoreTokens(Context).RequestToken;
+    }
+}
+<style>
+    .btn1 {
+        height: 30px;
+        width: 30px;
+        padding: 0;
+        margin: 0;
+    }
+</style>
+<a href="/Admin/CreateConspectus" class="btn btn-success">
+    Tạo mới
+</a>
+<div class="row">
+    <div class="col-12">
+        <div class="card my-4">
+            <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
+                <div class="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3">
+                    <h6 class="text-white text-capitalize ps-3">Danh sách đại cương</h6>
+                </div>
+            </div>
+            <div class="card-body px-0 pb-2">
+                <div class="table-responsive p-0">
+                    <table class="table align-items-center mb-0">
+                        <thead>
+                            <tr>
+                                <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Đại cương</th>
+                                <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Nội dung</th>
+                                <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Cập nhật</th>
+                                <th class="text-secondary opacity-7"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (Conspectus item in ViewBag.Conspectuses)
+                            {
+                                <tr>
+                                    <td>
+                                        <p class="mx-3 text-xs font-weight-bold mb-0">@item.Name</p>
+                                    </td>
+                                    <td>
+                                        <p class="mx-3 text-xs font-weight-bold mb-0">@(item.Content.Length > 50 ? item.Content.Substring(0, 50) + "..." : item.Content)</p>
+                                    </td>
+                                    <td>
+                                        <p class="mx-3 text-xs font-weight-bold mb-0">@item.ModifyDate.ToString("HH:mm dd/MM/yyyy")</p>
+                                    </td>
+                                    <td class="align-middle">
+                                        <button onclick="window.location.href='/Admin/ConspectusDetail/@item.Id'" title="Sửa" class="btn1 btn btn-secondary">
+                                            <i class="fa-solid fa-pen-to-square"></i>
+                                        </button>
+                                        <button onclick="deleteItem(@item.Id)" title="Xóa" class="btn1 btn btn-secondary">
+                                            <i class="fa-solid fa-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    document.getElementById('ListConspectusId').classList.add('active');
+    function deleteItem(id) {
+        if (confirm("Bạn có muốn xóa ?") == false) return;
+        //var formData = new FormData();
+        $.ajax(
+            {
+                url: `/Admin/DeleteConspectus/${id}`,
+                type: "GET",
+                headers:
+                {
+                    "RequestVerificationToken": '@GetAntiXsrfRequestToken()'
+                },
+                async: true,
+                processData: false,
+                contentType: false,
+                success: function (data) {
+                    if (data.IsSussess == false) {
+                        notyf.error(data.message);
+                        return;
+                    }
+                    notyf.success(data.message);
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 800);
+
+                }
+            }
+        );
+
+    }
+</script>

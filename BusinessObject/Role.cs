@@ -12,7 +12,8 @@ namespace BusinessObject
         public const string Staff = "Staff";
         public const string User = "User";
         public const string Manager = "Manager";
+        public const string Author = "Author";
 
-        public static List<string> ListRoles = new List<string>() { Admin, Staff, User, Manager };
+        public static List<string> ListRoles = new List<string>() { Admin, Staff, User, Manager, Author };
     }
 }

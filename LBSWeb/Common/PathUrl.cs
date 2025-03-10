@@ -16,6 +16,35 @@
         public static string ACCOUNT_RE_CONFIRM_EMAIL = "api/Account/ReConfirmEmail";
         public static string ACCOUNT_LOGIN_WITH_GOOGLE = "api/Account/LoginWithGoogle";
 
+        //Book
+        public static string CATEGORY_GET_ALL = "api/Book/GetCategories";
+        public static string CATEGORY_UPDATE = "api/Book/UpdateCategory";
+        public static string CATEGORY_DELETE = "api/Book/DeleteCategory";
+        public static string BOOK_DELETE_CHAPTER = "api/Book/DeleteChapterBook";
+        public static string BOOK_GET = "api/Book/GetBook";
+        public static string BOOK_CREATE = "api/Book/CreateBook";
+        public static string BOOK_UPDATE = "api/Book/UpdateBook";
+        public static string BOOK_UPDATE_CHAPTER = "api/Book/UpdateBookChapter";
+        public static string BOOK_GET_BY_USER = "api/Book/GetAllBookByUser";
+        public static string BOOK_CREATE_CHAPTER = "api/Book/CreateBookChapter";
+        public static string BOOK_GET_CHAPTER = "api/Book/GetListBookChapter";
+        public static string BOOK_GET_BOOK_CHAPTER = "api/Book/GetBookChapter";
+        public static string BOOK_GENERATE_SUMMARY_CHAPTER = "api/Book/GenerateSummary";
+        public static string BOOK_GENERATE_POSTER_CHAPTER = "api/Book/GeneratePoster";
+        public static string BOOK_GET_DRAFT = "api/Book/GetDrafts";
+
+        //Report
+        public static string REPORT_SHORT = "api/Account/ShortReport";
+
+        //Information
+        public static string INFO_LIST_BASICKNOWLEDGE = "api/Information/BasicKnowledge";
+        public static string INFO_DETAIL_BASICKNOWLEDGE = "api/Information/KnowledgeDetail";
+        public static string INFO_LIST_NOTIFICATION = "api/Information/ListNotification";
+        public static string INFO_DETAIL_NOTIFICATION = "api/Information/NotificationDetail";
+        public static string INFO_LIST_CONSPECTUS = "api/Information/ListConspectus";
+        public static string INFO_UPDATE_CONSPECTUS = "api/Information/UpdateConspectus";
+        public static string INFO_DETAIL_CONSPECTUS = "api/Information/ConspectusDetail";
+        public static string INFO_DELETE_CONSPECTUS = "api/Information/DeleteConspectus";
     }
 
 }

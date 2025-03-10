@@ -15,12 +15,14 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>
-        @ViewData["Title"]
+        LBS 
+        @* @ViewData["Title"] *@
     </title>
     <!--     Fonts and icons     -->
     <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700,900|Roboto+Slab:400,700" asp-append-version="true" />
     <!-- Nucleo Icons -->
     <link href="~/css/nucleo-icons.css" rel="stylesheet" asp-append-version="true" />
+    <link href="~/css/site.css" rel="stylesheet" asp-append-version="true" />
     <!-- Font Awesome Icons -->
     <script src="https://kit.fontawesome.com/42d5adcbca.js" asp-append-version="true" crossorigin="anonymous"></script>
     <!-- Material Icons -->
@@ -29,9 +31,17 @@
     <link href="https://cdn.datatables.net/2.1.8/css/dataTables.dataTables.min.css" asp-append-version="true" rel="stylesheet" />
     <link id="pagestyle" href="~/css/material-dashboard.css?v=3.1.0" asp-append-version="true" rel="stylesheet" />
     <link rel="icon" type="image/png" href="~/images/layoutHome/logo.png" asp-append-version="true">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" asp-append-version="true" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet" asp-append-version="true" />
 </head>
 
 <body class="g-sidenav-show  bg-gray-200">
+    <style>
+        .navbar-vertical.navbar-expand-xs .navbar-nav .nav-link {
+            padding-top: 0.5rem !important;
+            padding-bottom: 0.5rem !important;
+        }
+    </style>
     <aside class="sidenav navbar navbar-vertical navbar-expand-xs border-0 border-radius-xl my-3 fixed-start ms-3   bg-gradient-dark" id="sidenav-main">
         <div class="sidenav-header">
             <i class="fas fa-times p-3 cursor-pointer text-white opacity-5 position-absolute end-0 top-0 d-none d-xl-none" aria-hidden="true" id="iconSidenav"></i>
@@ -45,93 +55,131 @@
         {
             <div class="collapse navbar-collapse  w-auto " id="sidenav-collapse-main">
                 <ul class="navbar-nav">
-                    @if (claims.IsInRole("Admin"))
+                    @if (claims.IsInRole("Admin") || claims.IsInRole("Author"))
+                    {
+                        <li class="nav-item ml-2" style="padding-left:1.5rem;margin-bottom:0.2rem;margin-top:0.2rem;font-size: 14px;font-weight:bold">
+                            <small class="text-secondary">TRUYỆN CỦA TÔI</small>
+                        </li>
+                    }
+                    @if (claims.IsInRole("Admin") || claims.IsInRole("Manager"))
                     {
                         <li class="nav-item">
-                            <a class="nav-link text-white " id="DashboardId" href="/Admin">
+                            <a class="nav-link text-white" id="ListPostCategoryId" href="/Admin/ListCategories">
                                 <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
-                                    <i class="material-icons opacity-10">dashboard</i>
+                                    <i class="material-icons opacity-10">category</i>
                                 </div>
-                                <span class="nav-link-text ms-1">Trang chủ</span>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-white" id="ListPostCategoryId" href="/Admin/ListPostCategory">
-                                <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
-                                    <i class="material-icons opacity-10">table_view</i>
-                                </div>
-                                <span class="nav-link-text ms-1">Thể loại bài viết</span>
+                                <span class="nav-link-text ms-1">Thể loại</span>
                             </a>
                         </li>
                     }
-                    @if (claims.IsInRole("Staff") || claims.IsInRole("Admin"))
+                    @if (claims.IsInRole("Author") || claims.IsInRole("Admin") || claims.IsInRole("Manager"))
                     {
                         <li class="nav-item">
-                            <a class="nav-link text-white" id="ListPostId" href="/Admin/ListPost">
+                            <a class="nav-link text-white" id="BooksId" href="/Admin/Books">
                                 <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
-                                    <i class="material-icons opacity-10">table_view</i>
+                                    <i class="material-icons opacity-10">library_books</i>
                                 </div>
-                                <span class="nav-link-text ms-1">Bài viết</span>
+                                <span class="nav-link-text ms-1">Đã đăng</span>
+                            </a>
+                        </li>
+                        @if (claims.IsInRole("Author") || claims.IsInRole("Admin"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-white" id="CreatBookId" href="/Admin/CreateBook">
+                                    <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
+                                        <i class="material-icons opacity-10">upload_file</i>
+                                    </div>
+                                    <span class="nav-link-text ms-1">Thêm mới</span>
+                                </a>
+                            </li>
+                        }
+                        <li class="nav-item">
+                            <a class="nav-link text-white" id="BooksId" href="/Admin/Books">
+                                <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
+                                    <i class="material-icons opacity-10">pie_chart</i>
+                                </div>
+                                <span class="nav-link-text ms-1">Thống kê</span>
+                            </a>
+                        </li>
+
+                    }
+                    @if (claims.IsInRole("Admin") || claims.IsInRole("Author"))
+                    {
+                        <li class="nav-item ml-2" style="padding-left:1.5rem;margin-bottom:0.2rem;margin-top:0.2rem;font-size: 14px;font-weight:bold">
+                            <small class="text-secondary text-uppercase">Báo cáo & hỗ trợ</small>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-white">
+                                <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
+                                    <i class="material-icons opacity-10">pest_control</i>
+                                </div>
+                                <span class="nav-link-text ms-1">Xử lý báo cáo</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-white" id="UserReport2Id" href="/Admin/UserReport">
+                                <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
+                                    <i class="material-icons opacity-10">support</i>
+                                </div>
+                                <span class="nav-link-text ms-1">Yêu cầu hỗ trợ</span>
                             </a>
                         </li>
                     }
-                    @if (claims.IsInRole("Admin"))
+
+                    @if (claims.IsInRole("Admin") || claims.IsInRole("Author"))
                     {
-                        <li class="nav-item">
-                            <a class="nav-link text-white" id="ListServiceId" href="/Admin/ListService">
-                                <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
-                                    <i class="material-icons opacity-10">table_view</i>
-                                </div>
-                                <span class="nav-link-text ms-1">Gói dịch vụ</span>
-                            </a>
+                        <li class="nav-item ml-2" style="padding-left:1.5rem;margin-bottom:0.2rem;margin-top:0.2rem;font-size: 14px;font-weight:bold">
+                            <small class="text-secondary text-uppercase">Tư liệu</small>
                         </li>
-                    }
-                    @if (claims.IsInRole("Admin") || claims.IsInRole("Staff"))
-                    {
                         <li class="nav-item">
-                            <a class="nav-link text-white" id="ListServiceOrderId" href="/Admin/ListServiceOrder">
+                            <a class="nav-link text-white" id="DraftListId" href="/Admin/Drafts">
                                 <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
-                                    <i class="material-icons opacity-10">table_view</i>
+                                    <i class="material-icons opacity-10">edit_note</i>
                                 </div>
-                                <span class="nav-link-text ms-1">Đặt Dịch vụ</span>
-                            </a>
-                        </li>
-                    }
-                    @if (claims.IsInRole("Staff") || claims.IsInRole("Admin"))
-                    {
-                        <li class="nav-item">
-                            <a class="nav-link text-white" id="ListFeedbackId" href="/Admin/ListFeedback">
-                                <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
-                                    <i class="material-icons opacity-10">table_view</i>
-                                </div>
-                                <span class="nav-link-text ms-1">Đánh giá</span>
+                                <span class="nav-link-text ms-1">Bản thảo</span>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-white" id="QuestionViewId" href="/Admin/UserQuestionView">
-                                <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
-                                    <i class="material-icons opacity-10">table_view</i>
-                                </div>
-                                <span class="nav-link-text ms-1">Câu hỏi người dùng</span>
-                            </a>
-                        </li>
-                    }
-                    @if (claims.IsInRole("Admin"))
-                    {
-                        <li class="nav-item">
-                            <a class="nav-link text-white" id="AccountViewId" href="/Admin/ListAccountView">
-                                <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
-                                    <i class="material-icons opacity-10">table_view</i>
-                                </div>
-                                <span class="nav-link-text ms-1">Quản lý người dùng</span>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-white" id="AboutUsId" href="/Admin/AboutUs">
+                            <a class="nav-link text-white" id="ListConspectusId" href="/Admin/ListConspectus">
                                 <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
                                     <i class="material-icons opacity-10">receipt_long</i>
                                 </div>
-                                <span class="nav-link-text ms-1">Về chúng tôi</span>
+                                <span class="nav-link-text ms-1">Đại cương</span>
+                            </a>
+                        </li>
+                    }
+
+                    @if (claims.IsInRole("Admin") || claims.IsInRole("Author"))
+                    {
+                        <li class="nav-item ml-2" style="padding-left:1.5rem;margin-bottom:0.2rem;margin-top:0.2rem;font-size: 14px;font-weight:bold">
+                            <small class="text-secondary text-uppercase">Thông tin</small>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-white" id="BasicKnowledgeId" href="/Admin/BasicKnowledge">
+                                <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
+                                    <i class="material-icons opacity-10">live_help</i>
+                                </div>
+                                <span class="nav-link-text ms-1">Kiến thức cơ bản</span>
+                            </a>
+                        </li>
+@*                         <li class="nav-item">
+                            <a class="nav-link text-white" id="DraftListId" href="/Admin/Drafts">
+                                <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
+                                    <i class="material-icons opacity-10">receipt_long</i>
+                                </div>
+                                <span class="nav-link-text ms-1">Các danh hiệu</span>
+                            </a>
+                        </li> *@
+                    }
+
+                    @if (claims.IsInRole("Admin") || claims.IsInRole("Manager"))
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link text-white" id="ListPostCategoryId" href="/Admin/ListCategories">
+                                <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
+                                    <i class="material-icons opacity-10">forum</i>
+                                </div>
+                                <span class="nav-link-text ms-1">Đoạn chat</span>
                             </a>
                         </li>
                     }

@@ -1,0 +1,52 @@
+﻿@{
+    Layout = "~/Views/Admin/_AdminLayout.cshtml";
+}
+@model BasicKnowledge
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Xsrf
+@functions {
+    public string GetAntiXsrfRequestToken()
+    {
+        return Xsrf.GetAndStoreTokens(Context).RequestToken;
+    }
+}
+<style>
+    .btn1 {
+        height: 30px;
+        width: 30px;
+        padding: 0;
+        margin: 0;
+    }
+
+    .title{
+        margin-left:2rem;
+    }
+</style>
+@* <button type="button" onclick="document.getElementById('formModal').reset();" class="btn btn-success" data-toggle="modal" data-target="#exampleModalPost">
+    Tạo mới
+</button> *@
+<div class="row">
+    <div class="col-12">
+        <div class="card my-4">
+            <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
+                <div class="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3">
+                    <h6 class="text-white text-capitalize ps-3"></h6>
+                </div>
+            </div>
+            <div class="card-body px-0 pb-2">
+                <div class="table-responsive p-0">
+                      <h3 class="title">@Model.Title</h3>
+                    <p class="title">
+                          @Model.Content
+                      </p>
+                      <div style="text-align:center">
+                        <button type="button" onclick="window.location.href='/Admin/BasicKnowledge'" class="btn btn-secondary mt-4">Quay lại</button>
+                      </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script type="text/javascript">
+    document.getElementById('BasicKnowledgeId').classList.add('active');
+</script>

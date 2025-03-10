@@ -9,8 +9,8 @@ namespace BusinessObject.BaseModel
     public class ReportModel
     {
         public int TotalAccount { get; set; }
-        public int TotalService { get; set; }
-        public int TotalServiceBooking { get; set; }
-        public int TotalMoney { get; set; }
+        public int TotalCategory { get; set; }
+        public int TotalBookPending { get; set; }
+        public int TotalBookPublish { get; set; }
     }
 }

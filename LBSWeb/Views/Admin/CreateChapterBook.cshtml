@@ -1,0 +1,186 @@
+﻿@{
+    Layout = "~/Views/Admin/_AdminLayout.cshtml";
+}
+@model BookChapter
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Xsrf
+@functions {
+    public string GetAntiXsrfRequestToken()
+    {
+        return Xsrf.GetAndStoreTokens(Context).RequestToken;
+    }
+}
+@* <button type="button" onclick="document.getElementById('formModal').reset();" class="btn btn-success" data-toggle="modal" data-target="#exampleModalPost">
+    Tạo mới
+</button> *@
+<style>
+    .form-control {
+        margin-left: 0px !important;
+    }
+
+    #loadingSumary{
+        position:absolute;
+        top: 50%;
+        right:50%;
+    }
+
+    .ql-snow{
+        margin-left: 0px !important;
+        border-radius: 0.375rem !important;
+    }
+
+</style>
+<div class="row">
+    <form method="post" id="formBody" asp-action="CreateChapterBook">
+        <div class="col-12">
+            <div class="card my-4">
+                <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
+                    <div class="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3">
+                        <h6 class="text-white text-capitalize ps-3">Thêm chương</h6>
+                        <span class="ps-3 text-white" style="font-size:12px">@ViewBag.BookName</span>
+                    </div>
+                </div>
+                <div class="card-body px-0 pb-2">
+                    <div class="m-4 mt-0 p-0 row">
+                        <div class="form-group input-group input-group-outline col-6 p-0">
+                            <label>Loại</label>
+                            <select style="width:100%" asp-for="Type" onchange="changeType()" class="form-control">
+                                <option value="1">Đăng thường</option>
+                                <option value="2">Chèn chương</option>
+                                <option class="d-none" value="3">Lưu bản thảo</option>
+                            </select>
+                        </div>
+                        <div class="form-group input-group input-group-outline mt-4 col-6 p-0">
+                            <label for="Name">STT bắt đầu: <span id="StartChapterIdText">@ViewBag.StartChapterId</span></label>
+                            <input value="@ViewBag.StartChapterId" hidden style="width:100%" type="number" asp-for="ChaperId" class="form-control">
+                        </div>
+                    </div>
+
+                    <div class="table-responsive p-0 m-4 mt-0">
+                        <input style="width:100%" type="number" asp-for="BookId" value="@ViewBag.BookId" class="form-control" hidden>
+                        <div style="display:block" class="form-group input-group input-group-outline mt-0">
+                            <label for="Name">Tên chương</label>
+                            <input style="width:100%" type="text" asp-for="ChapterName" class="form-control" autofocus>
+                        </div>
+                        <div style="display:block" class="input-group input-group-outline mt-4">
+                            <label for="Content">Nội dung chương</label>
+                            @* <div id="editorContent" style="height:20rem"></div> *@
+                            <textarea oninput="getWordNo()" style="width:100%" asp-for="Content" type="text" class="form-control" rows="8"></textarea>
+                            <label>Số từ: <span id="wordNoCount">0</span></label>
+                            <input type="number" hidden asp-for="WordNo" />
+                        </div>
+                        <div class="d-flex ml-0">
+                            <button type="button" onclick="GenerateSummary()" class="btn btn-success mt-4">Tạo tóm tắt bằng AI</button>
+                        </div>
+
+                        <div style="position:relative">
+                            <div style="display:block" class="input-group input-group-outline mt-4">
+                                <label for="Summary">Tóm tắt chương</label>
+                                <textarea style="width:100%" asp-for="Summary" type="text" class=" form-control" rows="8"></textarea>
+                            </div>
+                            <div id="loadingSumary" class="loader"></div>
+                        </div>
+
+                        <div style="display:block" class="form-group input-group input-group-outline mt-4">
+                            <label for="Name">Thu phí</label>
+                            <input style="width:100%" type="number" disabled asp-for="Price" class="form-control">
+                        </div>
+                        <button type="submit" class="btn btn-success mt-4">Lưu thông tin</button>
+                        <button type="button" onclick="SaveDraft()" class="btn btn-warning mt-4 ml-2">Lưu bản thảo</button>
+                        @if (@ViewBag.ReturnUrl == "Books")
+                        {
+                            <button type="button" onclick="window.location.href='/Admin/Books'" class="btn btn-secondary mt-4 ml-2">Quay lại</button>
+                        }
+                        else
+                        {
+                            <button type="button" onclick="window.location.href='/Admin/@ViewBag.BookId/ChapterBooks'" class="btn btn-secondary mt-4 ml-2">Quay lại</button>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js" asp-append-version="true"></script>
+<script type="text/javascript">
+    document.getElementById('loadingSumary').classList.add('d-none');
+    // document.getElementById('CreatBookId').classList.add('active');
+
+    // const quill = new Quill('#editorContent', {
+    //     theme: 'snow'
+    // });
+
+    function SaveDraft(){
+        $('#Type').val('3');
+        $('#formBody').submit();
+    }
+
+    function changeType(){
+        let type = $('#Type').val();
+        if (type == 2) {
+            $("#ChaperId").attr("hidden", false);
+            $('#StartChapterIdText').hide();
+        }
+        else if (type == 1) {
+            $("#ChaperId").attr("hidden", true);
+            $('#StartChapterIdText').show();
+        }
+    }
+
+    function getWordNo(){
+        // var delta = quill.getContents();
+        // var text = JSON.stringify(delta);
+        var text = $('#Content').val();
+        let words = text.length > 0 ? text.split(/\s+/) : [];
+
+        $('#wordNoCount').html(words.length);
+        $('#WordNo').val(words.length);
+    }
+
+    function GenerateSummary(){
+        $('#Summary').val('');
+        $('#loadingSumary').removeClass('d-none');
+        //var summary;
+        var input = $('#Content').val();
+        var formData = new FormData();
+        formData.append('input', input);
+
+        // const evtSource = new EventSource(`/Admin/GenerateSummary?input=${input}`);
+        // //const eventList = document.querySelector("ul");
+
+        // evtSource.onmessage = (e) => {
+        //     console.log(e);
+        //     $('#Summary').val(e.data);
+        //     // const newElement = document.createElement("li");
+
+        //     // newElement.textContent = `message: ${e.data}`;
+        //     // eventList.appendChild(newElement);
+        // };
+
+        // console.log(obj);
+        $.ajax(
+            {
+                url: `/Admin/GenerateSummary`,
+                type: "POST",
+                headers:
+                {
+                    "RequestVerificationToken": '@GetAntiXsrfRequestToken()'
+                },
+                data: formData,
+                //dataType: "json",
+                async: true,
+                processData: false,
+                contentType: false,
+                success: function (data) {
+                    $('#loadingSumary').addClass('d-none');
+                    //console.log(data);
+                    if(data.isSussess == false){
+                        notyf.error(data.message);
+                        return;
+                    }
+                    $('#Summary').val(data.data);
+                }
+            }
+        );
+    }
+
+</script>

@@ -1,0 +1,162 @@
+﻿@{
+    Layout = "~/Views/Admin/_AdminLayout.cshtml";
+}
+@* @model Book *@
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Xsrf
+@functions {
+    public string GetAntiXsrfRequestToken()
+    {
+        return Xsrf.GetAndStoreTokens(Context).RequestToken;
+    }
+}
+<style>
+    .btn1 {
+        height: 30px;
+        width: 30px;
+        padding: 0;
+        margin: 0;
+    }
+
+    .container1 {
+        display: flex;
+        justify-content: space-evenly;
+    }
+
+    .card1 {
+        background-color: white;
+        border-radius: 10px;
+        box-shadow: 6px 4px 8px 4px rgb(0 0 0 / 20%);
+        padding: 20px;
+        width: 40%;
+        margin: 1rem;
+    }
+
+        .card1 h3 {
+            margin-top: 0;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+            .card1 h3 img {
+                width: 24px;
+                height: 24px;
+            }
+
+    .card1 ul {
+        list-style-type: none;
+        padding: 0;
+    }
+
+    .card1 ul li {
+            margin-bottom: 10px;
+        }
+
+    .card1 ul li a {
+                text-decoration: none;
+                color: #333;
+                font-size: 14px;
+            }
+
+    .card1 ul li a:hover {
+                    color: #007bff;
+                }
+</style>
+@* <button type="button" onclick="document.getElementById('formModal').reset();" class="btn btn-success" data-toggle="modal" data-target="#exampleModalPost">
+    Tạo mới
+</button> *@
+<div class="row">
+    <div class="col-12">
+        <div class="card my-4">
+            <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
+                <div class="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3">
+                    <h6 class="text-white text-capitalize ps-3"></h6>
+                </div>
+            </div>
+            <div class="card-body px-0 pb-2">
+                <div class="table-responsive p-0">
+                    <div class="form-group input-group input-group-outline mt-4" style="margin-top:1rem;text-align:center;display:block">
+                        <h3>Xin chào, bạn cần tìm gì?</h3>
+                        <input type="search" id="searchId" onchange="GetList()" class="form-control" placeholder="Nhập nội dung tìm kiếm..." style="width: 40%;margin: 0 auto;" />
+                    </div>
+                    <div class="container1">
+                        <div class="card1">
+                            <h3>
+                                <i class="material-icons opacity-10">help</i>
+                                Hướng Dẫn Cơ Bản
+                            </h3>
+                            <ul id="documentUl">
+                            </ul>
+                        </div>
+                        <div class="card1">
+                            <h3>
+                                <i class="material-icons opacity-10">emoji_objects</i>
+                                Trợ Lực Sáng Tác
+                            </h3>
+                            <ul id="composeUl">
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="container1">
+                        <div class="card1">
+                            <h3>
+                                <i class="material-icons opacity-10">paid</i>
+                                Thu Nhập Và Thanh Toán
+                            </h3>
+                            <ul id="paymentUl">
+                            </ul>
+                        </div>
+                        <div class="card1">
+                            <h3>
+                                <i class="material-icons opacity-10">campaign</i>
+                                Sử dụng IReading
+                            </h3>
+                            <ul id="otherUl">
+                                @* <li><a href="#">Bạn Cần Chuẩn Bị Những Gì Trước Khi Viết Truyện</a></li> *@
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script type="text/javascript">
+    document.getElementById('BasicKnowledgeId').classList.add('active');
+    GetList();
+    function GetList(){
+        var search = $('#searchId').val();
+        var htmldocumentUl = "";
+        var htmlcomposeUl = "";
+        var htmlpaymentUl = "";
+        var htmlotherUl = "";
+        $.ajax(
+            {
+                url: `/Admin/GetListKnowledge?search=${search}`,
+                type: "GET",
+                headers:
+                {
+                    "RequestVerificationToken": '@GetAntiXsrfRequestToken()'
+                },
+                async: true,
+                processData: false,
+                contentType: false,
+                success: function (data) {
+                    //console.log(data);
+                    data.forEach(item => {
+                        if (item.category == 0) htmldocumentUl += `<li><a href="/Admin/KnowledgeDetail/${item.id}">${item.title}</a></li>`;
+                        if (item.category == 1) htmlcomposeUl += `<li><a href="/Admin/KnowledgeDetail/${item.id}">${item.title}</a></li>`;
+                        if (item.category == 2) htmlpaymentUl += `<li><a href="/Admin/KnowledgeDetail/${item.id}">${item.title}</a></li>`;
+                        if (item.category == 3) htmlotherUl += `<li><a href="/Admin/KnowledgeDetail/${item.id}">${item.title}</a></li>`;
+                    });
+                    $('#documentUl').html(htmldocumentUl);
+                    $('#composeUl').html(htmlcomposeUl);
+                    $('#paymentUl').html(htmlpaymentUl);
+                    $('#otherUl').html(htmlotherUl);
+                }
+            }
+        );
+    }
+</script>

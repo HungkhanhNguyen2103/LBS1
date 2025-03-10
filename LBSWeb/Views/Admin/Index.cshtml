@@ -1,7 +1,7 @@
 ﻿@using System.Globalization
 @{
     Layout = "~/Views/Admin/_AdminLayout.cshtml";
-    ViewData["Title"] = "Trang chủ";
+    // ViewData["Title"] = "Trang chủ";
     CultureInfo cul = CultureInfo.GetCultureInfo("vi-VN");
 }
 @model ReportModel
@@ -17,8 +17,8 @@
                                     <i class="material-icons opacity-10">weekend</i>
                                 </div>
                                 <div class="text-end pt-1">
-                                    <p class="text-sm mb-0 text-capitalize">Số lượng dịch vụ</p>
-                                    <h4 class="mb-0">@Model.TotalService</h4>
+                                    <p class="text-sm mb-0 text-capitalize">Thể loại</p>
+                                    <h4 class="mb-0">@Model.TotalCategory</h4>
                                 </div>
                             </div>
                             <hr class="dark horizontal my-0">
@@ -31,10 +31,10 @@
                         <div class="card">
                             <div class="card-header p-3 pt-2">
                                 <div class="icon icon-lg icon-shape bg-gradient-primary shadow-primary text-center border-radius-xl mt-n4 position-absolute">
-                                    <i class="material-icons opacity-10">person</i>
+                                    <i class="material-icons opacity-10">weekend</i>
                                 </div>
                                 <div class="text-end pt-1">
-                                    <p class="text-sm mb-0 text-capitalize">Số lượng khách hàng</p>
+                                    <p class="text-sm mb-0 text-capitalize">Người dùng</p>
                                     <h4 class="mb-0">@Model.TotalAccount</h4>
                                 </div>
                             </div>
@@ -48,11 +48,11 @@
                         <div class="card">
                             <div class="card-header p-3 pt-2">
                                 <div class="icon icon-lg icon-shape bg-gradient-success shadow-success text-center border-radius-xl mt-n4 position-absolute">
-                                    <i class="material-icons opacity-10">person</i>
+                                    <i class="material-icons opacity-10">weekend</i>
                                 </div>
                                 <div class="text-end pt-1">
-                                    <p class="text-sm mb-0 text-capitalize">Số lượng dịch vụ đặt chỗ</p>
-                                    <h4 class="mb-0">@Model.TotalServiceBooking</h4>
+                                    <p class="text-sm mb-0 text-capitalize">Truyện đang chờ duyệt</p>
+                                    <h4 class="mb-0">@Model.TotalBookPending</h4>
                                 </div>
                             </div>
                             <hr class="dark horizontal my-0">
@@ -68,8 +68,8 @@
                                     <i class="material-icons opacity-10">weekend</i>
                                 </div>
                                 <div class="text-end pt-1">
-                                    <p class="text-sm mb-0 text-capitalize">Tổng doanh thu</p>
-                                    <h4 class="mb-0">@Model.TotalMoney.ToString("#,###", cul.NumberFormat) vnđ</h4>
+                                    <p class="text-sm mb-0 text-capitalize">Truyện đã xuất bản</p>
+                                    <h4 class="mb-0">@Model.TotalBookPublish</h4>
                                 </div>
                             </div>
                             <hr class="dark horizontal my-0">
@@ -79,6 +79,9 @@
                         </div>
                     </div>
                 </div>
+                <div class="text-center mt-4">
+                    <a href="">Xem thống kê chi tiết</a>
+                </div>           
             </div>
         </div>
     </div>

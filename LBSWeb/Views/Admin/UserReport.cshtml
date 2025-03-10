@@ -1,0 +1,161 @@
+﻿@{
+    Layout = "~/Views/Admin/_AdminLayout.cshtml";
+}
+@model Notification
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Xsrf
+@functions {
+    public string GetAntiXsrfRequestToken()
+    {
+        return Xsrf.GetAndStoreTokens(Context).RequestToken;
+    }
+}
+<style>
+    .btn1 {
+        height: 30px;
+        width: 30px;
+        padding: 0;
+        margin: 0;
+    }
+
+    .title{
+        margin-left:2rem;
+    }
+
+    .container {
+        display: flex;
+        width: 100%;
+        padding: 20px;
+    }
+
+    .sidebar {
+        width: 50%;
+        background-color: #fff;
+        /* box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); */
+        margin-right: 20px;
+        padding: 20px;
+    }
+
+        .sidebar h3 {
+            color: #d9534f;
+        }
+
+    .issue-list {
+        list-style: none;
+        padding: 0;
+    }
+
+        .issue-list li {
+            padding: 15px;
+            border-bottom: 1px solid #ddd;
+        }
+
+            .issue-list li:last-child {
+                border-bottom: none;
+            }
+
+            .issue-list li .title {
+                font-weight: bold;
+                color: #d9534f;
+            }
+
+            .issue-list li .status {
+                color: #a94442;
+                background-color: #f2dede;
+                padding: 5px 10px;
+                border-radius: 12px;
+                font-size: 12px;
+            }
+
+    .main {
+        width: 50%;
+        background-color: #fff;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+    }
+
+        .main h3 {
+            color: #d9534f;
+        }
+
+    .comment-box {
+        margin-top: 20px;
+    }
+
+        .comment-box textarea {
+            width: 100%;
+            height: 100px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+
+        .comment-box button {
+            background-color: #f0ad4e;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+            .comment-box button:hover {
+                background-color: #ec971f;
+            }
+</style>
+@* <button type="button" onclick="document.getElementById('formModal').reset();" class="btn btn-success" data-toggle="modal" data-target="#exampleModalPost">
+    Tạo mới
+</button> *@
+<div class="row">
+    <div class="col-12">
+        <div class="card my-4">
+            <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
+                <div class="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3">
+                    <h6 class="text-white text-capitalize ps-3"></h6>
+                </div>
+            </div>
+            <div class="card-body px-0 pb-2">
+                <div class="table-responsive container p-0">
+                    <!-- Sidebar -->
+                    <div class="sidebar">
+                        <h3>Danh sách yêu cầu</h3>
+                        <ul class="issue-list">
+                            <li>
+                                <span class="title">Lỗi tiêu đề</span>
+                                <p>--lỗi</p>
+                                <span class="status">Đã xử lý và đóng</span>
+                            </li>
+                            <li>
+                                <span class="title">Lỗi 2</span>
+                                <p>--Lỗi 2</p>
+                                <span class="status">Đã xử lý và đóng</span>
+                            </li>
+                            <li>
+                                <span class="title">Test</span>
+                                <p>--test</p>
+                                <span class="status">Đã xử lý và đóng</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Main Content -->
+                    <div class="main">
+                        <h3>Lỗi Tiêu Đề</h3>
+                        <p>lỗi</p>
+                        <span style="color: #d9534f;">Tiểu Hồng Trần đang xử lý</span>
+
+                        <div class="comment-box">
+                            <h4>Bình luận</h4>
+                            <textarea placeholder="Thêm bình luận..."></textarea>
+                            <button>Gửi</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    document.getElementById('UserReport2Id').classList.add('active');
+</script>

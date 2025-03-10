@@ -32,6 +32,18 @@ namespace BusinessObject
                     Id = Guid.Parse("627ec4a3-646f-455f-b65f-2903cf7819b2").ToString(),
                     Name = "Staff",
                     NormalizedName = "STAFF"
+                },
+                new IdentityRole()
+                {
+                    Id = Guid.Parse("627ec4a3-646f-455f-b65f-2903cf7820f2").ToString(),
+                    Name = "Author",
+                    NormalizedName = "AUTHOR"
+                },
+                new IdentityRole()
+                {
+                    Id = Guid.Parse("627ec4a3-646f-455f-b65f-2903cf78220f").ToString(),
+                    Name = "Manager",
+                    NormalizedName = "MANAGER"
                 }
                 );
 
@@ -54,14 +66,25 @@ namespace BusinessObject
                 },
                 new Account()
                 {
-                    Id = Guid.Parse("7d5002bd-f22f-4c7c-bce1-3d22eff321ef").ToString(),
-                    UserName = "staff",
-                    FullName = "Staff",
-                    NormalizedUserName = "STAFF",
-                    Email = "staff@gmail.com",
+                    Id = Guid.Parse("7d5002bd-f22f-4c7c-bce1-3d22eed213dd").ToString(),
+                    UserName = "manager",
+                    FullName = "Manager",
+                    NormalizedUserName = "MANAGER",
+                    Email = "manager@gmail.com",
                     AccountActive = true,
                     SecurityStamp = Guid.NewGuid().ToString("D"),
-                    PasswordHash = hasher.HashPassword(null, "Staff@123")
+                    PasswordHash = hasher.HashPassword(null, "Manager@123")
+                },
+                new Account()
+                {
+                    Id = Guid.Parse("7d5002bd-f22f-4c7c-bce1-3d22eff012ef").ToString(),
+                    UserName = "author",
+                    FullName = "Author",
+                    NormalizedUserName = "AUTHOR",
+                    Email = "author@gmail.com",
+                    AccountActive = true,
+                    SecurityStamp = Guid.NewGuid().ToString("D"),
+                    PasswordHash = hasher.HashPassword(null, "Author@123")
                 }
                 );
 
@@ -75,8 +98,28 @@ namespace BusinessObject
                     },
                     new IdentityUserRole<string>
                     {
+                        RoleId = Guid.Parse("627ec4a3-646f-455f-b65f-2903f87c19b6").ToString(),
+                        UserId = Guid.Parse("7d5002bd-f22f-4c7c-bce1-3d22eed213ff").ToString()
+                    },
+                    new IdentityUserRole<string>
+                    {
+                        RoleId = Guid.Parse("627ec4a3-646f-455f-b65f-2903f87c19b6").ToString(),
+                        UserId = Guid.Parse("7d5002bd-f22f-4c7c-bce1-3d22eff012ef").ToString()
+                    },
+                    new IdentityUserRole<string>
+                    {
+                        RoleId = Guid.Parse("627ec4a3-646f-455f-b65f-2903cf78220f").ToString(),
+                        UserId = Guid.Parse("7d5002bd-f22f-4c7c-bce1-3d22eed213dd").ToString()
+                    },
+                    new IdentityUserRole<string>
+                    {
                         RoleId = Guid.Parse("627ec4a3-646f-455f-b65f-2903cf7819b2").ToString(),
                         UserId = Guid.Parse("7d5002bd-f22f-4c7c-bce1-3d22eff321ef").ToString()
+                    },
+                    new IdentityUserRole<string>
+                    {
+                        RoleId = Guid.Parse("627ec4a3-646f-455f-b65f-2903cf7820f2").ToString(),
+                        UserId = Guid.Parse("7d5002bd-f22f-4c7c-bce1-3d22eff012ef").ToString()
                     });
 
         }

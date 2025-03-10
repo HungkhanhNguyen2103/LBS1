@@ -1,0 +1,139 @@
+﻿@{
+    Layout = "~/Views/Admin/_AdminLayout.cshtml";
+}
+@* @model Book *@
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Xsrf
+@functions {
+    public string GetAntiXsrfRequestToken()
+    {
+        return Xsrf.GetAndStoreTokens(Context).RequestToken;
+    }
+}
+<style>
+     .btn1 {
+         height: 30px;
+         width: 30px;
+         padding: 0;
+         margin: 0;
+     }
+</style>
+@* <button type="button" onclick="document.getElementById('formModal').reset();" class="btn btn-success" data-toggle="modal" data-target="#exampleModalPost">
+    Tạo mới
+</button> *@
+<div class="row">
+    <div class="col-12">
+        <div class="card my-4">
+            <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
+                <div class="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3">
+                    <h6 class="text-white text-capitalize ps-3"></h6>
+                </div>
+            </div>
+            <div class="card-body px-0 pb-2">
+                <div class="table-responsive p-0">
+                    <table class="table align-items-center mb-0">
+                        <thead>
+                            <tr>
+                                <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Truyện</th>
+                                <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Mới xuất bản</th>
+                                <th class="text-uppercase text-center text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Thời gian</th>
+                                <th class="text-center text-secondary opacity-7"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (BookViewModel item in ViewBag.Books)
+                            {
+                                <tr>
+                                    <td>
+                                        <div class="d-flex">
+                                            <img src="@item.Poster" class="avatar avatar-sm me-3" style="border-radius:5px;width:50px!important;height:50px!important" alt="">
+                                            <div>
+                                                <p id="name-@item.Id" class="text-l font-weight-bold mb-0">@item.Name</p>
+                                                <span class="text-secondary text-xs">@item.BookStatus</span>
+                                            </div>
+                                        </div>                                  
+                                    </td>
+                                    <td style="padding-left:1.5rem">
+                                        <span class="text-secondary text-xs font-weight-bold">@item.NewPulished</span>
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="text-secondary text-xs font-weight-bold">@item.NewPulishedDateTime</span>
+                                    </td>
+                                    <td class="align-middle text-center">
+                                        <button onclick="window.location.href='/Admin/@item.Id/CreateChapterBook?ReturnUrl=Books'" title="Thêm chương" class="btn1 btn btn-secondary">
+                                            <i class="fa-solid fa-plus"></i>
+                                        </button>
+                                        <button onclick="window.location.href='/Admin/@item.Id/ChapterBooks'" title="Danh sách chương" class="btn1 btn btn-secondary">
+                                            <i class="fa-solid fa-list"></i>
+                                        </button>
+                                        <button onclick="window.location.href='/Admin/UpdateBook/@item.Id'" title="Chỉnh sửa truyện" class="btn1 btn btn-secondary">
+                                            <i class="fa-solid fa-pen-to-square"></i>
+                                        </button>
+                                        <button onclick="window.location.href='/Admin/@item.Id/CreateChapterBook'" title="Thống kê" class="btn1 btn btn-secondary">
+                                            <i class="fa-solid fa-chart-simple"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    document.getElementById('BooksId').classList.add('active');
+
+    function showPopup(id){
+        $.ajax(
+            {
+                url: `/Admin/GetPost?id=${id}`,
+                type: "GET",
+                headers:
+                {
+                    "RequestVerificationToken": '@GetAntiXsrfRequestToken()'
+                },
+                //data: formData,
+                //dataType: "json",
+                async: true,
+                processData: false,
+                contentType: false,
+                success: function (data) {
+                    $('#post-cate-id').val(data.postCategoryId);
+                    $('#post-id').val(data.id);
+                    $('#PostDescription-id').val(data.postDescription);
+                    $('#img-post-id').attr('src', data.image);
+                    $('#image-post').val(data.image);
+                    $('#img-post-id').removeClass('d-none');
+                    $('#post-title').val(data.title);
+                    //console.log(data);
+                    //window.location.reload();
+                }
+            }
+        );
+    }
+
+    function deleteItem(id) {
+        if (confirm("Bạn có muốn xóa ?") == false) return;
+        //var formData = new FormData();
+        $.ajax(
+            {
+                url: `/Admin/DeletePost?id=${id}`,
+                type: "GET",
+                headers:
+                {
+                    "RequestVerificationToken": '@GetAntiXsrfRequestToken()'
+                },
+                async: true,
+                processData: false,
+                contentType: false,
+                success: function (data) {
+                    alert(data);
+                    window.location.reload();
+                }
+            }
+        );
+
+    }
+</script>

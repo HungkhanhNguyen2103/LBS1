@@ -14,7 +14,7 @@ namespace BusinessObject
         [BsonRepresentation(BsonType.ObjectId)]
         public string? Id { get; set; }
         public string? Image { get; set; }
-        public int BookId { get; set; }
-        public Book? Book { get; set; }
+        public string BookChapterId { get; set; }
+        //public Book? Book { get; set; }
     }
 }

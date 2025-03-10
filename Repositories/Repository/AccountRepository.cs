@@ -209,8 +209,10 @@ namespace Repositories.Repository
             }
             try
             {
-				await _userManager.AddToRoleAsync(user, Role.User);
-                responder.Data = await EncodeSha256(user, Role.User,true,user.ResetPassword);
+				await _userManager.AddToRolesAsync(user, new List<string> {Role.User,Role.Author});
+
+                var roles = $"{Role.User},{Role.Author}";
+                responder.Data = await EncodeSha256(user, roles, true,user.ResetPassword);
 
 
                 //Send Email 
@@ -291,9 +293,17 @@ namespace Repositories.Repository
 				seconds *= Int32.Parse(item.ToString());
 			}
 
+
+
 			List<Claim> claims = new List<Claim>();
+			claims.Add(new Claim(ClaimTypes.PrimarySid, user.Id));
 			claims.Add(new Claim(ClaimTypes.NameIdentifier, user.UserName));
-			claims.Add(new Claim(ClaimTypes.Role, role == null ? "" : role));
+
+            var roles = role.Split(",");
+            foreach (var role1 in roles)
+            {
+                claims.Add(new Claim(ClaimTypes.Role, role1 == null ? "" : role1));
+            }
 			claims.Add(new Claim(ClaimTypes.Name, user.FullName));
 			claims.Add(new Claim("EmailConfirm", emailConfirm.ToString()));
 			claims.Add(new Claim("ResetPassword", resetPassword.ToString()));
@@ -566,6 +576,19 @@ namespace Repositories.Repository
             responder.Data = await EncodeSha256(userExist, string.Join(", ", roles), userExist.EmailConfirmed, userExist.ResetPassword);
 
             return responder;
+        }
+
+        public async Task<ReponderModel<ReportModel>> ShortReport()
+        {
+            var res = new ReponderModel<ReportModel>();
+            var result = new ReportModel();
+            result.TotalCategory = await LBSDbContext.Categories.CountAsync();
+            result.TotalAccount = await _userManager.Users.CountAsync();
+            result.TotalBookPending = await LBSDbContext.Books.Where(c => c.Status == BookStatus.PendingPublication).CountAsync();
+            result.TotalBookPublish = await LBSDbContext.Books.Where(c => c.Status == BookStatus.Published).CountAsync();
+            res.Data = result;
+            res.IsSussess = true;
+            return res;
         }
     }
 

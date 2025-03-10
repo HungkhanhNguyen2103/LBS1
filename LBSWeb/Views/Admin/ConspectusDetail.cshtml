@@ -1,0 +1,58 @@
+﻿@{
+    Layout = "~/Views/Admin/_AdminLayout.cshtml";
+}
+@model Conspectus
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Xsrf
+@functions {
+    public string GetAntiXsrfRequestToken()
+    {
+        return Xsrf.GetAndStoreTokens(Context).RequestToken;
+    }
+}
+@* <button type="button" onclick="document.getElementById('formModal').reset();" class="btn btn-success" data-toggle="modal" data-target="#exampleModalPost">
+    Tạo mới
+</button> *@
+<style>
+    .form-control {
+        margin-left: 0px !important;
+    }
+
+    #loading {
+        position: absolute;
+        top: 50%;
+        right: 50%;
+    }
+</style>
+<div class="row">
+    <form method="post" asp-action="UpdateConspectus">
+        <div class="col-12">
+            <div class="card my-4">
+                <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
+                    <div class="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3">
+                        <h6 class="text-white text-capitalize ps-3">Cập nhật đại cương</h6>
+                    </div>
+                </div>
+                <div class="card-body px-0 pb-2">
+                    <div class="table-responsive p-0 m-4 mt-0">
+                        <input asp-for="Id" hidden/>
+                        <div style="display:block" class="form-group input-group input-group-outline mt-4">
+                            <label for="Name">Tên đại cương</label>
+                            <input style="width:100%" type="text" asp-for="Name" class="form-control" autofocus>
+                        </div>
+                        <div style="display:block" class="input-group input-group-outline mt-4">
+                            <label for="Summary">Nội dung đại cương</label>
+                            <textarea style="width:100%" asp-for="Content" type="text" class="form-control" rows="8"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-success mt-4">Lưu thông tin</button>
+                        <button type="button" onclick="window.location.href='/Admin/ListConspectus'" class="btn btn-secondary mt-4 ml-2">Quay lại</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script type="text/javascript">
+
+
+</script>

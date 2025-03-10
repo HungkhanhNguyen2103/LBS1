@@ -38,6 +38,15 @@ namespace BusinessObject
 
     public enum BookStatus
     {
-        Done = 0,    
+        Done = 0,
+        Continue = 1,
+        Pause = 2,
+        PendingPublication = 3,
+        Published = 4
+    }
+
+    public class BookStatusName
+    {
+        public static List<string> ListBookStatus = new List<string> { "Hoàn thành", "Còn tiếp" , "Tạm dừng" , "Chờ xuất bản" , "Đã xuất bản" };
     }
 }

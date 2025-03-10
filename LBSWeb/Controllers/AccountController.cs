@@ -153,7 +153,7 @@ namespace LBSWeb.Controllers
 		{
             if (User.Identity.IsAuthenticated)
             {
-                return Redirect("/");
+                return Redirect("/Admin/Index");
             }
             return View();
 		}
@@ -162,7 +162,7 @@ namespace LBSWeb.Controllers
         {
             if (User.Identity.IsAuthenticated)
             {
-                return Redirect("/");
+                return Redirect("/Admin/Index");
             }
             return View();
         }
@@ -184,7 +184,7 @@ namespace LBSWeb.Controllers
         {
             if (User.Identity.IsAuthenticated)
             {
-                return Redirect("/");
+                return Redirect("/Admin/Index");
             }
             return View();
         }
@@ -201,17 +201,16 @@ namespace LBSWeb.Controllers
                 var claims = TokenUtil.ValidateToken(res.Data, _configuration["Tokens:Key"], _configuration["Tokens:Issuer"]);
                 if (claims != null)
                 {
-                    HttpContext.Response.Cookies.Append("token", res.Data, new CookieOptions { MaxAge = TimeSpan.FromMinutes(45) });
+                    HttpContext.Response.Cookies.Append("token", res.Data, new CookieOptions { MaxAge = TimeSpan.FromDays(365*2) });
                     var claimsIdentity = new ClaimsIdentity(
                         claims.Claims, CookieAuthenticationDefaults.AuthenticationScheme);
                     await HttpContext.SignInAsync(
                         CookieAuthenticationDefaults.AuthenticationScheme,
                         new ClaimsPrincipal(claimsIdentity));
-                    if (claims.IsInRole("Admin") && account.ReturnUrl == "/") return Redirect("/Admin");
+                    //return Redirect("/Admin");
                     
                 }
-                if (string.IsNullOrEmpty(account.ReturnUrl)) account.ReturnUrl = "/";
-                return Redirect(account.ReturnUrl);
+                return Redirect("/Admin/Index");
             }
             return View(account);
         }
@@ -220,7 +219,7 @@ namespace LBSWeb.Controllers
 		{
             if (User.Identity.IsAuthenticated)
             {
-                return Redirect("/");
+                return Redirect("/Admin/Index");
             }
 			return View(new AccountModel { ReturnUrl = ReturnUrl});
 		}
@@ -240,7 +239,7 @@ namespace LBSWeb.Controllers
                 if (claims.IsInRole("Admin")) return Redirect("/Admin");
                 //return Redirect("/");
             }
-            return Redirect("/");
+            return Redirect("/Admin/Index");
         }
 
         [AllowAnonymous]
@@ -248,7 +247,7 @@ namespace LBSWeb.Controllers
         {
             HttpContext.Response.Cookies.Delete("token");
             HttpContext.SignOutAsync();
-            return Redirect("/");
+            return RedirectToAction("Login");
         }
     }
 }

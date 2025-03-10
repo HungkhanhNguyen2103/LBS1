@@ -3,6 +3,7 @@ using BusinessObject;
 using BusinessObject.BaseModel;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Repositories.IRepository;
 using Repositories.Repository;
 
 namespace LBSAPI.Controllers
@@ -66,6 +67,14 @@ namespace LBSAPI.Controllers
         {
             var rs = await _accountRepository.Login(model);
             return rs;
+        }
+
+        [Route("ShortReport")]
+        [HttpGet]
+        public async Task<ReponderModel<ReportModel>> ShortReport()
+        {
+            var result = await _accountRepository.ShortReport();
+            return result;
         }
 
         [Route("GrantAccessRole")]

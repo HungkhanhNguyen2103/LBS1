@@ -36,7 +36,7 @@ namespace LBSWeb.API
                     //    _context.HttpContext.Session.GetString(CommonConstants.TOKEN));
                     if (overrideTimeout != null)
                     {
-                        client.Timeout = overrideTimeout.GetValueOrDefault(TimeSpan.FromSeconds(60));
+                        client.Timeout = overrideTimeout.GetValueOrDefault(TimeSpan.FromMinutes(3));
                     }
                     BuildUrlParams(ref url, dctParams);
                     var response = client.GetAsync(url).Result;
@@ -71,7 +71,7 @@ namespace LBSWeb.API
                     client.BaseAddress = new Uri(API_URL);
                     client.DefaultRequestHeaders.Accept.Clear();
                     client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                    client.Timeout = overrideTimeout.GetValueOrDefault(TimeSpan.FromSeconds(60));
+                    client.Timeout = overrideTimeout.GetValueOrDefault(TimeSpan.FromMinutes(3));
 
                     var content = CreateHttpContent(JObj);
                     var res = client.PostAsync(string.Format(url), content).Result;

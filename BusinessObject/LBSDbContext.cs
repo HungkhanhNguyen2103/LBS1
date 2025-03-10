@@ -22,6 +22,10 @@ namespace BusinessObject
             builder.Entity<UserTranscationBook>().ToTable("UserTranscationBook").HasKey(x => x.Id);
             builder.Entity<Category>().ToTable("Category").HasKey(x => x.Id);
             builder.Entity<Comment>().ToTable("Comment").HasKey(x => x.Id);
+            builder.Entity<BasicKnowledge>().ToTable("BasicKnowledge").HasKey(x => x.Id);
+            builder.Entity<Conspectus>().ToTable("Conspectus").HasKey(x => x.Id);
+            builder.Entity<Notification>().ToTable("Notification").HasKey(x => x.Id);
+            builder.Entity<UserReport>().ToTable("UserReport").HasKey(x => x.Id);
         }
 
         public virtual DbSet<TemplateEmail> TemplateEmails { get; set; }
@@ -31,5 +35,10 @@ namespace BusinessObject
         public virtual DbSet<UserTranscationBook> UserTranscationBooks { get; set; }
         public virtual DbSet<Category> Categories { get; set; }
         public virtual DbSet<Comment> Comments { get; set; }
+        public virtual DbSet<BasicKnowledge> BasicKnowledges { get; set; }
+        public virtual DbSet<Conspectus> Conspectuses { get; set; }
+        public virtual DbSet<Notification> Notifications { get; set; }
+        public virtual DbSet<UserReport> UserReports { get; set; }
+        public virtual DbSet<UserReportComment> UserReportComments { get; set; }
     }
 }

@@ -110,41 +110,85 @@ namespace BusinessObject.Migrations
                             Id = "7d5002bd-f22f-4c7c-bce1-3d22eed213ff",
                             AccessFailedCount = 0,
                             AccountActive = true,
-                            ConcurrencyStamp = "5a9c9e70-254e-41ea-a7f0-6e3c3de08c04",
+                            ConcurrencyStamp = "174b1c4d-3c0d-469b-b0ab-6220d9bb561d",
                             Email = "admin@gmail.com",
                             EmailConfirmed = false,
                             FullName = "Admin",
                             Gender = 0,
                             LockoutEnabled = false,
                             NormalizedUserName = "ADMIN",
-                            PasswordHash = "AQAAAAIAAYagAAAAEP8KHk2FcqreH0McypjIruA+htPsKosV/T554g2ulWS2s7AHiw3C3VSCTcvjb0lMFQ==",
+                            PasswordHash = "AQAAAAIAAYagAAAAENdcWfsphAdwsCHCiwtw6Uj0eOaQLozzdkZu+WaACQ1QseC3xujhnpSk9QYh1aPIrw==",
                             PhoneNumberConfirmed = false,
                             ResetPassword = 0,
-                            SecurityStamp = "d1fcb8fd-5171-4e24-9830-769823a0af90",
+                            SecurityStamp = "abd9923a-1569-44e5-bb6f-42ea8e370933",
                             SocialAccount = false,
                             TwoFactorEnabled = false,
                             UserName = "admin"
                         },
                         new
                         {
-                            Id = "7d5002bd-f22f-4c7c-bce1-3d22eff321ef",
+                            Id = "7d5002bd-f22f-4c7c-bce1-3d22eed213dd",
                             AccessFailedCount = 0,
                             AccountActive = true,
-                            ConcurrencyStamp = "c0d569df-21b4-40b6-be39-2dee2b57b61a",
-                            Email = "staff@gmail.com",
+                            ConcurrencyStamp = "745c4bfe-321c-490d-b6c3-b66ea44607e9",
+                            Email = "manager@gmail.com",
                             EmailConfirmed = false,
-                            FullName = "Staff",
+                            FullName = "Manager",
                             Gender = 0,
                             LockoutEnabled = false,
-                            NormalizedUserName = "STAFF",
-                            PasswordHash = "AQAAAAIAAYagAAAAEAfHQcQxvOLgmAS9BVaYT8PWLGzeq51p8aj6LARTi1ASHOk+Yr04ECDK7jmCAYfGFA==",
+                            NormalizedUserName = "MANAGER",
+                            PasswordHash = "AQAAAAIAAYagAAAAEE66c89vpelVvVrddfevuN3+HFwROba0PNMv5nHR3grqVwYCc/ZiuRxO3wYVMngVQQ==",
                             PhoneNumberConfirmed = false,
                             ResetPassword = 0,
-                            SecurityStamp = "7136313d-1cc3-4732-937d-534efba986ad",
+                            SecurityStamp = "902d6522-747b-4459-af04-7cc37b3658e6",
                             SocialAccount = false,
                             TwoFactorEnabled = false,
-                            UserName = "staff"
+                            UserName = "manager"
+                        },
+                        new
+                        {
+                            Id = "7d5002bd-f22f-4c7c-bce1-3d22eff012ef",
+                            AccessFailedCount = 0,
+                            AccountActive = true,
+                            ConcurrencyStamp = "8f47d184-b03a-4ac7-8b45-6c8d86452e84",
+                            Email = "author@gmail.com",
+                            EmailConfirmed = false,
+                            FullName = "Author",
+                            Gender = 0,
+                            LockoutEnabled = false,
+                            NormalizedUserName = "AUTHOR",
+                            PasswordHash = "AQAAAAIAAYagAAAAEDVzOQEo5tRa7snja7qhnW3ClCcFwTKLrFzDJTjP8B/i/aDjefd8dP34zRMrq6tS7g==",
+                            PhoneNumberConfirmed = false,
+                            ResetPassword = 0,
+                            SecurityStamp = "e97c8e2b-541d-4917-8623-adf0fddbcf05",
+                            SocialAccount = false,
+                            TwoFactorEnabled = false,
+                            UserName = "author"
                         });
+                });
+
+            modelBuilder.Entity("BusinessObject.BasicKnowledge", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("Category")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(MAX)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(MAX)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("BasicKnowledge", (string)null);
                 });
 
             modelBuilder.Entity("BusinessObject.Book", b =>
@@ -251,6 +295,62 @@ namespace BusinessObject.Migrations
                     b.ToTable("Comment", (string)null);
                 });
 
+            modelBuilder.Entity("BusinessObject.Conspectus", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(MAX)");
+
+                    b.Property<string>("CreateBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("ModifyDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(MAX)");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Conspectus", (string)null);
+                });
+
+            modelBuilder.Entity("BusinessObject.Notification", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(MAX)");
+
+                    b.Property<DateTime>("ModifyDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(MAX)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Notification", (string)null);
+                });
+
             modelBuilder.Entity("BusinessObject.TemplateEmail", b =>
                 {
                     b.Property<int>("Id")
@@ -300,6 +400,78 @@ namespace BusinessObject.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("UserBook", (string)null);
+                });
+
+            modelBuilder.Entity("BusinessObject.UserReport", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Author")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ChapterBookId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CreateBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Image")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("ModifyDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("ReportType")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("UserReportStatus")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserReport", (string)null);
+                });
+
+            modelBuilder.Entity("BusinessObject.UserReportComment", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Content")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Image")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("UserReportId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserReportId");
+
+                    b.ToTable("UserReportComments");
                 });
 
             modelBuilder.Entity("BusinessObject.UserTranscation", b =>
@@ -403,6 +575,18 @@ namespace BusinessObject.Migrations
                             Id = "627ec4a3-646f-455f-b65f-2903cf7819b2",
                             Name = "Staff",
                             NormalizedName = "STAFF"
+                        },
+                        new
+                        {
+                            Id = "627ec4a3-646f-455f-b65f-2903cf7820f2",
+                            Name = "Author",
+                            NormalizedName = "AUTHOR"
+                        },
+                        new
+                        {
+                            Id = "627ec4a3-646f-455f-b65f-2903cf78220f",
+                            Name = "Manager",
+                            NormalizedName = "MANAGER"
                         });
                 });
 
@@ -500,8 +684,28 @@ namespace BusinessObject.Migrations
                         },
                         new
                         {
+                            UserId = "7d5002bd-f22f-4c7c-bce1-3d22eed213ff",
+                            RoleId = "627ec4a3-646f-455f-b65f-2903f87c19b6"
+                        },
+                        new
+                        {
+                            UserId = "7d5002bd-f22f-4c7c-bce1-3d22eff012ef",
+                            RoleId = "627ec4a3-646f-455f-b65f-2903f87c19b6"
+                        },
+                        new
+                        {
+                            UserId = "7d5002bd-f22f-4c7c-bce1-3d22eed213dd",
+                            RoleId = "627ec4a3-646f-455f-b65f-2903cf78220f"
+                        },
+                        new
+                        {
                             UserId = "7d5002bd-f22f-4c7c-bce1-3d22eff321ef",
                             RoleId = "627ec4a3-646f-455f-b65f-2903cf7819b2"
+                        },
+                        new
+                        {
+                            UserId = "7d5002bd-f22f-4c7c-bce1-3d22eff012ef",
+                            RoleId = "627ec4a3-646f-455f-b65f-2903cf7820f2"
                         });
                 });
 
@@ -558,6 +762,15 @@ namespace BusinessObject.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("BusinessObject.Conspectus", b =>
+                {
+                    b.HasOne("BusinessObject.Account", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("BusinessObject.UserBook", b =>
                 {
                     b.HasOne("BusinessObject.Book", "Book")
@@ -573,6 +786,24 @@ namespace BusinessObject.Migrations
                     b.Navigation("Book");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("BusinessObject.UserReport", b =>
+                {
+                    b.HasOne("BusinessObject.Account", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("BusinessObject.UserReportComment", b =>
+                {
+                    b.HasOne("BusinessObject.UserReport", "UserReport")
+                        .WithMany()
+                        .HasForeignKey("UserReportId");
+
+                    b.Navigation("UserReport");
                 });
 
             modelBuilder.Entity("BusinessObject.UserTranscation", b =>
