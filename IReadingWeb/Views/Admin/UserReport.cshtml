@@ -1,0 +1,303 @@
+﻿@{
+    Layout = "~/Views/Admin/_AdminLayout.cshtml";
+}
+@model UserReport
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Xsrf
+@functions {
+    public string GetAntiXsrfRequestToken()
+    {
+        return Xsrf.GetAndStoreTokens(Context).RequestToken;
+    }
+}
+<style>
+    .btn1 {
+        height: 30px;
+        width: 30px;
+        padding: 0;
+        margin: 0;
+    }
+
+    .title{
+        /* margin-left:2rem; */
+    }
+
+    .container {
+        display: flex;
+        width: 100%;
+        padding: 20px;
+    }
+
+    .sidebar {
+        width: 50%;
+        background-color: #fff;
+        /* box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); */
+        margin-right: 20px;
+        padding: 20px;
+    }
+
+        .sidebar h3 {
+            color: #d9534f;
+        }
+
+    .issue-list {
+        list-style: none;
+        padding: 0;
+    }
+
+        .issue-list li {
+            padding: 5px;
+            border-bottom: 1px solid #ddd;
+        }
+
+            .issue-list li:hover{
+                background-color: #80808014;
+            }
+
+            .issue-list li.active {
+                background-color: #80808021;
+            }
+
+            .issue-list li:last-child {
+                border-bottom: none;
+            }
+
+            .issue-list li .title {
+                font-weight: bold;
+                color: #d9534f;
+            }
+
+            .issue-list li .status {
+                color: #a94442;
+                background-color: #f2dede;
+                padding: 5px 10px;
+                border-radius: 12px;
+                font-size: 12px;
+            }
+
+            .issue-list li .status-pending{
+                color: #42a952;
+                background-color: #dff2de;
+                padding: 5px 10px;
+                border-radius: 12px;
+                font-size: 12px;
+            }
+
+    .main {
+        width: 50%;
+        background-color: #fff;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+    }
+
+        .main h3 {
+            color: #d9534f;
+        }
+
+    .comment-box {
+        margin-top: 20px;
+        font-size: 14px;
+    }
+
+        .comment-box textarea {
+            width: 100%;
+            height: 100px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+
+        .comment-box button {
+            /* background-color: #f0ad4e; */
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+/*             .comment-box button:hover {
+                background-color: #ec971f;
+            } */
+</style>
+<button type="button" onclick="document.getElementById('formModal').reset();" class="btn btn-success @(User.IsInRole("Author") && ViewBag.ReportType == 1 ? "" : "d-none")" data-toggle="modal" data-target="#exampleModal">
+    Tạo mới
+</button>
+<div class="row">
+    <div class="col-12">
+        <div class="card my-4">
+            <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
+                <div class="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3">
+                    <h6 class="text-white text-capitalize ps-3">Yêu cầu & Báo cáo</h6>
+                </div>
+            </div>
+            <div class="card-body px-0 pb-2">
+                <div style="width:12rem;margin-left:2rem" class="form-group input-group input-group-outline mt-4">
+                    <select style="width:100%" class="form-select form-control" onchange="ChangeSelect(this)" id="UserReportStatus">
+                        <option value="1">Yêu cầu của tôi</option>
+                        <option value="0">Yêu cầu đã đóng</option>
+                    </select>
+                </div>
+                <div class="table-responsive container p-0">
+                    <!-- Sidebar -->
+                    <div class="sidebar">
+                        <ul class="issue-list">
+                            @foreach (UserReport item in @ViewBag.ListUserReport)
+                            {
+                                <li id="@item.Id" onclick="RenderDetail(@item.Id)" style="display:flex;align-items:center">
+                                    <div style="width:50%;margin-left:10px">
+                                        <span class="title">@item.Title</span>
+                                        <p style="margin-bottom:0;font-size:13px">--@item.Content</p>
+                                    </div>
+                                    <div>
+                                        <span class="@(item.UserReportStatus == UserReportStatus.Done ? "status" : "status-pending")">@(item.UserReportStatus == UserReportStatus.Done ? "Đã xử lý và đóng" : "Đang xử lý")</span>
+                                    </div>
+                                </li>
+                            }
+                            @if (@ViewBag.ListUserReport.Count == 0)
+                            {
+                                <li>Hiện không có yêu cầu hay báo lỗi nào</li>
+                            }
+
+                        </ul>
+                    </div>
+
+                    <!-- Main Content -->
+                    <div class="@(@ViewBag.ListUserReport.Count == 0 ? "d-none" : "") main">
+                        <div style="display:flex;justify-content:space-between;align-items:end">
+                            <h5 id="title"></h5>
+                            <h5 id="userReportId" class="d-none"></h5>
+                            @if (@ViewBag.Status == 0)
+                            {
+                                <button type="button" onclick="ClickOpen()" class="btn btn-warning m-0">Mở lại</button>
+                            }
+                            else if (@ViewBag.Status == 1)
+                            {
+                                <button type="button" onclick="ClickDone()" class="btn btn-danger m-0">Đóng</button>
+                            }
+                        </div>
+                        <p id="content"></p>
+                        <span style="color: #d9534f;"></span>
+
+                        <div class="comment-box">
+                            <h4 style="font-size:15px">Bình luận</h4>
+                            <textarea class="font-control" placeholder="Thêm bình luận..."></textarea>
+                            <button class="btn btn-warning">Gửi</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <form id="formModal" class="modal-content" method="post" asp-action="CreateUserReport">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Gửi yêu cầu</h5>
+                <button type="button" class="btn close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div style="display:block" class="form-group input-group input-group-outline">
+                    <input type="number" asp-for="Id" hidden />
+                    <label for="Title">Tiêu đề</label>
+                    <input style="width:100%" type="text" class="form-control" asp-for="Title" required placeholder="Tiêu đề">
+                </div>
+                <div style="display:block" class="form-group input-group input-group-outline">
+                    <label for="Content">Nội dung</label>
+                    <textarea style="width:100%" type="text" asp-for="Content" class="form-control" placeholder="Nội dung"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-primary">Lưu thông tin</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script type="text/javascript">
+    document.getElementById(`UserReport${@ViewBag.ReportType}Id`).classList.add('active');
+    $('#UserReportStatus').val(@ViewBag.Status);
+    RenderDetail(@ViewBag.FirstId);
+
+    function ChangeSelect(el) {
+        var status = $(el).val();
+        window.location.href = `/Admin/UserReport/${@ViewBag.ReportType}?status=${status}`;
+    }
+
+    function ClickOpen() {
+        var id = $('#userReportId').html();
+        $.ajax(
+            {
+                url: `/Admin/OpenUserReport/${id}`,
+                type: "GET",
+                headers:
+                {
+                    "RequestVerificationToken": '@GetAntiXsrfRequestToken()'
+                },
+                async: true,
+                processData: false,
+                contentType: false,
+                success: function (data) {
+                    notyf.success(data.message);
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 800);
+                }
+            }
+        );
+    }
+
+    function ClickDone(){
+        var id = $('#userReportId').html();
+        $.ajax(
+            {
+                url: `/Admin/CloseUserReport/${id}`,
+                type: "GET",
+                headers:
+                {
+                    "RequestVerificationToken": '@GetAntiXsrfRequestToken()'
+                },
+                async: true,
+                processData: false,
+                contentType: false,
+                success: function (data) {
+                    notyf.success(data.message);
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 800);
+                }
+            }
+        );
+    }
+
+    function RenderDetail(id){
+        $(".issue-list li").removeClass('active');
+        $(`#${id}`).addClass("active");
+        //console.log(id);
+        $.ajax(
+            {
+                url: `/Admin/UserReportDetail/${id}`,
+                type: "GET",
+                headers:
+                {
+                    "RequestVerificationToken": '@GetAntiXsrfRequestToken()'
+                },
+                //data: formData,
+                //dataType: "json",
+                async: true,
+                processData: false,
+                contentType: false,
+                success: function (data) {
+                    //console.log(data);
+                    $('#title').html(data.data.title);
+                    $('#content').html(data.data.content);
+                    $('#userReportId').html(data.data.id);
+                }
+            }
+        );
+    }
+</script>

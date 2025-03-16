@@ -1,0 +1,122 @@
+﻿@{
+    Layout = "~/Views/Admin/_AdminLayout.cshtml";
+    // ViewData["Title"] = "Loại bài viết";
+}
+@model Notification
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Xsrf
+@functions {
+    public string GetAntiXsrfRequestToken()
+    {
+        return Xsrf.GetAndStoreTokens(Context).RequestToken;
+    }
+}
+
+<button type="button" onclick="document.getElementById('formModal').reset();" class="btn btn-success" data-toggle="modal" data-target="#exampleModal">
+    Tạo mới
+</button>
+<div class="row">
+    <div class="col-12">
+        <div class="card my-4">
+            <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
+                <div class="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3">
+                    <h6 class="text-white text-capitalize ps-3">Thông báo</h6>
+                </div>
+            </div>
+            <div class="card-body px-0 pb-2">
+                <div class="table-responsive p-0">
+                    <table class="table align-items-center mb-0">
+                        <thead>
+                            <tr>
+                                <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Tên</th>
+                                @* <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Mô tả</th> *@
+                                <th class="text-secondary opacity-7"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (Notification item in ViewBag.Notifications)
+                            {
+                                <tr>
+                                    <td>
+                                        <p id="name-@item.Id" class="mx-3 text-xs font-weight-bold mb-0">@item.Name</p>
+                                    </td>
+                                    <td class="align-middle">
+                                        <button type="button" onclick="showPopup(@item.Id,'@item.Name','@item.Content')" title="Sửa" class="btn1 btn btn-secondary" data-toggle="modal" data-target="#exampleModal">
+                                            <i class="fa-solid fa-pen-to-square"></i>
+                                        </button>
+                                        <button type="button" onclick="deleteItem(@item.Id)" title="Xóa" class="btn1 btn btn-secondary">
+                                            <i class="fa-solid fa-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <form id="formModal" class="modal-content" method="post" asp-action="UpdateNotification">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Thông báo</h5>
+                <button type="button" class="btn close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div style="display:block" class="form-group input-group input-group-outline">
+                    <input type="number" asp-for="Id" hidden />
+                    <label for="Name">Tên</label>
+                    <input style="width:100%"  type="text" class="form-control" asp-for="Name" required placeholder="Tên">
+                </div>
+                <div style="display:block" class="form-group input-group input-group-outline">
+                    <label for="Content">Nội dung</label>
+                    <textarea style="width:100%" type="text" asp-for="Content" class="form-control" placeholder="Nội dung"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-primary">Lưu thông tin</button>
+            </div>
+        </form>
+    </div>
+</div>
+<script type="text/javascript">
+    document.getElementById('ListNotificationsId').classList.add('active');
+    function showPopup(id,name,des){
+        document.getElementById('Id').value = id;
+        document.getElementById('Name').value = name;
+        document.getElementById('Content').value = des;
+    }
+
+    function deleteItem(id) {
+        if (confirm("Bạn có muốn xóa ?") == false) return;
+        //var formData = new FormData();
+        $.ajax(
+            {
+                url: `/Admin/DeleteNotification?id=${id}`,
+                type: "GET",
+                headers:
+                {
+                    "RequestVerificationToken": '@GetAntiXsrfRequestToken()'
+                },
+                //data: formData,
+                //dataType: "json",
+                async: true,
+                processData: false,
+                contentType: false,
+                success: function (data) {
+                    notyf.success(data);
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 800);
+
+                }
+            }
+        );
+
+    }
+</script>

@@ -590,6 +590,16 @@ namespace Repositories.Repository
             res.IsSussess = true;
             return res;
         }
+
+        public async Task<List<string>> GetRolesByUserName(string userName)
+        {
+            var result = new List<string>();
+            var user = await _userManager.FindByNameAsync(userName);
+            if (user == null) return result;
+            var roles = await _userManager.GetRolesAsync(user);
+            result = roles.ToList();
+            return result;
+        }
     }
 
 

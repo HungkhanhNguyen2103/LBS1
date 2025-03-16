@@ -1,0 +1,107 @@
+﻿@{
+    Layout = "~/Views/Admin/_AdminLayout.cshtml";
+}
+@* @model Notification *@
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Xsrf
+@functions {
+    public string GetAntiXsrfRequestToken()
+    {
+        return Xsrf.GetAndStoreTokens(Context).RequestToken;
+    }
+}
+<style>
+    .btn1 {
+        height: 30px;
+        width: 30px;
+        padding: 0;
+        margin: 0;
+    }
+
+    .title{
+        margin-left:2rem;
+    }
+</style>
+@* <button type="button" onclick="document.getElementById('formModal').reset();" class="btn btn-success" data-toggle="modal" data-target="#exampleModalPost">
+    Tạo mới
+</button> *@
+<div class="row">
+    <div class="col-12">
+        <div class="card my-4">
+            <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
+                <div class="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3">
+                    <h6 class="text-white text-capitalize ps-3"></h6>
+                </div>
+            </div>
+            <div class="card-body px-0 pb-2">
+                <div class="table-responsive p-0">
+@*                     <h3 class="title">@Model.Name</h3>
+                    <small class="title">@Model.ModifyDate.ToString("HH:mm-dd/MM/yyyy")</small> *@
+@*                     <p class="title">
+                        @Model.Content
+                    </p> *@
+                    <ul id="ulApprove">
+                        @foreach (string item in @ViewBag.AppoveSupport)
+                        {
+                            <li>@Html.Raw(item)</li>
+                        }
+                    </ul>
+                    <button type="button" onclick="approveBook(@ViewBag.BookId)" style="margin-left:2rem" class="btn btn-success mt-4">Xác nhận duyệt</button>
+                    <button type="button" onclick="window.location.href='/Admin/Books'" class="btn btn-secondary mt-4 ml-2">Quay lại</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal -->
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Nội dung chương</h5>
+                    <button type="button" class="btn close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body" id="modal-body">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="~/lib/jquery/dist/jquery.js" asp-append-version="true"></script>
+<script type="text/javascript">
+    $(".spContent").on('click', function () {
+        var content = $(this).data('content');
+        $('#modal-body').html(content);
+    });
+
+    function approveBook(id) {
+        if (confirm("Bạn có muốn duyệt ?") == false) return;
+        //var formData = new FormData();
+        $.ajax(
+            {
+                url: `/Admin/UpdateApproveBook/${id}`,
+                type: "GET",
+                headers:
+                {
+                    "RequestVerificationToken": '@GetAntiXsrfRequestToken()'
+                },
+                //data: formData,
+                //dataType: "json",
+                async: true,
+                processData: false,
+                contentType: false,
+                success: function (data) {
+                    if (data.IsSussess == false) {
+                        notyf.error(data.message);
+                        return;
+                    }
+                    notyf.success(data.message);
+                    setTimeout(() => {
+                        window.location.href = '/Admin/Books';
+                    }, 800);
+                }
+            }
+        );
+
+    }
+</script>

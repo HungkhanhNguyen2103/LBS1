@@ -22,6 +22,11 @@ namespace BusinessObject
         BasicInstructions = 0,
         CreativeSupport = 1,
         IncomeandPayments = 2,
-        UsingLBS = 3
+        UsingIReading = 3
     }
+
+    //Hướng Dẫn Cơ Bản
+    //Trợ Lực Sáng Tác
+    //Thu Nhập Và Thanh Toán
+    //Sử dụng IReading
 }

@@ -23,6 +23,7 @@ namespace Repositories.Repository
         Task<ReponderModel<string>> UpdateInformation(AccountModel account);
         Task<ReponderModel<string>> LoginWithGoogle(string email,string fullname);
         Task<ReponderModel<ReportModel>> ShortReport();
+        Task<List<string>> GetRolesByUserName(string userName);
 
     }
 }

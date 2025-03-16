@@ -22,12 +22,14 @@ namespace Repositories.Repository
         private readonly LBSDbContext _lBSDbContext;
         private ImageManager _imageManager;
         private AIGeneration _aIGeneration;
-        public BookRepository(LBSMongoDBContext mongoContext, LBSDbContext lBSDbContext,ImageManager imageManager, AIGeneration aIGeneration)
+        private IAccountRepository _accountRepository;
+        public BookRepository(LBSMongoDBContext mongoContext, LBSDbContext lBSDbContext,ImageManager imageManager, AIGeneration aIGeneration,IAccountRepository accountRepository)
         {
             _mongoContext = mongoContext;
             _lBSDbContext = lBSDbContext;
             _imageManager = imageManager;
             _aIGeneration = aIGeneration;
+            _accountRepository = accountRepository;
         }
 
         public async Task<ReponderModel<string>> UpdateCategory(Category model)
@@ -254,8 +256,18 @@ namespace Repositories.Repository
         public async Task<ReponderModel<BookViewModel>> GetAllBookByUser(string userName)
         {
             var result = new ReponderModel<BookViewModel>();
+            var roles = await _accountRepository.GetRolesByUserName(userName);
 
-            var listBook = await _lBSDbContext.Books.Where(c => c.CreateBy == userName).ToListAsync();
+            var listBook = new List<Book>();
+
+            if (roles.Contains(Role.Author))
+            {
+                listBook = await _lBSDbContext.Books.Where(c => c.CreateBy == userName).ToListAsync();
+            }
+            if (roles.Contains(Role.Manager))
+            {
+                listBook = await _lBSDbContext.Books.ToListAsync();
+            }
 
             result.DataList = new List<BookViewModel>();
             foreach (var item in listBook)
@@ -264,6 +276,8 @@ namespace Repositories.Repository
                 bookChapter.Id = item.Id;
                 bookChapter.Name = item.Name;
                 bookChapter.Poster = item.Poster;
+                bookChapter.Author = item.CreateBy;
+                bookChapter.Status = item.Status;
                 result.DataList.Add(bookChapter);
             }
 
@@ -294,11 +308,22 @@ namespace Repositories.Repository
 
             if (!string.IsNullOrEmpty(bookChapter.Summary))
             {
-                //var res = await _aIGeneration.TextGenerateToSpeech(bookChapter.Summary);
-                //if (res.IsSussess) bookChapter.AudioUrl = res.Data;
+                var res = await _aIGeneration.TextGenerateToSpeech(bookChapter.Summary);
+                if (res.IsSussess) bookChapter.AudioUrl = res.Data;
             }
 
             bookChapter.ModifyDate = DateTime.Now;
+
+            var listBookChapter = await GetListBookChapter(bookChapter.BookId);
+            if(listBookChapter.IsSussess && listBookChapter.DataList.Count == 2)
+            {
+                var book = await _lBSDbContext.Books.FirstOrDefaultAsync(c => c.Id == bookChapter.BookId);
+                if(book != null && book.Status == BookStatus.PendingPublication)
+                {
+                    book.Status = BookStatus.PendingApproval;
+                    await _lBSDbContext.SaveChangesAsync();
+                }
+            }
 
             // chen chuong
             if (bookChapter.Type == 2)
@@ -342,7 +367,7 @@ namespace Repositories.Repository
         {
             var result = new ReponderModel<BookChapter>();
             var filter = Builders<BookChapter>.Filter.And(
-                            Builders<BookChapter>.Filter.Where(p => p.BookId >= bookId),
+                            Builders<BookChapter>.Filter.Where(p => p.BookId == bookId),
                             Builders<BookChapter>.Filter.Where(p => p.Type != 3)
                         );
 
@@ -350,9 +375,34 @@ namespace Repositories.Repository
 
             var listBookChapter = await _mongoContext.BookChapters.Find(filter).Sort(sort).ToListAsync();
 
+            var dataResult = listBookChapter.Select(c => new BookChapter
+            {
+                AudioUrl = c.AudioUrl,
+                BookId = c.BookId,
+                BookType = c.BookType,
+                ChaperId = c.ChaperId,
+                ChapterName = c.ChapterName,
+                Content = c.Content,
+                CreateBy = c.CreateBy,
+                Id = c.Id,
+                ModifyDate = c.ModifyDate,
+                Price = c.Price,
+                Summary = c.Summary,
+                Type = c.Type,
+                UserId = c.UserId,
+                ViewNo = GetViewNo(c.Id),
+                WordNo = c.WordNo
+            }).ToList();
+
             result.IsSussess = true;
-            result.DataList = listBookChapter;
+            result.DataList = dataResult;
             return result;
+        }
+
+        private int GetViewNo(string chapterId)
+        {
+            var data = _lBSDbContext.UserBookViews.Where(c => c.ChapterId == chapterId).Count();
+            return data;
         }
 
         private async Task<BookViewModel> GetNewChapterPulished(Book book)
@@ -369,6 +419,7 @@ namespace Repositories.Repository
 
                 var bookViewModel = new BookViewModel
                 {
+                    //Author = lastedBookChapter != null ? lastedBookChapter.CreateBy : string.Empty,
                     BookStatus = BookStatusName.ListBookStatus[(int)book.Status],
                     NewPulished = lastedBookChapter != null && !string.IsNullOrEmpty(lastedBookChapter.ChapterName) ? lastedBookChapter.ChapterName : string.Empty,
                     NewPulishedDateTime = lastedBookChapter != null ? lastedBookChapter.ModifyDate.AddHours(7).ToString("HH:mm dd/MM/yyyy") : string.Empty,
@@ -510,5 +561,115 @@ namespace Repositories.Repository
             return result;
         }
 
+        public async Task<ReponderModel<string>> ApproveBook(int bookId)
+        {
+            var result = new ReponderModel<string>();
+
+            var book = await _lBSDbContext.Books.FirstOrDefaultAsync(c => c.Id == bookId);
+            if(book == null || book.Status != BookStatus.PendingApproval)
+            {
+                result.Message = "Dữ liệu không chính xác";
+                return result;
+            }
+
+            //var chapterBook = await GetListBookChapter(bookId);
+            var filter = Builders<BookChapter>.Filter.And(
+                            Builders<BookChapter>.Filter.Where(p => p.BookId >= bookId),
+                            Builders<BookChapter>.Filter.Where(p => p.Type != 3)
+                        );
+
+            var sort = Builders<BookChapter>.Sort.Ascending(x => x.ChaperId);
+
+            var listBookChapter = await _mongoContext.BookChapters.Find(filter).Sort(sort).ToListAsync();
+            if (listBookChapter.Count < 3)
+            {
+                result.Message = "Dữ liệu chương truyện không chính xác";
+                return result;
+            }
+            // duyet 3 chuong dau tien
+            int i = 0;
+            while (i < 3)
+            {
+                var item = listBookChapter[i];
+                var resultChapter = await _aIGeneration.TextGenerate("Kiểm tra giúp tôi đoạn text có chứa từ ngữ không phù hợp không (format như sau: - Từ ngữ : 'A' => 'vị trí hiển thị câu chữa từ ấy' bạn chỉ cần trả lời theo format này): " + item.Content);
+                var textRender = $@"<span> Tên chương: {item.ChapterName} <br></span>
+                                    <span> Nội dung: <span style='cursor: pointer;color:blue' class='spContent' data-content='{item.Content}' data-toggle='modal' data-target='#exampleModal'>Chi tiết</span> <br></span>
+                                    <span> Xác nhận AI: {resultChapter.Data} </span>";
+                result.DataList.Add(textRender);
+                i++;
+            }
+
+            result.IsSussess = true;
+            result.Message = "Kết thúc quá trình duyệt";
+            return result;
+        }
+
+        public async Task<ReponderModel<string>> UpdateApproveBook(int bookId)
+        {
+            var result = new ReponderModel<string>();
+
+            var data = await _lBSDbContext.Books.FirstOrDefaultAsync(c => c.Id == bookId);
+            if(data == null)
+            {
+                result.Message = "Data không hợp lệ";
+                return result;
+            }
+            data.Status = BookStatus.Published;
+            await _lBSDbContext.SaveChangesAsync();
+            result.Message = "Duyệt thành công";
+            result.IsSussess = true;
+            return result; 
+        }
+
+        public async Task<ReponderModel<string>> UpdateBookChapterView(UserBookView model)
+        {
+            var result = new ReponderModel<string>();
+            model.ModifyDate = DateTime.Now;
+            _lBSDbContext.UserBookViews.Add(model);
+            await _lBSDbContext.SaveChangesAsync();
+            result.Message = "Cập nhật thành công";
+            result.IsSussess = true;
+            return result;
+        }
+
+        public async Task<ReponderModel<StatisticsChapterBook>> StatisticsChapterBook(int bookId)
+        {
+            var result = new ReponderModel<StatisticsChapterBook>();
+            var listChapter = await GetListBookChapter(bookId);
+            var listChapterBook = listChapter.DataList.OrderBy(c => c.ChaperId).ToList();
+
+            var item = new StatisticsChapterBook
+            {
+                Title = "Lượt xem",
+                Label = listChapterBook.Select(c => "Chương " + c.ChaperId).ToList(),
+                Data = listChapterBook.Select(c => c.ViewNo.ToString()).ToList()
+            };
+
+            result.Data = item;
+            result.IsSussess = true;
+            return result;
+        }
+
+        public async Task<ReponderModel<StatisticsChapterBook>> StatisticsBook(string username)
+        {
+            var result = new ReponderModel<StatisticsChapterBook>();
+
+            var listBook = await _lBSDbContext.Books.Where(c => c.CreateBy == username).ToListAsync();
+            var item1 = new StatisticsChapterBook
+            {
+                Title = "Tổng lượt xem"
+            };
+
+            foreach (var item in listBook)
+            {
+                var listChapter = await GetListBookChapter(item.Id);
+                var totalView = listChapter.DataList.Sum(c => c.ViewNo);
+                item1.Label.Add(item.Name);
+                item1.Data.Add(totalView.ToString());
+            }
+            result.Data = item1;
+            result.IsSussess = true;
+            return result;
+        }
     }
 }

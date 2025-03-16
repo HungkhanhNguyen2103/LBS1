@@ -26,6 +26,7 @@ namespace BusinessObject
             builder.Entity<Conspectus>().ToTable("Conspectus").HasKey(x => x.Id);
             builder.Entity<Notification>().ToTable("Notification").HasKey(x => x.Id);
             builder.Entity<UserReport>().ToTable("UserReport").HasKey(x => x.Id);
+            builder.Entity<UserBookView>().ToTable("UserBookView").HasKey(x => x.Id);
         }
 
         public virtual DbSet<TemplateEmail> TemplateEmails { get; set; }
@@ -40,5 +41,6 @@ namespace BusinessObject
         public virtual DbSet<Notification> Notifications { get; set; }
         public virtual DbSet<UserReport> UserReports { get; set; }
         public virtual DbSet<UserReportComment> UserReportComments { get; set; }
+        public virtual DbSet<UserBookView> UserBookViews { get; set; }
     }
 }

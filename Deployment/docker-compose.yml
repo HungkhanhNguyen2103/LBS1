@@ -1,0 +1,55 @@
+﻿services:
+    ireading_api:
+        image: ireading_api
+        container_name: ireading_api
+         # build:
+            # context: ./../LWEYSWebAPI
+            # dockerfile: ./Dockerfile.LWEYSAPI
+        ports:
+            - 7157:8080
+        volumes:
+            - /root/docker/volumes/ireading_api/content_root_path/wwwroot:/app/wwwroot
+        restart: always
+        environment: 
+            - ASPNETCORE_ENVIRONMENT=Production
+            - CONNECTION_STRING=Server=mssqlserver;Database=IReading;User=sa;Password=SEP490G68_Capstonproject;TrustServerCertificate=True
+            - WEBPAGE_URL=http://ireading.store
+            - API_URL=http://103.56.163.69:7157
+    ireading_web:
+        image: ireading_web
+        container_name: ireading_web
+        # build:
+           # context: ./../LWEYS
+           # dockerfile: ./Dockerfile.LWEYS
+        ports:
+            - 7198:8080
+        volumes:
+            - /root/docker/volumes/ireading_web/content_root_path/wwwroot:/app/wwwroot
+        restart: always
+        environment: 
+            - ASPNETCORE_ENVIRONMENT=Production
+            # - CONNECTION_STRING=Server=mssqlserver;Database=LWEYS;User=sa;Password=0123654798aA@;TrustServerCertificate=True
+            - API_URL=http://103.56.163.69:7157
+    
+
+     Server=mssqlserver
+     Server=103.56.163.69
+     redis:
+         image: redis
+         container_name: redis_server
+         ports:
+             - 6379:6379
+         restart: always
+     mssqlserver:
+         image: mcr.microsoft.com/mssql/server
+         container_name: mssqlserver
+         user: root
+         ports:
+             - 1433:1433
+         restart: always
+         environment:
+             SA_PASSWORD: SEP490G68_Capstonproject
+             ACCEPT_EULA: Y
+             MSSQL_PID: Express
+         volumes:
+             - /root/data/MSSQLSERVER/DATA:/var/opt/mssql/data

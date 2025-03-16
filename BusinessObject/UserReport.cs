@@ -9,9 +9,9 @@ namespace BusinessObject
     public class UserReport
     {
         public int Id { get; set; }
-        public string Title { get; set; }
-        public string Content { get; set; }
-        public string Image { get; set; }
+        public string? Title { get; set; }
+        public string? Content { get; set; }
+        public string? Image { get; set; }
         public UserReportType ReportType { get; set; }
         public UserReportStatus UserReportStatus { get; set; }
         public string? ChapterBookId { get; set; }

@@ -42,11 +42,12 @@ namespace BusinessObject
         Continue = 1,
         Pause = 2,
         PendingPublication = 3,
-        Published = 4
+        Published = 4,
+        PendingApproval = 5
     }
 
     public class BookStatusName
     {
-        public static List<string> ListBookStatus = new List<string> { "Hoàn thành", "Còn tiếp" , "Tạm dừng" , "Chờ xuất bản" , "Đã xuất bản" };
+        public static List<string> ListBookStatus = new List<string> { "Hoàn thành", "Còn tiếp" , "Tạm dừng" , "Chờ xuất bản" , "Đã xuất bản","Chờ duyệt" };
     }
 }

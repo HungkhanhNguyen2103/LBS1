@@ -1,0 +1,150 @@
+﻿@{
+    Layout = "~/Views/Admin/_AdminLayout.cshtml";
+}
+@model BasicKnowledge
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Xsrf
+@functions {
+    public string GetAntiXsrfRequestToken()
+    {
+        return Xsrf.GetAndStoreTokens(Context).RequestToken;
+    }
+}
+
+<button type="button" onclick="document.getElementById('formModal').reset();" class="btn btn-success" data-toggle="modal" data-target="#exampleModal">
+    Tạo mới
+</button>
+<div class="row">
+    <div class="col-12">
+        <div class="card my-4">
+            <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
+                <div class="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3">
+                    <h6 class="text-white text-capitalize ps-3">Kiến thức cơ bản</h6>
+                </div>
+            </div>
+            <div style="width:12rem;margin-left:2rem" class="form-group input-group input-group-outline mt-4">
+                <select style="width:100%" class="form-select form-control" onchange="ChangeSelect(this)" id="CategoryKnowledgeType">
+                    <option value="0">Hướng Dẫn Cơ Bản</option>
+                    <option value="1">Trợ Lực Sáng Tác</option>
+                    <option value="2">Thu Nhập Và Thanh Toán</option>
+                    <option value="3">Sử dụng IReading</option>
+                </select>
+            </div>
+
+            <div class="card-body px-0 pb-2">
+                <div class="table-responsive p-0">
+                    <table class="table align-items-center mb-0">
+                        <thead>
+                            <tr>
+                                <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Tiêu đề</th>
+                                @* <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Mô tả</th> *@
+                                <th class="text-secondary opacity-7"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (BasicKnowledge item in ViewBag.ListBasicKnowledge)
+                            {
+                                <tr>
+                                    <td>
+                                        <p id="name-@item.Id" class="mx-3 text-xs font-weight-bold mb-0">@item.Title</p>
+                                    </td>
+                                    <td class="align-middle">
+                                        <button type="button" onclick="showPopup(@item.Id,'@item.Title','@item.Content')" title="Sửa" class="btn1 btn btn-secondary" data-toggle="modal" data-target="#exampleModal">
+                                            <i class="fa-solid fa-pen-to-square"></i>
+                                        </button>
+                                        <button type="button" onclick="deleteItem(@item.Id)" title="Xóa" class="btn1 btn btn-secondary">
+                                            <i class="fa-solid fa-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <form id="formModal" class="modal-content" method="post" asp-action="UpdateBasicKnowledge">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Kiến thức cơ bản</h5>
+                <button type="button" class="btn close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div style="display:block" class="form-group input-group input-group-outline">
+                    <input type="number" asp-for="Id" hidden />
+                    <label for="Title">Tiêu đề</label>
+                    <input style="width:100%"  type="text" class="form-control" asp-for="Title" required placeholder="Tên">
+                </div>
+                <div style="display:block" class="form-group input-group input-group-outline mt-4">
+                    <label>Thể loại</label>
+                    <select style="width:100%" asp-for="Category" class="form-control">
+                        <option value="0">Hướng Dẫn Cơ Bản</option>
+                        <option value="1">Trợ Lực Sáng Tác</option>
+                        <option value="2">Thu Nhập Và Thanh Toán</option>
+                        <option value="3">Sử dụng IReading</option>
+                    </select>
+                </div>
+                <div style="display:block" class="form-group input-group input-group-outline">
+                    <label for="Content">Nội dung</label>
+                    <textarea style="width:100%" type="text" asp-for="Content" class="form-control" placeholder="Nội dung"></textarea>
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-primary">Lưu thông tin</button>
+            </div>
+        </form>
+    </div>
+</div>
+<script type="text/javascript">
+    document.getElementById('BasicKnowledgeId').classList.add('active');
+    document.getElementById('CategoryKnowledgeType').value = @ViewBag.Category
+    
+    function ChangeSelect(el){
+        var category = $(el).val();
+        window.location.href = `/Admin/ListBasicKnowledge?category=${category}`;
+    }
+
+    function showPopup(id,name,des){
+        document.getElementById('Id').value = id;
+        document.getElementById('Title').value = name;
+        document.getElementById('Content').value = des;
+    }
+
+    function deleteItem(id) {
+        if (confirm("Bạn có muốn xóa ?") == false) return;
+        //var formData = new FormData();
+        $.ajax(
+            {
+                url: `/Admin/DeleteBasicKnowledge?id=${id}`,
+                type: "GET",
+                headers:
+                {
+                    "RequestVerificationToken": '@GetAntiXsrfRequestToken()'
+                },
+                //data: formData,
+                //dataType: "json",
+                async: true,
+                processData: false,
+                contentType: false,
+                success: function (data) {
+                    if (data.IsSussess == false) {
+                        notyf.error(data.message);
+                        return;
+                    }
+                    notyf.success(data.message);
+                    setTimeout(() => {
+                        window.location.href = '/Admin/ListBasicKnowledge';
+                    }, 800);
+                }
+            }
+        );
+
+    }
+</script>

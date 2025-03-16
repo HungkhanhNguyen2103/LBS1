@@ -21,6 +21,8 @@ namespace BusinessObject
         public DateTime ModifyDate { get; set; }
         public BookType BookType { get; set; }
         public int WordNo { get; set; }
+        [BsonIgnore]
+        public int ViewNo { get; set; }
         public int Price { get; set; }
         public string? CreateBy { get; set; }
         public string? UserId { get; set; }
