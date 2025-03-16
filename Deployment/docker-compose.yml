@@ -3,8 +3,8 @@
         image: ireading_api
         container_name: ireading_api
         build:
-            context: ./../IReadingAPI
-            dockerfile: ./Dockerfile.IReadingAPI
+            context: ..
+            dockerfile: ./Deployment/Dockerfile.IReadingAPI
         ports:
             - 7157:8080
         volumes:
@@ -19,8 +19,8 @@
         image: ireading_web
         container_name: ireading_web
         build:
-           context: ./../IReadingWeb
-           dockerfile: ./Dockerfile.IReadingWeb
+           context: ..
+           dockerfile: ./Deployment/Dockerfile.IReadingWeb
         ports:
             - 7198:8080
         volumes:
