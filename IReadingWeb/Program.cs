@@ -9,6 +9,14 @@ using Microsoft.AspNetCore.Mvc;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.WebHost.ConfigureKestrel(serverOptions =>
+{
+    serverOptions.ListenAnyIP(80); // HTTP
+    serverOptions.ListenAnyIP(443, listenOptions =>
+    {
+        listenOptions.UseHttps("/etc/ssl/ireadingcertificate.pfx", "SEP490G68_Capstonproject");
+    });
+});
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
