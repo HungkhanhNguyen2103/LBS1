@@ -1,7 +1,7 @@
-﻿# lweys_api
-docker build -t lweys_api -f Dockerfile.LWEYSAPI ..
-# lweys
-docker build -t lweys -f Dockerfile.LWEYS ..
+﻿# ireading_api
+docker build -t ireading_api -f Dockerfile.IREADINGAPI ..
+# ireading_web
+docker build -t ireading_web -f Dockerfile.IREADINGWEB ..
 
 docker-compose -f docker-compose.yml down
 docker-compose build
