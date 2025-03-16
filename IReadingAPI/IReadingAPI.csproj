@@ -27,7 +27,7 @@
 
   <ItemGroup>
     <Reference Include="ImgurAPI">
-      <HintPath>..\References\ImgurAPI.dll</HintPath>
+      <HintPath>References\ImgurAPI.dll</HintPath>
     </Reference>
   </ItemGroup>
 
