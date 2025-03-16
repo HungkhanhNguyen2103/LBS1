@@ -2,9 +2,9 @@
     ireading_api:
         image: ireading_api
         container_name: ireading_api
-         # build:
-            # context: ./../LWEYSWebAPI
-            # dockerfile: ./Dockerfile.LWEYSAPI
+        build:
+            context: ./../IReadingAPI
+            dockerfile: ./Dockerfile.IReadingAPI
         ports:
             - 7157:8080
         volumes:
@@ -18,9 +18,9 @@
     ireading_web:
         image: ireading_web
         container_name: ireading_web
-        # build:
-           # context: ./../LWEYS
-           # dockerfile: ./Dockerfile.LWEYS
+        build:
+           context: ./../IReadingWeb
+           dockerfile: ./Dockerfile.IReadingWeb
         ports:
             - 7198:8080
         volumes:
@@ -32,24 +32,24 @@
             - API_URL=http://103.56.163.69:7157
     
 
-     Server=mssqlserver
-     Server=103.56.163.69
-     redis:
-         image: redis
-         container_name: redis_server
-         ports:
-             - 6379:6379
-         restart: always
-     mssqlserver:
-         image: mcr.microsoft.com/mssql/server
-         container_name: mssqlserver
-         user: root
-         ports:
-             - 1433:1433
-         restart: always
-         environment:
-             SA_PASSWORD: SEP490G68_Capstonproject
-             ACCEPT_EULA: Y
-             MSSQL_PID: Express
-         volumes:
-             - /root/data/MSSQLSERVER/DATA:/var/opt/mssql/data
+    # Server=mssqlserver
+    # Server=103.56.163.69
+    # redis:
+        # image: redis
+        # container_name: redis_server
+        # ports:
+            # - 6379:6379
+        # restart: always
+    # mssqlserver:
+        # image: mcr.microsoft.com/mssql/server
+        # container_name: mssqlserver
+        # user: root
+        # ports:
+            # - 1433:1433
+        # restart: always
+        # environment:
+            # sa_password: sep490g68_capstonproject
+            # accept_eula: y
+            # mssql_pid: express
+        # volumes:
+            # - /root/data/mssqlserver/data:/var/opt/mssql/data
