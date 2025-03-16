@@ -22,7 +22,7 @@
            context: ..
            dockerfile: ./Deployment/Dockerfile.IReadingWeb
         ports:
-            - 7198:8080
+            - 80:8080
         volumes:
             - /root/docker/volumes/ireading_web/content_root_path/wwwroot:/app/wwwroot
         restart: always
