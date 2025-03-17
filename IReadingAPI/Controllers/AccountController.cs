@@ -41,7 +41,7 @@ namespace LBSAPI.Controllers
         [HttpPost]
         public async Task<ReponderModel<string>> LoginWithGoogle(AccountModel model)
         {
-            var rs = await _accountRepository.LoginWithGoogle(model.Email, model.FullName);
+            var rs = await _accountRepository.LoginWithGoogle(model.Email, model.FullName, model.RegisterType);
             return rs;
         }
 

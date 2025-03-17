@@ -209,9 +209,19 @@ namespace Repositories.Repository
             }
             try
             {
-				await _userManager.AddToRolesAsync(user, new List<string> {Role.User,Role.Author});
-
-                var roles = $"{Role.User},{Role.Author}";
+                var roles = string.Empty;
+                //Author
+                if(account.RegisterType == 1)
+                {
+                    await _userManager.AddToRolesAsync(user, new List<string> { Role.User, Role.Author });
+                    roles = $"{Role.User},{Role.Author}";
+                }
+                else if(account.RegisterType == 0)
+                {
+                    await _userManager.AddToRolesAsync(user, new List<string> { Role.User});
+                    roles = $"{Role.User}";
+                }
+				
                 responder.Data = await EncodeSha256(user, roles, true,user.ResetPassword);
 
 
@@ -509,7 +519,7 @@ namespace Repositories.Repository
             return responder;
         }
 
-        public async Task<ReponderModel<string>> LoginWithGoogle(string email,string fullname)
+        public async Task<ReponderModel<string>> LoginWithGoogle(string email,string fullname,int registerType)
         {
             var responder = new ReponderModel<string>();
             var userExist = await _userManager.FindByEmailAsync(email);
@@ -529,8 +539,19 @@ namespace Repositories.Repository
                 var result = await _userManager.CreateAsync(user, pw);
                 try
                 {
-                    await _userManager.AddToRoleAsync(user, Role.User);
-                    responder.Data = await EncodeSha256(user, Role.User, true, user.ResetPassword);
+                    var role1s = string.Empty;
+                    //Author
+                    if (registerType == 1)
+                    {
+                        await _userManager.AddToRolesAsync(user, new List<string> { Role.User, Role.Author });
+                        role1s = $"{Role.User},{Role.Author}";
+                    }
+                    else if (registerType == 0)
+                    {
+                        await _userManager.AddToRolesAsync(user, new List<string> { Role.User });
+                        role1s = $"{Role.User}";
+                    }
+                    responder.Data = await EncodeSha256(user, role1s, true, user.ResetPassword);
 
 
                     //Send Email 

@@ -21,6 +21,10 @@ namespace BusinessObject.BaseModel
         public string? ReturnUrl { get; set; }
         public bool AccountActive { get; set; }
         public int GrantPermission { get; set; }
+
+        // 0 - User
+        // 1 - Author
+        public int RegisterType { get; set; }
     }
 
     public class AccountViewModel : AccountModel

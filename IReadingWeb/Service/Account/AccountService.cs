@@ -34,6 +34,7 @@ namespace LBSWeb.Services.Account
             }
             try
             {
+                model.RegisterType = 1;
                 string url = PathUrl.ACCOUNT_REGISTER;
                 res = await _api.Post<ReponderModel<string>>(url, model);
 
@@ -56,6 +57,7 @@ namespace LBSWeb.Services.Account
             }
             try
             {
+                model.RegisterType = 1;
                 string url = PathUrl.ACCOUNT_LOGIN;
                 res = await _api.Post<ReponderModel<string>>(url, model);
 
@@ -129,6 +131,7 @@ namespace LBSWeb.Services.Account
             var res = new ReponderModel<string>();
             try
             {
+                account.RegisterType = 1;
                 string url = PathUrl.ACCOUNT_UPDATE_INFO;
                 res = await _api.Post<ReponderModel<string>>(url, account);
 
@@ -164,6 +167,7 @@ namespace LBSWeb.Services.Account
             var res = new ReponderModel<string>();
             try
             {
+                model.RegisterType = 1;
                 string url = PathUrl.ACCOUNT_ACCESS_ROLE;
                 res = await _api.Post<ReponderModel<string>>(url, model);
 
@@ -180,6 +184,7 @@ namespace LBSWeb.Services.Account
             var res = new ReponderModel<string>();
             try
             {
+                model.RegisterType = 1;
                 string url = PathUrl.ACCOUNT_FORGOT_PASSWORD;
                 res = await _api.Post<ReponderModel<string>>(url, model);
 
@@ -201,6 +206,7 @@ namespace LBSWeb.Services.Account
             }
             try
             {
+                accountModel.RegisterType = 1;
                 string url = PathUrl.ACCOUNT_CHANGE_PASSWORD;
                 res = await _api.Post<ReponderModel<string>>(url, accountModel);
 
@@ -238,7 +244,8 @@ namespace LBSWeb.Services.Account
             var model = new AccountModel
             {
                 Email = email,
-                FullName = fullname
+                FullName = fullname,
+                RegisterType = 1
             };
             if (model == null)
             {
