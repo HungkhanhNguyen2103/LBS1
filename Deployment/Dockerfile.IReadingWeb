@@ -28,7 +28,7 @@ WORKDIR /app
 COPY --from=publish /app/publish .
 
 # Copy your PFX certificate into the container
-COPY Ssl/ireadingcertificate.pfx /Ssl/ireadingcertificate.pfx
+COPY ./Ssl/ireadingcertificate.pfx ./Ssl/ireadingcertificate.pfx
 
 # Set the environment variable for ASP.NET Core to use HTTPS
 ENV ASPNETCORE_URLS="https://+:443;http://+:80"
