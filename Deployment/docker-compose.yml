@@ -14,7 +14,7 @@
             - ASPNETCORE_ENVIRONMENT=Production
             - CONNECTION_STRING=Server=mssqlserver;Database=IReading;User=sa;Password=SEP490G68_Capstonproject;TrustServerCertificate=True
             - WEBPAGE_URL=http://ireading.store
-            - API_URL=http://103.56.163.69:7157
+            - API_URL=https://ireading.store/
     ireading_web:
         image: ireading_web
         container_name: ireading_web
@@ -29,7 +29,7 @@
         environment: 
             - ASPNETCORE_ENVIRONMENT=Production
             # - CONNECTION_STRING=Server=mssqlserver;Database=LWEYS;User=sa;Password=0123654798aA@;TrustServerCertificate=True
-            - API_URL=http://103.56.163.69:7157
+            - API_URL=https://ireading.store/
     
 
     # Server=mssqlserver
