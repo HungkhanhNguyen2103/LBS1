@@ -134,7 +134,7 @@
             <div class="card-body px-0 pb-2">
                 <div style="width:12rem;margin-left:2rem" class="form-group input-group input-group-outline mt-4">
                     <select style="width:100%" class="form-select form-control" onchange="ChangeSelect(this)" id="UserReportStatus">
-                        <option value="1">Yêu cầu của tôi</option>
+                        <option value="1">@(@ViewBag.ReportType == 0 ? "Xử lý báo cáo" : "Yêu cầu của tôi")</option>
                         <option value="0">Yêu cầu đã đóng</option>
                     </select>
                 </div>
@@ -179,7 +179,7 @@
                         <p id="content"></p>
                         <span style="color: #d9534f;"></span>
 
-                        <div class="comment-box">
+                        <div class="comment-box d-none">
                             <h4 style="font-size:15px">Bình luận</h4>
                             <textarea class="font-control" placeholder="Thêm bình luận..."></textarea>
                             <button class="btn btn-warning">Gửi</button>

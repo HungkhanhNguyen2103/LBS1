@@ -501,7 +501,7 @@ namespace Repositories.Repository
                 //var res = await _aIGeneration.TextGenerateToSpeech(bookChapter.Summary);
                 //if(res.IsSussess) bookChapter.AudioUrl = res.Data;
             }
-
+            bookChapter.Type = 1;
             bookChapter.ModifyDate = DateTime.Now;
 
 
@@ -514,7 +514,8 @@ namespace Repositories.Repository
                         .Set(c => c.Content, bookChapter.Content)
                         .Set(c => c.BookType, bookChapter.BookType)
                         .Set(c => c.WordNo, bookChapter.WordNo)
-                        .Set(c => c.Price, bookChapter.Price);
+                        .Set(c => c.Price, bookChapter.Price)
+                        .Set(c => c.Type, bookChapter.Type);
 
             await _mongoContext.BookChapters.UpdateOneAsync(filter,update);
 

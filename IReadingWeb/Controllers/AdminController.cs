@@ -434,6 +434,7 @@ namespace LBSWeb.Controllers
             var result = await _bookService.GetBook(id);
             var resultChapterBook = await _bookService.GetBookChapter(chapterId);
             ViewBag.BookName = result.Data.Name;
+            ViewBag.ChapterId = chapterId;
             return View(resultChapterBook.Data);
         }
 
@@ -446,7 +447,7 @@ namespace LBSWeb.Controllers
             if (result.IsSussess)
             {
                 _notyf.Success(result.Message);
-                return RedirectToAction("ChapterBooks");
+                return Redirect($"/Admin/{bookChapter.BookId}/ChapterBooks");
             }
             else
             {
@@ -531,7 +532,7 @@ namespace LBSWeb.Controllers
             if (result.IsSussess)
             {
                 _notyf.Success(result.Message);
-                return RedirectToAction("Books");
+                return Redirect($"/Admin/{bookChapter.BookId}/ChapterBooks");
             }
             else
             {

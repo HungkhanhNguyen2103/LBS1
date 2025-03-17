@@ -17,9 +17,12 @@
         margin: 0;
     }
 </style>
-<button type="button" onclick="window.location.href ='/Admin/@ViewBag.BookId/CreateChapterBook'" class="btn btn-success">
-    Thêm chương
-</button>
+@if (User.IsInRole("Author"))
+{
+    <button type="button" onclick="window.location.href ='/Admin/@ViewBag.BookId/CreateChapterBook'" class="btn btn-success">
+        Thêm chương
+    </button>
+}
 <button type="button" onclick="window.location.href='/Admin/Books'" class="btn btn-secondary ml-2">Quay lại</button>
 <div class="row">
     <div class="col-12">
@@ -61,14 +64,18 @@
                                     <td class="align-middle">
                                         <span class="text-secondary text-xs font-weight-bold">@item.ViewNo</span>
                                     </td>
-                                    <td class="align-middle">
-                                        <button onclick="window.location.href='/Admin/@ViewBag.BookId/UpdateChapterBook/@item.Id'" title="Sửa" class="btn1 btn btn-secondary">
-                                            <i class="fa-solid fa-pen-to-square"></i>
-                                        </button>
-                                        <button onclick="deleteItem('@item.Id')" title="Xóa" class="btn1 btn btn-secondary">
-                                            <i class="fa-solid fa-trash"></i>
-                                        </button>
-                                    </td>
+                                    @if (User.IsInRole("Author"))
+                                    {
+                                        <td class="align-middle">
+                                            <button onclick="window.location.href='/Admin/@ViewBag.BookId/UpdateChapterBook/@item.Id'" title="Sửa" class="btn1 btn btn-secondary">
+                                                <i class="fa-solid fa-pen-to-square"></i>
+                                            </button>
+                                            <button onclick="deleteItem('@item.Id')" title="Xóa" class="btn1 btn btn-secondary">
+                                                <i class="fa-solid fa-trash"></i>
+                                            </button>
+                                        </td>
+                                    }
+
                                 </tr>
                             }
 

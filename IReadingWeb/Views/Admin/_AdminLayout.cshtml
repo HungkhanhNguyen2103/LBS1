@@ -73,7 +73,7 @@
                     @if (claims.IsInRole("Author") || claims.IsInRole("Manager"))
                     {
                         <li class="nav-item ml-2" style="padding-left:1.5rem;margin-bottom:0.2rem;margin-top:0.2rem;font-size: 14px;font-weight:bold">
-                            <small class="text-secondary">TRUYỆN @(claims.IsInRole("Author") ? "CỦA TÔI" : "")</small>
+                            <small class="text-secondary">SÁCH @(claims.IsInRole("Author") ? "CỦA TÔI" : "")</small>
                         </li>
                     }
                     @if (claims.IsInRole("Manager"))
