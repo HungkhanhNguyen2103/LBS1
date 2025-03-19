@@ -258,6 +258,11 @@ namespace Repositories.Repository
             var result = new ReponderModel<BookViewModel>();
             var roles = await _accountRepository.GetRolesByUserName(userName);
 
+            if (roles.Count == 0)
+            {
+                roles = new List<string> { Role.Visitor };
+            }
+
             var listBook = new List<Book>();
 
             if (roles.Contains(Role.Author))
@@ -267,6 +272,10 @@ namespace Repositories.Repository
             if (roles.Contains(Role.Manager))
             {
                 listBook = await _lBSDbContext.Books.ToListAsync();
+            }
+            if (roles.Contains(Role.Visitor))
+            {
+                listBook = await _lBSDbContext.Books.Where(c => c.Status == BookStatus.Done || c.Status == BookStatus.Published || c.Status == BookStatus.Continue).ToListAsync();
             }
 
             result.DataList = new List<BookViewModel>();
