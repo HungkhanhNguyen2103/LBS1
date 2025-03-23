@@ -37,9 +37,17 @@ namespace Repositories.Repository
             var result = new ReponderModel<string>();
             if(string.IsNullOrEmpty(model.Name) || string.IsNullOrWhiteSpace(model.Name))
             {
-                result.Message = "Hãy nhập thể loại";
+                result.Message = "Hãy nhập danh mục";
                 return result;
             }
+
+            var cateExist = await _lBSDbContext.Categories.FirstOrDefaultAsync(c => c.Name == model.Name);
+            if(cateExist != null)
+            {
+                result.Message = "Danh mục đã được tạo trước đó";
+                return result;
+            }
+
             var cate = await _lBSDbContext.Categories.FirstOrDefaultAsync(c => c.Id == model.Id);
             if(cate == null) _lBSDbContext.Categories.Add(model);
             else
@@ -122,7 +130,7 @@ namespace Repositories.Repository
 
             book.Name = bookModel.Name;
             book.Summary = bookModel.Summary;
-            book.CategoryId = bookModel.CategoryId;
+            //book.CategoryId = bookModel.CategoryId;
             book.AgeLimitType = bookModel.AgeLimitType;
             book.BookType = bookModel.BookType;
             book.Price = bookModel.Price;
@@ -183,13 +191,19 @@ namespace Repositories.Repository
 
             if (string.IsNullOrEmpty(bookModel.Name))
             {
-                result.Message = "Nhập tên truyện";
+                result.Message = "Nhập tên sách";
                 return result;
             }
 
             if (string.IsNullOrEmpty(bookModel.Summary))
             {
-                result.Message = "Nhập tóm tắt";
+                result.Message = "Nhập giới thiệu";
+                return result;
+            }
+
+            if (bookModel.CategoryIds == null || bookModel.CategoryIds.Count == 0)
+            {
+                result.Message = "Chọn danh mục";
                 return result;
             }
 
@@ -201,13 +215,14 @@ namespace Repositories.Repository
             {
                 Name = bookModel.Name,
                 Summary = bookModel.Summary,
-                CategoryId = bookModel.CategoryId,
+                //CategoryId = bookModel.CategoryId,
                 AgeLimitType = bookModel.AgeLimitType,
                 BookType = bookModel.BookType,
                 Price = bookModel.Price,
                 CreateBy = bookModel.CreateBy,
                 Status = BookStatus.PendingPublication,
                 UserId = bookModel.UserId,
+                SubCategory = bookModel.SubCategory,
                 //Poster = response.Data.Link,
                 CreateDate = DateTime.Now,
                 ModifyDate = DateTime.Now
@@ -449,9 +464,9 @@ namespace Repositories.Repository
             return result;
         }
 
-        public async Task<ReponderModel<string>> GeneratePoster(string input)
+        public async Task<ReponderModel<string>> GeneratePoster(string name, string summary)
         {
-            var result = await _aIGeneration.TextGenerateToImage("Tạo ảnh với dữ liệu từ tên truyện: " + input);
+            var result = await _aIGeneration.TextGenerateToImage("Tạo ảnh với dữ liệu từ tên sách: " + name + " và (hoặc) giới thiệu: " + summary);
             return result;
         }
 
@@ -507,8 +522,8 @@ namespace Repositories.Repository
             }
             if (!string.IsNullOrEmpty(bookChapter.Summary) && bookChapterRow.Summary != bookChapter.Summary)
             {
-                //var res = await _aIGeneration.TextGenerateToSpeech(bookChapter.Summary);
-                //if(res.IsSussess) bookChapter.AudioUrl = res.Data;
+                var res = await _aIGeneration.TextGenerateToSpeech(bookChapter.Summary);
+                if (res.IsSussess) bookChapter.AudioUrl = res.Data;
             }
             bookChapter.Type = 1;
             bookChapter.ModifyDate = DateTime.Now;

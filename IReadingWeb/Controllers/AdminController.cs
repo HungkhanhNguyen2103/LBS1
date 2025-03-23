@@ -345,7 +345,6 @@ namespace LBSWeb.Controllers
             bookModel.CreateBy = User.FindFirst(ClaimTypes.NameIdentifier).Value;
             bookModel.UserId = User.FindFirst(ClaimTypes.PrimarySid).Value;
             var result = await _bookService.CreateBook(bookModel);
-            ViewBag.Categories = result.DataList;
             if (result.IsSussess) 
             { 
                 _notyf.Success(result.Message);
@@ -353,6 +352,8 @@ namespace LBSWeb.Controllers
             }
             else
             {
+                var result1 = await _bookService.GetCategories();
+                ViewBag.Categories = result1.DataList;
                 _notyf.Error(result.Message);
                 return View(bookModel);
             }
@@ -460,9 +461,9 @@ namespace LBSWeb.Controllers
         [HttpPost]
         [Authorize(Roles = $"{Role.Author}")]
         [Route("GeneratePoster")]
-        public async Task<IActionResult> GeneratePoster(string input)
+        public async Task<IActionResult> GeneratePoster(string input,string summary)
         {
-            var result = await _bookService.GeneratePoster(input);
+            var result = await _bookService.GeneratePoster(input, summary);
             return Json(result);
         }
 

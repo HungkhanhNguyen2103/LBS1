@@ -179,7 +179,7 @@ namespace LBSAPI.Controllers
         [HttpPost]
         public async Task<ReponderModel<string>> GeneratePoster(RequestModel model)
         {
-            var result = await _bookRepository.GeneratePoster(model.Data);
+            var result = await _bookRepository.GeneratePoster(model.Data,model.OptionData);
             return result;
         }
 

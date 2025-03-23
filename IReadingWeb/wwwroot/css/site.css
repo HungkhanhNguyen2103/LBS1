@@ -2,6 +2,27 @@ html {
   font-size: 14px;
 }
 
+
+.input-group {
+    padding-left: 5px;
+}
+
+.note {
+    background-color: #F6E6E6;
+    margin: 0 17px;
+    color: #CD7778;
+    border-radius: 10px;
+    padding: 1rem;
+}
+
+    .note ul {
+        padding-left: 0px;
+    }
+
+    .note li {
+        list-style: none;
+    }
+
 @media (min-width: 768px) {
   html {
     font-size: 16px;

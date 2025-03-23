@@ -21,7 +21,8 @@ namespace BusinessObject.BaseModel
         public DateTime CreateDate { get; set; }
         public DateTime ModifyDate { get; set; }
         public string? CreateBy { get; set; }
-        public int CategoryId { get; set; }
+        public List<int> CategoryIds { get; set; } = new List<int>();
+        public string? SubCategory { get; set; }
         public string? UserId { get; set; }
         //public IFormFile? FileUpload { get; set; }
     }

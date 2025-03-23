@@ -217,18 +217,20 @@ namespace LBSWeb.Service.Book
             return res;
         }
 
-        public async Task<ReponderModel<string>> GeneratePoster(string input)
+        public async Task<ReponderModel<string>> GeneratePoster(string input, string summary)
         {
-            var model = new RequestModel
-            {
-                Data = input
-            };
             var res = new ReponderModel<string>();
-            if (string.IsNullOrEmpty(input))
+            if (string.IsNullOrEmpty(input) && string.IsNullOrEmpty(summary))
             {
-                res.Message = "Cần nhập tên truyện";
+                res.Message = "Cần nhập tên truyện hoặc giới thiệu";
                 return res;
             }
+            var model = new RequestModel
+            {
+                Data = string.IsNullOrEmpty(input) ? " " : input,
+                OptionData = string.IsNullOrEmpty(summary) ? " " : summary
+            };
+
             try
             {
                 string url = PathUrl.BOOK_GENERATE_POSTER_CHAPTER;

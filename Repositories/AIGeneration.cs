@@ -99,11 +99,11 @@ namespace Repositories
 
             try
             {
-                //var imageOption = new ImageGenerationOptions
-                //{
-                //    Size = GeneratedImageSize.W512xH512
-                //    //Quality = GeneratedImageQuality.Standard
-                //};
+                var imageOption = new ImageGenerationOptions
+                {
+                    //Size = GeneratedImageSize.W512xH512
+                    Quality = GeneratedImageQuality.Standard
+                };
                 GeneratedImage image = await client.GenerateImageAsync(prompt: input);
                 var urlImage = image.ImageUri.OriginalString;
                 if (string.IsNullOrEmpty(urlImage)) 

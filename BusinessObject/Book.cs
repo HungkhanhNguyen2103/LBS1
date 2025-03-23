@@ -22,11 +22,12 @@ namespace BusinessObject
         public int AgeLimitType { get; set; }
         public DateTime CreateDate { get; set; }
         public DateTime ModifyDate { get; set; }
+        public string? SubCategory { get; set; }
         [Column(TypeName = "nvarchar(50)")]
         public string? CreateBy { get; set; }
-        public int CategoryId { get; set; }
+        //public int CategoryId { get; set; }
         public string? UserId { get; set; }
-        public Category? Category { get; set; }
+        //public Category? Category { get; set; }
         public Account? User { get; set; }
     }
 

@@ -12,14 +12,20 @@
 @* <button type="button" onclick="document.getElementById('formModal').reset();" class="btn btn-success" data-toggle="modal" data-target="#exampleModalPost">
     Tạo mới
 </button> *@
+<link href="~/css/MultiSelect.css" rel="stylesheet" type="text/css"  asp-append-version="true">
 <style>
     .form-control{
         margin-left: 0px !important;
     }
 
+    button {
+        margin-left: 5px;
+    }
+
+
    #loading {
         position: absolute;
-        top: 50%;
+        top: 57%;
         right: 50%;
     }
 </style>
@@ -29,28 +35,36 @@
         <div class="card my-4">
             <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
                 <div class="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3">
-                    <h6 class="text-white text-capitalize ps-3">Thêm mới truyện</h6>
+                    <h6 class="text-white text-capitalize ps-3">Thêm mới sách</h6>
                 </div>
             </div>
             <div class="card-body px-0 pb-2">
+                <div class="note">
+                    <ul>
+                            <li>-Danh mục con: abc</li>
+                    </ul>
+                </div>
                 <div class="table-responsive p-0 m-4 mt-0">
                     <div style="display:block" class="form-group input-group input-group-outline mt-4">
-                        <label for="Name">Tên truyện</label>
-                        <input style="width:100%" type="text" asp-for="Name" class="form-control" autofocus>
+                        <label for="Name">Tên truyện <span style="color:red">*</span>:</label>
+                        <input style="width:100%" type="text" asp-for="Name" class="form-control">
                     </div>
                     <div style="display:block" class="input-group input-group-outline mt-4">
-                        <label for="Summary">Giới thiệu</label>
-                        <textarea style="width:100%" asp-for="Summary" type="text" class="form-control" rows="8" ></textarea>
+                            <label for="Summary">Giới thiệu <span style="color:red">*</span>:</label>
+                            <textarea style="width:100%" asp-for="Summary" type="text" class="form-control" rows="8"></textarea>
                     </div>
                     <div style="display:block" class="form-group input-group input-group-outline mt-4">
-                        <label>Thể loại</label>
-                        <select style="width:100%" asp-for="CategoryId" class="form-control">
-                            <option selected value="">Vui lòng chọn</option>
+                        <label>Danh mục <span style="color:red">*</span>:</label>
+                        <select style="width:100%" class="form-control" asp-for="CategoryIds" multiple data-multi-select>
                             @foreach (Category cate in ViewBag.Categories)
                             {
                                 <option value="@cate.Id">@cate.Name</option>
                             }
                         </select>
+                    </div>
+                    <div style="display:block" class="form-group input-group input-group-outline mt-4">
+                        <label>Danh mục con:</label>
+                            <input style="width:100%" type="text" class="form-control" asp-for="SubCategory" />
                     </div>
                     <div class="d-flex ml-0">
                          <button type="button" onclick="GeneratePoster()" class="btn btn-success mt-4">Tạo bìa truyện bằng AI</button>
@@ -58,7 +72,7 @@
                     <div id="loading" class="dot-elastic"></div>
                     <div style="display:block;position:relative" class="input-group input-group-outline mt-4">
                         <input type="number" asp-for="Id" id="post-id" hidden />
-                        <label for="Name">Cập nhật ảnh bìa</label>
+                        <label for="Name">Cập nhật ảnh bìa:</label>
                         <input type="file" style="width:100%" onchange="changeImageFile(this)" accept="image/*" class="form-control">
                             <img style="margin-top:2rem;height:16rem!important;width:16rem!important; border-radius:1rem!important" id="img-post-id" src="https://i.imgur.com/KHD58yX.png" class="avatar avatar-sm me-3 border-radius-lg">
                         <input type="text" id="image-post" asp-for="Poster" hidden />
@@ -71,7 +85,7 @@
     </div>
     </form>
 </div>
-
+<script src="~/js/MultiSelect.js" asp-append-version="true"></script>
 <script type="text/javascript">
     // document.getElementById('CreatBookId').classList.add('active');
     document.getElementById('loading').classList.add('d-none');
@@ -102,8 +116,10 @@
         $('#loading').removeClass('d-none');
         //var summary;
         var input = $('#Name').val();
+        var summary = $('#Summary').val();
         var formData = new FormData();
         formData.append('input', input);
+        formData.append('summary', summary);
         $.ajax(
             {
                 url: `/Admin/GeneratePoster`,
