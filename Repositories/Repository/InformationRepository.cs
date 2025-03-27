@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using System.Net;
 using System.Reflection.Metadata;
+using MongoDB.Driver;
 
 namespace Repositories.Repository
 {
@@ -311,6 +312,112 @@ namespace Repositories.Repository
                 return result;
             }
             result.Data = data;
+            result.IsSussess = true;
+            return result;
+        }
+
+        public async Task<ReponderModel<RoomModel>> GetRoomByAuthor(string username, string chapterBookId)
+        {
+            var reponse = new ReponderModel<RoomModel>();
+            var asQuery = _lBSDbContext.Rooms.AsQueryable();
+
+            // model chat chapter book
+            if(chapterBookId != "-1")
+            {
+                asQuery = asQuery.Where(c => c.ChapterBookId == chapterBookId);
+            }
+
+            var result = await asQuery.FirstOrDefaultAsync(c => c.AuthorUser == username);
+
+            //create new room
+            var roomName = string.Empty;
+            if (result == null)
+            {
+                var newRoom = new Room
+                {
+                    RoomName = Guid.NewGuid().ToString(),
+                    AuthorUser = username
+                };
+                _lBSDbContext.Rooms.Add(newRoom);
+                await _lBSDbContext.SaveChangesAsync();
+
+                roomName = newRoom.RoomName;
+            }
+            else roomName = result.RoomName;
+
+            var filter = Builders<Messenger>.Filter.And(
+                            Builders<Messenger>.Filter.Eq(c => c.RoomId, roomName),
+                            Builders<Messenger>.Filter.Or(
+                                Builders<Messenger>.Filter.Where(p => p.CreateBy == username),
+                                Builders<Messenger>.Filter.Where(p => p.To == username)
+                            )
+            );
+            var messengers = await _mongoContext.Messengers.Find(filter).ToListAsync();
+
+            reponse.Data = new RoomModel
+            {
+                RoomName = roomName,
+                AuthorUser = username,
+                Messagers = messengers
+            };
+
+            reponse.IsSussess = true;
+
+            return reponse;
+        }
+
+        public async Task<ReponderModel<RoomModel>> GetRoomByManager(string username, string chapterBookId)
+        {
+            var reponse = new ReponderModel<RoomModel>();
+
+            var asQuery = _lBSDbContext.Rooms.AsQueryable();
+
+
+            // model chat chapter book
+            if (chapterBookId != "-1")
+            {
+                asQuery = asQuery.Where(c => c.ChapterBookId == chapterBookId);
+            }
+
+            var result = await asQuery.ToListAsync();
+
+            foreach (var item in result)
+            {
+                var filter = Builders<Messenger>.Filter.And(
+                                Builders<Messenger>.Filter.Eq(c => c.RoomId, item.RoomName),
+                                Builders<Messenger>.Filter.Or(
+                                    Builders<Messenger>.Filter.Where(p => p.CreateBy == item.AuthorUser),
+                                    Builders<Messenger>.Filter.Where(p => p.To == item.AuthorUser)
+                                )
+                            );
+                var messengers = await _mongoContext.Messengers.Find(filter).ToListAsync();
+
+                var author = await _accountRepository.GetInformation(item.AuthorUser);
+                var roomModel = new RoomModel
+                {
+                    RoomName = item.RoomName,
+                    AuthorUser = item.AuthorUser,
+                    AuthorFullName = author.Data.FullName,
+                    Messagers = messengers,
+                };
+                reponse.DataList.Add(roomModel);
+            }
+            reponse.IsSussess = true;
+
+            return reponse;
+        }
+
+        public async Task<ReponderModel<string>> SendMessage(Messenger messenger)
+        {
+            var result = new ReponderModel<string>();
+            if(messenger == null) 
+            {
+                result.Message = "Không có dữ liệu";
+                return result;
+            }
+            messenger.ModifyDate = DateTime.Now;
+            await _mongoContext.Messengers.InsertOneAsync(messenger);
+            result.Message = "Cập nhật thành công";
             result.IsSussess = true;
             return result;
         }

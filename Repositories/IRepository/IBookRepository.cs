@@ -15,10 +15,11 @@ namespace Repositories.IRepository
         Task<ReponderModel<Category>> GetCategories();
         Task<ReponderModel<string>> UpdateCategory(Category model);
         Task<ReponderModel<string>> DeleteCategory(int id);
-        Task<ReponderModel<string>> UpdateBook(Book book);
-        Task<ReponderModel<Book>> GetBook(int id);
+        Task<ReponderModel<string>> UpdateBook(BookModel book);
+        Task<ReponderModel<BookModel>> GetBook(int id);
         Task<ReponderModel<string>> CreateBook(BookModel bookModel);
         Task<ReponderModel<BookViewModel>> GetAllBookByUser(string userName);
+        Task<ReponderModel<BookViewModel>> GetAllBookByCategory(string category);
         Task<ReponderModel<string>> CreateBookChapter(BookChapter bookChapter);
         Task<ReponderModel<string>> UpdateBookChapter(BookChapter bookChapter);
         Task<ReponderModel<BookChapter>> GetBookChapter(string id);
@@ -30,6 +31,7 @@ namespace Repositories.IRepository
         Task<ReponderModel<string>> GenerateTextToImage(string input);
         Task<ReponderModel<DraftModel>> GetDrafts(string userName);
         Task<ReponderModel<string>> ApproveBook(int bookId);
+        Task<ReponderModel<string>> QuicklyApproveChapterContent(string input);
         Task<ReponderModel<string>> UpdateApproveBook(int bookId);
         Task<ReponderModel<string>> UpdateBookChapterView(UserBookView model);
         Task<ReponderModel<StatisticsChapterBook>> StatisticsChapterBook(int bookId);

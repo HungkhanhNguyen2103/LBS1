@@ -41,12 +41,12 @@
             <div class="card-body px-0 pb-2">
                 <div class="note">
                     <ul>
-                            <li>-Danh mục con: abc</li>
+                            <li>- Danh mục con: abc</li>
                     </ul>
                 </div>
                 <div class="table-responsive p-0 m-4 mt-0">
                     <div style="display:block" class="form-group input-group input-group-outline mt-4">
-                        <label for="Name">Tên truyện <span style="color:red">*</span>:</label>
+                        <label for="Name">Tên sách <span style="color:red">*</span>:</label>
                         <input style="width:100%" type="text" asp-for="Name" class="form-control">
                     </div>
                     <div style="display:block" class="input-group input-group-outline mt-4">
@@ -64,7 +64,7 @@
                     </div>
                     <div style="display:block" class="form-group input-group input-group-outline mt-4">
                         <label>Danh mục con:</label>
-                            <input style="width:100%" type="text" class="form-control" asp-for="SubCategory" />
+                        <input style="width:100%" type="text" class="form-control" asp-for="SubCategory" />
                     </div>
                     <div class="d-flex ml-0">
                          <button type="button" onclick="GeneratePoster()" class="btn btn-success mt-4">Tạo bìa truyện bằng AI</button>
@@ -74,7 +74,7 @@
                         <input type="number" asp-for="Id" id="post-id" hidden />
                         <label for="Name">Cập nhật ảnh bìa:</label>
                         <input type="file" style="width:100%" onchange="changeImageFile(this)" accept="image/*" class="form-control">
-                            <img style="margin-top:2rem;height:16rem!important;width:16rem!important; border-radius:1rem!important" id="img-post-id" src="https://i.imgur.com/KHD58yX.png" class="avatar avatar-sm me-3 border-radius-lg">
+                        <img style="margin-top:2rem;height:16rem!important;width:16rem!important; border-radius:1rem!important" id="img-post-id" src="https://i.imgur.com/KHD58yX.png" class="avatar avatar-sm me-3 border-radius-lg">
                         <input type="text" id="image-post" asp-for="Poster" hidden />
                     </div>
                     <button type="submit" class="btn btn-success mt-4">Lưu thông tin</button>

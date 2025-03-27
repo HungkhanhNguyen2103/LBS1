@@ -22,5 +22,8 @@ namespace LBSWeb.Service.Information
         Task<ReponderModel<UserReport>> UserReport(int id);
         Task<ReponderModel<string>> OpenUserReport(int id);
         Task<ReponderModel<string>> CloseUserReport(int id);
+        Task<ReponderModel<RoomModel>> GetRoomByAuthor(string username, string chapterBookId);
+        Task<ReponderModel<RoomModel>> GetRoomByManager(string username, string chapterBookId);
+        Task<ReponderModel<string>> SendMessage(Messenger messenger);
     }
 }

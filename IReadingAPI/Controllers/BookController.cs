@@ -93,9 +93,25 @@ namespace LBSAPI.Controllers
 
         [Route("UpdateBook")]
         [HttpPost]
-        public async Task<ReponderModel<string>> UpdateBook(Book bookModel)
+        public async Task<ReponderModel<string>> UpdateBook(BookModel bookModel)
         {
             var result = await _bookRepository.UpdateBook(bookModel);
+            return result;
+        }
+
+        [Route("GetAllBookByCategory")]
+        [HttpGet]
+        public async Task<ReponderModel<BookViewModel>> GetAllBookByCategory(string category)
+        {
+            var result = await _bookRepository.GetAllBookByCategory(category);
+            return result;
+        }
+
+        [Route("QuicklyApproveChapterContent")]
+        [HttpPost]
+        public async Task<ReponderModel<string>> QuicklyApproveChapterContent(RequestModel model)
+        {
+            var result = await _bookRepository.QuicklyApproveChapterContent(model.Data);
             return result;
         }
 
@@ -151,7 +167,7 @@ namespace LBSAPI.Controllers
 
         [Route("GetBook")]
         [HttpGet]
-        public async Task<ReponderModel<Book>> GetBook(int id)
+        public async Task<ReponderModel<BookModel>> GetBook(int id)
         {
             var result = await _bookRepository.GetBook(id);
             return result;

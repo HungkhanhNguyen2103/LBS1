@@ -16,10 +16,12 @@ namespace BusinessObject
             _mongoDatabase = client.GetDatabase(databaseName);
             BookImages = GetCollection<BookImage>(typeof(BookImage).Name);
             BookChapters = GetCollection<BookChapter>(typeof(BookChapter).Name);
+            Messengers = GetCollection<Messenger>(typeof(Messenger).Name);
         }
 
         public IMongoCollection<BookImage> BookImages { get; set; }
         public IMongoCollection<BookChapter> BookChapters { get; set; }
+        public IMongoCollection<Messenger> Messengers { get; set; }
 
         private IMongoCollection<T> GetCollection<T>(string collectionName)
         {

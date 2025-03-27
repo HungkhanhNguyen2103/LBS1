@@ -1,0 +1,224 @@
+﻿@using System.Globalization
+@using System.Security.Claims
+@using Newtonsoft.Json
+@{
+    Layout = "~/Views/Admin/_AdminLayout.cshtml";
+    var listChat = Html.Raw(JsonConvert.SerializeObject(Model));
+    //var userName = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+}
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Xsrf
+@functions {
+    public string GetAntiXsrfRequestToken()
+    {
+        return Xsrf.GetAndStoreTokens(Context).RequestToken;
+    }
+}
+@model List<RoomModel>
+<style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      /* font-family: 'Segoe UI', sans-serif; */
+    }
+
+    .chat-wrapper {
+      display: flex;
+      height: 100vh;
+    }
+
+    /* Sidebar - User List */
+    .user-list {
+      width: 240px;
+      background-color: #fff;
+      border-right: 1px solid #ccc;
+      padding: 10px;
+      overflow-y: auto;
+    }
+
+    .user1 {
+      padding: 10px;
+      margin-bottom: 5px;
+      cursor: pointer;
+      background-color: #f1f1f1;
+      border-radius: 5px;
+    }
+
+    .user1:hover {
+      background-color: #e7e7e7;
+    }
+
+    .user.active {
+      background-color: #E12B6B;
+      color: white;
+    }
+
+    /* Chat Area */
+    .chat-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      /* background-color: #f9f9f9; */
+      padding-right:5px;
+    }
+
+    .chat-header {
+      border-radius: 5px;
+      padding: 16px;
+      background-color: #E12B6B;
+      color: white;
+      font-size: 18px;
+    }
+
+    .chat-messages {
+      flex: 1;
+      padding: 16px;
+      overflow-y: auto;
+    }
+
+    .message {
+      max-width: 75%;
+      margin-bottom: 10px;
+      padding: 10px 14px;
+      border-radius: 18px;
+      clear: both;
+    }
+
+    .message.user {
+      background-color: #E12B6B;
+      color: white;
+      align-self: flex-end;
+      margin-left: auto;
+    }
+
+    .message.bot {
+      background-color: #e0e0e0;
+      align-self: flex-start;
+      margin-right: auto;
+    }
+
+    .chat-input {
+      display: flex;
+      padding: 10px;
+      border-top: 1px solid #ccc;
+      background-color: #fff;
+    }
+
+    .chat-input input {
+      flex: 1;
+      padding: 10px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    .chat-input button {
+      margin-left: 10px;
+      padding: 10px 20px;
+      background-color: #E12B6B;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .chat-input button:hover {
+      background-color: #0056b3;
+    }
+</style>
+<div class="row">
+    <div class="col-12">
+        <div class="card my-4">
+            <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
+                <div class="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3">
+                    <h6 class="text-white text-capitalize ps-3">Đoạn chat</h6>
+                </div>
+            </div>
+            <div class="card-body px-0">
+                <div class="chat-wrapper">
+                    <!-- Sidebar: User list -->
+                    <div class="user-list" id="userList">
+                        @foreach (var item in Model)
+                        {
+                            <div class="user1 " onclick="selectUser('@item.AuthorFullName','@item.RoomName')">@item.AuthorFullName</div>
+                        }
+                        @* active *@
+                    </div>
+
+                    <!-- Chat Area -->
+                    <div class="chat-area">
+                        <div class="chat-header" id="chatHeader">Chat với: Bot</div>
+                        <div class="chat-messages" id="chatMessages"></div>
+                        <div class="chat-input">
+                            <input type="text" id="messageInput" placeholder="Nhập tin nhắn..." />
+                            <button type="button" class="btn btn-info mb-0" onclick="sendMessageClient()">Gửi</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    document.getElementById('ListChatId').classList.add('active');
+    let currentUser = '';
+    //let currentRoomName = '';
+
+    let listChat = @listChat;
+
+
+    function selectUser(name,roomName) {
+        currentUser = name;
+        //currentRoomName = roomName;
+        // Update header
+        document.getElementById('chatHeader').textContent = 'Chat với: ' + name;
+
+        // Highlight selected
+        const users = document.querySelectorAll('.user');
+        users.forEach(u => u.classList.remove('active'));
+        event.target.classList.add('active');
+
+        // Clear chat (optional)
+        document.getElementById('chatMessages').innerHTML = '';
+
+        var roomInfo = listChat.find(c => c.RoomName == roomName);
+        roomInfo.Messagers.forEach(item => {
+            console.log(item);
+            if (item.CreateBy == userName) {
+                clientMessageDiv(item.Content);
+            }
+            else if (item.To == userName || item.To == null) {
+                retriveMessageDiv(item.Content);
+            }
+        });
+        //console.log(roomInfo);
+    }
+
+    function sendMessageClient() {
+        const input = document.getElementById("messageInput");
+        const message = input.value.trim();
+        if (!message) return;
+
+        const container = document.getElementById("chatMessages");
+
+        const userMsg = document.createElement("div");
+        userMsg.className = "message user";
+        userMsg.textContent = message;
+        container.appendChild(userMsg);
+
+        sendMessage(message);
+
+        // setTimeout(() => {
+        //     const botMsg = document.createElement("div");
+        //     botMsg.className = "message bot";
+        //     botMsg.textContent = currentUser + ": Cảm ơn bạn đã nhắn!";
+        //     container.appendChild(botMsg);
+        //     container.scrollTop = container.scrollHeight;
+        // }, 600);
+
+        input.value = "";
+        container.scrollTop = container.scrollHeight;
+    }
+</script>

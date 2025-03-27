@@ -10,7 +10,6 @@ namespace BusinessObject
     public class BookCategory
     {
         public int Id { get; set; }
-        [Column(TypeName = "nvarchar(MAX)")]
         public int? BookId { get; set; }
         public Book? Book { get; set; }
         public int? CategoryId { get; set; }

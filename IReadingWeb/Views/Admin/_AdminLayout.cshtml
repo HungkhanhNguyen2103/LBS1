@@ -1,11 +1,24 @@
 ﻿@using Repositories
 @using Microsoft.Extensions.Configuration
+@using System.Security.Claims
 @{
     var claims = User;
     var jwtToken = ViewContext.HttpContext.Request.Cookies["token"];
+    string userName = "";
     if(string.IsNullOrEmpty(jwtToken) && User.Identity.IsAuthenticated)
     {
         ViewContext.HttpContext.Response.Redirect("/Account/Logout");
+    }
+    if (!string.IsNullOrEmpty(jwtToken) && User.Identity.IsAuthenticated)
+    {
+        userName = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+    }
+}
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Xsrf
+@functions {
+    public string GetAntiXsrfRequestToken()
+    {
+        return Xsrf.GetAndStoreTokens(Context).RequestToken;
     }
 }
 <!DOCTYPE html>
@@ -33,10 +46,12 @@
     <link rel="icon" type="image/png" href="~/images/layoutHome/logo.png" asp-append-version="true">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" asp-append-version="true" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet" asp-append-version="true" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.7/signalr.min.js" asp-append-version="true"></script>
+    <script src="~/lib/jquery/dist/jquery.js" asp-append-version="true"></script>
+    <script src="https://cdn.datatables.net/2.2.2/js/dataTables.min.js" asp-append-version="true"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js" asp-append-version="true"></script>
+    <script src="~/js/chat.js" defer asp-append-version="true"></script>
 </head>
-<script src="~/lib/jquery/dist/jquery.js" asp-append-version="true"></script>
-<script src="https://cdn.datatables.net/2.2.2/js/dataTables.min.js" asp-append-version="true"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js" asp-append-version="true"></script>
 @* <script src="https://cdn.datatables.net/2.2.2/js/dataTables.bootstrap5.min.js" asp-append-version="true"></script> *@
 <body class="g-sidenav-show  bg-gray-200">
     <style>
@@ -56,6 +71,113 @@
             padding: 0;
             margin: 0;
         }
+
+        .chat-wrapper1 {
+            display: flex;
+            height: 60vh;
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 350px;
+            border-radius: 8px;
+            background-color: #fff;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+            .chat-wrapper1.closed {
+                width: 50px;
+                height: 50px;
+                border-radius: 50%;
+                overflow: hidden;
+            }
+
+        /* Chat Area */
+        .chat-area1 {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background-color: #f9f9f9;
+        }
+
+        .chat-header1 {
+            padding: 16px;
+            background-color: #E12B6B;
+            color: white;
+            font-size: 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chat-messages1 {
+            flex: 1;
+            padding: 16px;
+            overflow-y: auto;
+        }
+
+        .message1 {
+            max-width: 75%;
+            margin-bottom: 10px;
+            padding: 10px 14px;
+            border-radius: 18px;
+            clear: both;
+        }
+
+            .message1.user {
+                background-color: #E12B6B;
+                color: white;
+                align-self: flex-end;
+                margin-left: auto;
+            }
+
+            .message1.bot {
+                background-color: #e0e0e0;
+                align-self: flex-start;
+                margin-right: auto;
+            }
+
+        .chat-input1 {
+            display: flex;
+            padding: 10px;
+            border-top: 1px solid #ccc;
+            background-color: #fff;
+        }
+
+            .chat-input1 input {
+                flex: 1;
+                padding: 10px;
+                font-size: 16px;
+                border: 1px solid #ccc;
+                border-radius: 4px;
+            }
+
+            .chat-input1 button {
+                margin-left: 10px;
+                padding: 10px 20px;
+                background-color: #E12B6B;
+                color: white;
+                border: none;
+                border-radius: 4px;
+                cursor: pointer;
+            }
+
+                .chat-input1 button:hover {
+                    background-color: #0056b3;
+                }
+
+        /* Close/Open button */
+        .toggle-btn {
+            font-size: 20px;
+            background-color: transparent;
+            border: none;
+            color: white;
+            cursor: pointer;
+        }
+
+            .toggle-btn:hover {
+                color: #ff6666;
+            }
     </style>
     <aside class="sidenav navbar navbar-vertical navbar-expand-xs border-0 border-radius-xl my-3 fixed-start ms-3   bg-gradient-dark" id="sidenav-main">
         <div class="sidenav-header">
@@ -205,7 +327,7 @@
                     @if (claims.IsInRole("Admin") || claims.IsInRole("Manager"))
                     {
                         <li class="nav-item">
-                            <a class="nav-link text-white" id="ListPostCategoryId" href="/Admin/ListCategories">
+                            <a class="nav-link text-white" id="ListChatId" href="/Admin/ListChat">
                                 <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
                                     <i class="material-icons opacity-10">forum</i>
                                 </div>
@@ -246,10 +368,148 @@
               @RenderBody()
         </div>
     </main>
+    @if (claims != null && claims.IsInRole("Author"))
+    {
+        <div class="chat-wrapper1 closed" id="chatWrapper">
+            <input type="text" hidden id="RoomName"/>
+            <div class="chat-area1">
+                <div class="chat-header1">
+                    <div id="chatHeader" onclick="toggleChatShort()"><i style="cursor: pointer;" class="material-icons opacity-10">chat</i></div>
+                    <button class="toggle-btn" onclick="toggleChatShort()">×</button>
+                </div>
+                <div class="chat-messages1 chatContentAuthor" id="chatMessages"></div>
+                <div class="chat-input1">
+                    <input type="text" id="messageInput" placeholder="Nhập tin nhắn..." />
+                    <button type="button" onclick="sendMessageShort()">Gửi</button>
+                </div>
+            </div>
+        </div>
+    }
+
     <script src="~/js/popper.js" asp-append-version="true"></script>
     <script src="~/js/bootstrap.min.js" asp-append-version="true"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     @await Component.InvokeAsync("Notyf")
     @RenderSection("Scripts", required: false)
+    <script>
+        let userName = '@userName';
+
+        function clientMessageDiv(message) {
+            const container = document.getElementById("chatMessages");
+
+            const userMsg = document.createElement("div");
+            userMsg.className = "message1 user";
+            userMsg.textContent = message;
+            container.appendChild(userMsg);
+        }
+
+        function retriveMessageDiv(message){
+            const container = document.getElementById("chatMessages");
+            const botMsg = document.createElement("div");
+            botMsg.className = "message1 bot";
+            botMsg.textContent = message;
+            container.appendChild(botMsg);
+        }
+
+        function sendMessageShort() {
+            const input = document.getElementById("messageInput");
+            const message = input.value.trim();
+            if (!message) return;
+
+            clientMessageDiv(message);
+
+            //send SignalR
+            sendMessage(message);
+
+            // create to db
+            sendMessageToServer(message);
+            // setTimeout(() => {
+
+            // }, 600);
+
+            input.value = "";
+            container.scrollTop = container.scrollHeight;
+        }
+
+        getRoomChat();
+
+        function getRoomChat(){
+            $.ajax(
+                {
+                    url: `/Admin/GetRoomChat`,
+                    type: "GET",
+                    headers:
+                    {
+                        "RequestVerificationToken": '@GetAntiXsrfRequestToken()'
+                    },
+                    async: true,
+                    processData: false,
+                    contentType: false,
+                    success: function (data) {
+                        console.log(data);
+                        let container = document.getElementById("chatMessages");
+                        data.messagers.forEach(item => {
+                            if (item.createBy == userName) {
+                                clientMessageDiv(item.content);
+                            }
+                            else if (item.to == userName) {
+                                retriveMessageDiv(item.content);
+                            }
+                        });
+                        $('#RoomName').val(data.roomName);
+                        container.scrollTop = container.scrollHeight;
+                    }
+                }
+            );
+        }
+
+        function sendMessageToServer(content) {
+            var formData = new FormData();
+            formData.append('RoomId', $('#RoomName').val());
+            formData.append('Content', content);
+            $.ajax(
+                {
+                    url: `/Admin/SendMessage`,
+                    type: "POST",
+                    headers:
+                    {
+                        "RequestVerificationToken": '@GetAntiXsrfRequestToken()'
+                    },
+                    data: formData,
+                    dataType: "json",
+                    async: true,
+                    processData: false,
+                    contentType: false,
+                    success: function (data) {
+                        console.log(data);
+                    }
+                }
+            );
+        }
+
+
+        function toggleChatShort() {
+            const chatWrapper = document.getElementById('chatWrapper');
+            const toggleBtn = document.querySelector('.toggle-btn');
+
+            chatWrapper.classList.toggle('closed');
+
+
+            if (chatWrapper.classList.contains('closed')) {
+                chatHeader.innerHTML = '<i style="cursor: pointer;" class="material-icons opacity-10">chat</i>';
+            }
+            else{
+                chatHeader.innerHTML = 'Chat với quản lý';
+            }
+
+            // Change button text based on the state
+            if (chatWrapper.classList.contains('closed')) {
+                toggleBtn.textContent = 'Open'; 
+            } else {
+                toggleBtn.textContent = '×'; 
+            }
+        }
+
+    </script>
 </body>
 </html>

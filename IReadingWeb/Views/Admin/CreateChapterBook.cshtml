@@ -17,7 +17,27 @@
         margin-left: 0px !important;
     }
 
-    #loadingSumary{
+    .highlight-bad-word {
+        color: #D58B81;
+        text-decoration: underline;
+        font-weight: bold;
+    }
+
+    .ai-feedback{
+        border: 1px solid #8080804d;
+        border-radius: 6px;
+        margin-bottom:2rem;
+    }
+
+    button {
+        margin-left: 5px;
+    }
+
+    .input-group{
+        padding-left: 5px !important;
+    }
+
+    #loadingSumary, .loadingDiv {
         position:absolute;
         top: 50%;
         right:50%;
@@ -40,9 +60,14 @@
                     </div>
                 </div>
                 <div class="card-body px-0 pb-2">
-                    <div class="m-4 mt-0 p-0 row">
+                    <div class="note">
+                        <ul>
+                            <li>- Nội dung chương: abc</li>
+                        </ul>
+                    </div>
+                    <div class="m-4 mt-4 p-0 row">
                         <div class="form-group input-group input-group-outline col-6 p-0">
-                            <label>Loại</label>
+                            <label>Loại:</label>
                             <select style="width:100%" asp-for="Type" onchange="changeType()" class="form-control">
                                 <option value="1">Đăng thường</option>
                                 <option value="2">Chèn chương</option>
@@ -58,30 +83,43 @@
                     <div class="table-responsive p-0 m-4 mt-0">
                         <input style="width:100%" type="number" asp-for="BookId" value="@ViewBag.BookId" class="form-control" hidden>
                         <div style="display:block" class="form-group input-group input-group-outline mt-0">
-                            <label for="Name">Tên chương</label>
+                            <label for="Name">Tên chương:</label>
                             <input style="width:100%" type="text" asp-for="ChapterName" class="form-control" autofocus>
                         </div>
-                        <div style="display:block" class="input-group input-group-outline mt-4">
-                            <label for="Content">Nội dung chương</label>
-                            @* <div id="editorContent" style="height:20rem"></div> *@
-                            <textarea oninput="getWordNo()" style="width:100%" asp-for="Content" type="text" class="form-control" rows="8"></textarea>
-                            <label>Số từ: <span id="wordNoCount">0</span></label>
-                            <input type="number" hidden asp-for="WordNo" />
+                        <div class="row input-group input-group-outline mt-4">
+                            <div style="display:block">
+                                <label for="Content">Nội dung chương:</label>
+                                <input type="file" style="width:30%;margin-bottom:10px" onchange="changeFile(this)" accept=".docx,.txt,.pdf" class="form-control">
+                                <div class="row" style="display:flex">
+                                    <div class="col-9">
+                                        <div contenteditable="true" style="height:19rem;overflow: auto;" id="ContentDiv" class="form-control"></div>
+                                        <textarea oninput="getWordNo()" asp-for="Content" type="text" class="d-none form-control" rows="18"></textarea>
+                                        <label>Số từ: <span id="wordNoCount">0</span></label>
+                                        <input type="number" hidden asp-for="WordNo" />
+                                    </div>
+                                    <div class="col-3 ai-feedback" style="position:relative">
+                                        <ul id="requestContent" style="height:18rem;max-height:18rem;overflow: auto;padding-left:16px">
+                                        </ul>
+                                        <div id="loadingDivFeedBack" class="dot-elastic loadingDiv"></div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
+
                         <div class="d-flex ml-0">
                             <button type="button" onclick="GenerateSummary()" class="btn btn-success mt-4">Tạo tóm tắt bằng AI</button>
                         </div>
 
                         <div style="position:relative">
                             <div style="display:block" class="input-group input-group-outline mt-4">
-                                <label for="Summary">Tóm tắt chương</label>
-                                <textarea style="width:100%" asp-for="Summary" type="text" class=" form-control" rows="8"></textarea>
+                                <label for="Summary">Tóm tắt chương:</label>
+                                <textarea style="width:100%" asp-for="Summary" type="text" class="form-control" rows="8"></textarea>
                             </div>
                             <div id="loadingSumary" class="loader"></div>
                         </div>
 
                         <div style="display:block" class="form-group input-group input-group-outline mt-4">
-                            <label for="Name">Thu phí</label>
+                            <label for="Name">Thu phí:</label>
                             <input style="width:100%" type="number" disabled asp-for="Price" class="form-control">
                         </div>
                         <button type="submit" class="btn btn-success mt-4">Lưu thông tin</button>
@@ -101,13 +139,199 @@
     </form>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js" asp-append-version="true"></script>
+<script src="https://cdn.jsdelivr.net/npm/mark.js@8.11.1/dist/mark.min.js" asp-append-version="true"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js" asp-append-version="true"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.4.2/mammoth.browser.min.js" asp-append-version="true"></script>
 <script type="text/javascript">
     document.getElementById('loadingSumary').classList.add('d-none');
+    document.getElementById('loadingDivFeedBack').classList.add('d-none');
+
     // document.getElementById('CreatBookId').classList.add('active');
 
     // const quill = new Quill('#editorContent', {
     //     theme: 'snow'
     // });
+
+    const input1 = document.getElementById("ContentDiv");
+    const events = [
+        "click", "focus", "blur", "change", "input",
+        "keydown", "keyup", "keypress",
+        "paste", "cut", "copy", "mousedown", "mouseup",
+        "mouseenter", "mouseleave", "mouseover", "mouseout",
+        "drag", "drop", "contextmenu"
+    ];
+
+    events.forEach(event => {
+        input1.addEventListener(event, (e) => {
+            getWordNo();
+
+        });
+    });
+
+    input1.addEventListener("keyup", () => {
+        quicklyCheckChapterContent();
+    });
+
+    let typingTimer;
+    const doneTypingInterval = 2000;
+    function quicklyCheckChapterContent(){
+        clearTimeout(typingTimer);
+        typingTimer = setTimeout(() => {
+            let content = input1.innerText;
+            checkChapterContentByAI(content);
+        }, doneTypingInterval);
+    }
+
+    function cleanFormattingExceptBadWords(divId) {
+        const div = document.getElementById(divId);
+
+        const walker = document.createTreeWalker(div, NodeFilter.SHOW_ELEMENT, null, false);
+
+        let nodesToRemoveFormat = [];
+
+        while (walker.nextNode()) {
+            const node = walker.currentNode;
+
+            if (
+                node.nodeType === Node.ELEMENT_NODE &&
+                node.tagName.toLowerCase() !== "span" &&
+                !node.classList.contains("highlight-bad-word")
+            ) {
+                nodesToRemoveFormat.push(node);
+            }
+
+            if (
+                node.tagName.toLowerCase() === "span" &&
+                !node.classList.contains("highlight-bad-word")
+            ) {
+                nodesToRemoveFormat.push(node);
+            }
+        }
+
+        nodesToRemoveFormat.forEach(node => {
+            const parent = node.parentNode;
+            while (node.firstChild) {
+                parent.insertBefore(node.firstChild, node);
+            }
+            parent.removeChild(node);
+        });
+    }
+
+
+    function checkChapterContentByAI(content) {
+        $('#loadingDivFeedBack').show();
+        let formData = new FormData();
+        formData.append('Data', content);
+        $.ajax(
+            {
+                url: `/Admin/QuicklyApproveChapterContent`,
+                type: "POST",
+                headers:
+                {
+                    "RequestVerificationToken": '@GetAntiXsrfRequestToken()'
+                },
+                data: formData,
+                //dataType: "json",
+                async: true,
+                processData: false,
+                contentType: false,
+                success: function (data) {
+                    $('#loadingDivFeedBack').hide();
+                    //console.log(data);
+                    let matches = data.match(/<li.*?<\/li>/g);
+                    //data = data.replace('<ul>', '').replace('</ul>', '').replace('```html', '').replace('```','');
+                    if (data.includes("li")) $('#requestContent').prepend(matches);
+                    $('#requestContent').prepend("<br>");
+
+                    const matcheWords = [...data.matchAll(/<li.*?>'(.+?)'\s*=>/g)];
+                    const words = matcheWords.map(m => m[1]);
+
+                    let instance = new Mark(document.querySelector("#ContentDiv"));
+                    instance.unmark({
+                        done: function () {
+                            instance.mark(words, {
+                                element: "span",
+                                className: "highlight-bad-word"
+                            });
+                        }
+                    });
+
+                    cleanFormattingExceptBadWords('ContentDiv');
+                }
+            }
+        );
+    }
+
+    function changeFile(input) {
+        document.getElementById("ContentDiv").innerText = "";
+        if (input.files && input.files[0]) {
+            let file = input.files[0];
+            let typeName = file.type;
+            if (typeName.includes('msword')){
+                notyf.error("Vui lòng chọn file .docx hợp lệ!");
+                getWordNo();
+                return;
+            }
+            if (typeName == "application/vnd.openxmlformats-officedocument.wordprocessingml.document") {
+                const reader = new FileReader();
+
+                reader.onload = function (event) {
+                    const arrayBuffer = event.target.result;
+
+                    mammoth.extractRawText({ arrayBuffer: arrayBuffer })
+                        .then(result => {
+                            document.getElementById("ContentDiv").innerText = result.value;
+                            getWordNo();
+                        })
+                        .catch(err => {
+                            console.error("Lỗi đọc file:", err);
+                            notyf.error("Không thể đọc file Word.");
+                        });
+                };
+
+                reader.readAsArrayBuffer(file);
+            }
+            if (typeName == "text/plain") {
+                //console.log("text");
+                const reader = new FileReader();
+
+                reader.onload = function (e) {
+                    const text = e.target.result;
+                    document.getElementById("ContentDiv").innerText = text;
+                    getWordNo();
+                };
+
+                reader.readAsText(file);
+            }
+            if (typeName == "application/pdf") {
+
+                const reader = new FileReader();
+
+                reader.onload = function () {
+                    const typedArray = new Uint8Array(reader.result);
+
+                    pdfjsLib.getDocument(typedArray).promise.then(async function (pdf) {
+                        let textContent = '';
+
+                        for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+                            const page = await pdf.getPage(pageNum);
+                            const content = await page.getTextContent();
+                            const strings = content.items.map(item => item.str).join(' ');
+                            textContent += `Trang ${pageNum}:\n${strings}\n\n`;
+                        }
+
+
+                        document.getElementById("ContentDiv").innerText = textContent;
+                        getWordNo();
+                    });
+                };
+
+                reader.readAsArrayBuffer(file);
+            }
+        
+        }
+    }
+
 
     function SaveDraft(){
         $('#Type').val('3');
@@ -129,12 +353,16 @@
     function getWordNo(){
         // var delta = quill.getContents();
         // var text = JSON.stringify(delta);
-        var text = $('#Content').val();
+        var textDiv = $('#ContentDiv').text();
+        $('#Content').val(textDiv);
+        var text = textDiv;
         let words = text.length > 0 ? text.split(/\s+/) : [];
 
         $('#wordNoCount').html(words.length);
         $('#WordNo').val(words.length);
     }
+
+
 
     function GenerateSummary(){
         $('#Summary').val('');

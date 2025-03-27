@@ -1,5 +1,6 @@
 using AspNetCoreHero.ToastNotification;
 using AspNetCoreHero.ToastNotification.Extensions;
+using IReadingWeb.Hubs;
 using LBSWeb.API;
 using LBSWeb.Service.Book;
 using LBSWeb.Service.Information;
@@ -33,6 +34,8 @@ builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<IBookService, BookService>();
 builder.Services.AddScoped<IInformationService, InformationService>();
 
+//SignalR DI
+builder.Services.AddSignalR();
 
 // Config Auto ValidateAntiforgery Token
 builder.Services.AddMvc(options =>
@@ -88,5 +91,7 @@ app.MapControllerRoute(
     name: "default",
     //pattern: "{controller=Account}/{action=Login}/{id?}");
     pattern: "{controller=Account}/{action=Login}/{id?}");
+
+app.MapHub<ChatHub>("/chathub");
 
 app.Run();

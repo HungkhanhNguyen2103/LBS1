@@ -10,8 +10,9 @@ namespace LBSWeb.Service.Book
         Task<ReponderModel<string>> UpdateCategory(Category model);
         Task<ReponderModel<string>> DeleteCategory(int id);
         Task<ReponderModel<string>> CreateBook(BookModel bookModel);
-        Task<ReponderModel<string>> UpdateBook(BusinessObject.Book bookModel);
-        Task<ReponderModel<BusinessObject.Book>> GetBook(int id);
+        Task<ReponderModel<string>> UpdateBook(BookModel bookModel);
+        Task<ReponderModel<string>> QuicklyApproveChapterContent(RequestModel model);
+        Task<ReponderModel<BookModel>> GetBook(int id);
         Task<ReponderModel<BookViewModel>> GetAllBookByUser(string userName);
         Task<ReponderModel<string>> CreateBookChapter(BookChapter bookChapter);
         Task<ReponderModel<BookChapter>> GetBookChapter(string id);

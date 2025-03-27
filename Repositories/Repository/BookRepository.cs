@@ -4,6 +4,7 @@ using BusinessObject.BaseModel;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Serializers;
 using MongoDB.Driver;
 using OpenAI.Chat;
 using Repositories.IRepository;
@@ -95,7 +96,7 @@ namespace Repositories.Repository
             return result;
         }
 
-        public async Task<ReponderModel<string>> UpdateBook(Book bookModel)
+        public async Task<ReponderModel<string>> UpdateBook(BookModel bookModel)
         {
             var result = new ReponderModel<string>();
 
@@ -107,13 +108,20 @@ namespace Repositories.Repository
 
             if (string.IsNullOrEmpty(bookModel.Name))
             {
-                result.Message = "Nhập tên truyện";
+                result.Message = "Nhập tên sách";
                 return result;
             }
 
             if (string.IsNullOrEmpty(bookModel.Summary))
             {
-                result.Message = "Nhập tóm tắt";
+                result.Message = "Nhập giới thiệu";
+                return result;
+            }
+
+
+            if (bookModel.CategoryIds == null || bookModel.CategoryIds.Count == 0)
+            {
+                result.Message = "Chọn danh mục";
                 return result;
             }
 
@@ -134,6 +142,11 @@ namespace Repositories.Repository
             book.AgeLimitType = bookModel.AgeLimitType;
             book.BookType = bookModel.BookType;
             book.Price = bookModel.Price;
+            book.BookCategories = bookModel.CategoryIds.Select(c => new BookCategory
+            {
+                CategoryId = c
+            }).ToList();
+            book.SubCategory = bookModel.SubCategory;
             book.Status = BookStatus.PendingPublication;
             //Poster = response.Data.Link,
             //CreateDate = DateTime.Now,
@@ -223,9 +236,14 @@ namespace Repositories.Repository
                 Status = BookStatus.PendingPublication,
                 UserId = bookModel.UserId,
                 SubCategory = bookModel.SubCategory,
+                BookCategories = bookModel.CategoryIds.Select(c => new BookCategory
+                {
+                    CategoryId = c
+                }).ToList(),
                 //Poster = response.Data.Link,
                 CreateDate = DateTime.Now,
-                ModifyDate = DateTime.Now
+                ModifyDate = DateTime.Now,
+
             };
 
             if (!string.IsNullOrEmpty(bookModel.Poster) )
@@ -258,6 +276,7 @@ namespace Repositories.Repository
             try
             {
                 await _lBSDbContext.SaveChangesAsync();
+
                 result.Message = "Cập nhật thành công";
                 result.IsSussess = true;
             }
@@ -370,11 +389,11 @@ namespace Repositories.Repository
             return result;
         }
 
-        public async Task<ReponderModel<Book>> GetBook(int id)
+        public async Task<ReponderModel<BookModel>> GetBook(int id)
         {
-            var result = new ReponderModel<Book>();
+            var result = new ReponderModel<BookModel>();
             
-            var book = await _lBSDbContext.Books.FirstOrDefaultAsync(c => c.Id == id);
+            var book = await _lBSDbContext.Books.Include(c => c.BookCategories).ThenInclude(c => c.Category).FirstOrDefaultAsync(c => c.Id == id);
 
             if (book == null) 
             {
@@ -382,7 +401,26 @@ namespace Repositories.Repository
                 return result;
             }
 
-            result.Data = book;
+            var bookModel = new BookModel
+            {
+                Id = book.Id,
+                Name = book.Name,
+                AgeLimitType = book.AgeLimitType,
+                BookType = book.BookType,
+                CreateBy = book.CreateBy,
+                CreateDate = book.CreateDate,
+                ModifyDate = book.ModifyDate,
+                Poster = book.Poster,
+                Price = book.Price,
+                Status = book.Status,
+                SubCategory = book.SubCategory,
+                Summary = book.Summary,
+                UserId = book.UserId,
+                ListCategories = book.BookCategories != null ? book.BookCategories.Select(c => c.Category).ToList() : new List<Category>(),
+                CategoryIds = book.BookCategories != null ? book.BookCategories.Select(c => c.Id).ToList() : new List<int>(),
+            };
+
+            result.Data = bookModel;
             result.IsSussess = true;
             return result;
         }
@@ -693,6 +731,37 @@ namespace Repositories.Repository
                 item1.Data.Add(totalView.ToString());
             }
             result.Data = item1;
+            result.IsSussess = true;
+            return result;
+        }
+
+        public async Task<ReponderModel<string>> QuicklyApproveChapterContent(string input)
+        {
+            var promp = $@"Bạn là công cụ kiểm duyệt nội dung. Kiểm tra và phân tích đoạn văn dưới đây giúp tôi đoạn text có chứa từ ngữ hoặc cụm từ không phù hợp (tục tĩu, thù hằn, phân biệt, kích động, bạo lực, tình dục,sai tôn giáo, từ ngữ thuộc chế độ cũ ,v.v.): 
+                            (
+                               - Có xuất hiện: format như sau: <li style='color:red'>'A' => giải thích</li>
+                               - Không xuất hiện từ ngữ: format như sau: <li style='color:green'>Nội dung không chứa từ ngữ không phù hợp</li>
+                            ) 
+                             Bạn chỉ cần trả lời theo format này, Đây là nội dung đoạn văn: {input}";
+            var result = new ReponderModel<string>();
+            var resultChapter = await _aIGeneration.TextGenerate(promp);
+            result.IsSussess = true;
+            result.Data = resultChapter.Data;
+            return result;
+        }
+
+        public async Task<ReponderModel<BookViewModel>> GetAllBookByCategory(string category)
+        {
+            var result = new ReponderModel<BookViewModel>();
+            var listBook = await _lBSDbContext.BookCategories.Include(c => c.Book).Include(c => c.Category).Where(c => c.Category != null && c.Category.Name == category).Select(c => c.Book).Where(c=> c != null && (c.Status == BookStatus.Done || c.Status == BookStatus.Published || c.Status == BookStatus.Continue)).ToListAsync();
+            result.DataList = listBook.Select(c => new BookViewModel
+            {
+                Id = c.Id,
+                Author = c.CreateBy,
+                Name = c.Name,
+                Poster = c.Poster,
+                Status = c.Status
+            }).ToList();
             result.IsSussess = true;
             return result;
         }

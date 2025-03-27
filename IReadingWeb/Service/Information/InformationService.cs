@@ -144,6 +144,44 @@ namespace LBSWeb.Service.Information
             return res;
         }
 
+        public async Task<ReponderModel<RoomModel>> GetRoomByAuthor(string username, string chapterBookId)
+        {
+            var res = new ReponderModel<RoomModel>();
+            try
+            {
+                string url = PathUrl.INFO_GET_ROOM_AUTHOR;
+                var param = new Dictionary<string, string>();
+                param.Add("username", username);
+                param.Add("chapterBookId", chapterBookId);
+                res = await _api.Get<ReponderModel<RoomModel>>(url, param);
+
+            }
+            catch (Exception ex)
+            {
+                res.Message = "Lỗi gọi api!";
+            }
+            return res;
+        }
+
+        public async Task<ReponderModel<RoomModel>> GetRoomByManager(string username, string chapterBookId)
+        {
+            var res = new ReponderModel<RoomModel>();
+            try
+            {
+                string url = PathUrl.INFO_GET_ROOM_MANAGER;
+                var param = new Dictionary<string, string>();
+                param.Add("username", username);
+                param.Add("chapterBookId", chapterBookId);
+                res = await _api.Get<ReponderModel<RoomModel>>(url, param);
+
+            }
+            catch (Exception ex)
+            {
+                res.Message = "Lỗi gọi api!";
+            }
+            return res;
+        }
+
         public async Task<ReponderModel<BasicKnowledge>> KnowledgeDetail(int id)
         {
             var res = new ReponderModel<BasicKnowledge>();
@@ -243,6 +281,27 @@ namespace LBSWeb.Service.Information
                 var param = new Dictionary<string, string>();
                 param.Add("id", id.ToString());
                 res = await _api.Get<ReponderModel<string>>(url, param);
+
+            }
+            catch (Exception ex)
+            {
+                res.Message = "Lỗi gọi api!";
+            }
+            return res;
+        }
+
+        public async Task<ReponderModel<string>> SendMessage(Messenger model)
+        {
+            var res = new ReponderModel<string>();
+            if (model == null)
+            {
+                res.Message = "Thông tin không hợp lệ!";
+                return res;
+            }
+            try
+            {
+                string url = PathUrl.INFO_SEND_MESSAGE;
+                res = await _api.Post<ReponderModel<string>>(url, model);
 
             }
             catch (Exception ex)

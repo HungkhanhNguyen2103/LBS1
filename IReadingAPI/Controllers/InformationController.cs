@@ -15,6 +15,30 @@ namespace LBSAPI.Controllers
             _informationRepository = informationRepository;
         }
 
+        [Route("GetRoomByAuthor")]
+        [HttpGet]
+        public async Task<ReponderModel<RoomModel>> GetRoomByAuthor(string username, string chapterBookId)
+        {
+            var result = await _informationRepository.GetRoomByAuthor(username,chapterBookId);
+            return result;
+        }
+
+        [Route("SendMessage")]
+        [HttpPost]
+        public async Task<ReponderModel<string>> SendMessage(Messenger messenger)
+        {
+            var result = await _informationRepository.SendMessage(messenger);
+            return result;
+        }
+
+        [Route("GetRoomByManager")]
+        [HttpGet]
+        public async Task<ReponderModel<RoomModel>> GetRoomByManager(string username, string chapterBookId)
+        {
+            var result = await _informationRepository.GetRoomByManager(username, chapterBookId);
+            return result;
+        }
+
         [Route("BasicKnowledge")]
         [HttpPost]
         public async Task<ReponderModel<BasicKnowledge>> BasicKnowledge(RequestModel model)

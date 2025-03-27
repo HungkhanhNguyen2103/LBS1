@@ -1,7 +1,7 @@
 ﻿@{
     Layout = "~/Views/Admin/_AdminLayout.cshtml";
 }
-@model Book
+@model BookModel
 @inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Xsrf
 @functions {
     public string GetAntiXsrfRequestToken()
@@ -12,14 +12,19 @@
 @* <button type="button" onclick="document.getElementById('formModal').reset();" class="btn btn-success" data-toggle="modal" data-target="#exampleModalPost">
     Tạo mới
 </button> *@
+<link href="~/css/MultiSelect.css" rel="stylesheet" type="text/css" asp-append-version="true">
 <style>
     .form-control{
         margin-left: 0px !important;
     }
 
+    button {
+        margin-left: 5px;
+    }
+
     #loading {
         position: absolute;
-        top: 50%;
+        top: 57%;
         right: 50%;
     }
 </style>
@@ -29,29 +34,37 @@
             <div class="card my-4">
                 <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
                     <div class="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3">
-                        <h6 class="text-white text-capitalize ps-3">Thông tin truyện</h6>
+                        <h6 class="text-white text-capitalize ps-3">Thông tin sách</h6>
                     </div>
                 </div>
                 <div class="card-body px-0 pb-2">
+                    <div class="note">
+                        <ul>
+                            <li>- Danh mục con: abc</li>
+                        </ul>
+                    </div>
                     <div class="table-responsive p-0 m-4 mt-0">
                         <input style="width:100%" type="number" asp-for="Id" class="form-control" hidden>
                         <div style="display:block" class="form-group input-group input-group-outline mt-4">
-                            <label for="Name">Tên truyện</label>
-                            <input style="width:100%" type="text" asp-for="Name" class="form-control" autofocus>
+                            <label for="Name">Tên sách <span style="color:red">*</span>:</label>
+                            <input style="width:100%" type="text" asp-for="Name" class="form-control">
                         </div>
                         <div style="display:block" class="input-group input-group-outline mt-4">
-                            <label for="Summary">Giới thiệu</label>
+                            <label for="Summary">Giới thiệu <span style="color:red">*</span>:</label>
                             <textarea style="width:100%" asp-for="Summary" type="text" class="form-control" rows="8"></textarea>
                         </div>
                         <div style="display:block" class="form-group input-group input-group-outline mt-4">
-                            <label>Thể loại</label>
-                            <select style="width:100%" class="form-control">
-                                <option selected value="">Vui lòng chọn</option>
+                            <label>Danh mục <span style="color:red">*</span>:</label>
+                            <select style="width:100%" class="form-control" asp-for="CategoryIds" multiple data-multi-select>
                                 @foreach (Category cate in ViewBag.Categories)
                                 {
                                     <option value="@cate.Id">@cate.Name</option>
                                 }
                             </select>
+                        </div>
+                        <div style="display:block" class="form-group input-group input-group-outline mt-4">
+                            <label>Danh mục con:</label>
+                            <input style="width:100%" type="text" class="form-control" asp-for="SubCategory" />
                         </div>
                         <div class="@(User.IsInRole("Manager") || User.IsInRole("Admin") ? "d-none" : "") d-flex ml-0">
                             <button type="button" onclick="GeneratePoster()" class="btn btn-success mt-4">Tạo bìa truyện bằng AI</button>
@@ -74,7 +87,7 @@
         </div>
     </form>
 </div>
-
+<script src="~/js/MultiSelect.js" asp-append-version="true"></script>
 <script type="text/javascript">
     // document.getElementById('CreatBookId').classList.add('active');
     document.getElementById('loading').classList.add('d-none');
@@ -104,8 +117,10 @@
         $('#loading').removeClass('d-none');
         //var summary;
         var input = $('#Name').val();
+        var summary = $('#Summary').val();
         var formData = new FormData();
         formData.append('input', input);
+        formData.append('summary', summary);
         $.ajax(
             {
                 url: `/Admin/GeneratePoster`,

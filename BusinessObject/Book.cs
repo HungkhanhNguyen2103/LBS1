@@ -29,6 +29,7 @@ namespace BusinessObject
         public string? UserId { get; set; }
         //public Category? Category { get; set; }
         public Account? User { get; set; }
+        public ICollection<BookCategory>? BookCategories { get; set; }
     }
 
     public enum BookType

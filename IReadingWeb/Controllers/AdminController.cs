@@ -371,9 +371,18 @@ namespace LBSWeb.Controllers
         }
 
         [Authorize(Roles = $"{Role.Author}")]
+        [Route("QuicklyApproveChapterContent")]
+        [HttpPost]
+        public async Task<IActionResult> QuicklyApproveChapterContent(RequestModel model)
+        {
+            var result = await _bookService.QuicklyApproveChapterContent(model);
+            return Json(result.Data);
+        }
+
+        [Authorize(Roles = $"{Role.Author}")]
         [Route("UpdateBook/{id}")]
         [HttpPost]
-        public async Task<IActionResult> UpdateBook(Book bookModel)
+        public async Task<IActionResult> UpdateBook(BookModel bookModel)
         {
             //bookModel.Id = id;
             var result = await _bookService.UpdateBook(bookModel);
@@ -384,6 +393,8 @@ namespace LBSWeb.Controllers
             }
             else
             {
+                var result1 = await _bookService.GetCategories();
+                ViewBag.Categories = result1.DataList;
                 _notyf.Error(result.Message);
                 return View(bookModel);
             }
@@ -413,7 +424,7 @@ namespace LBSWeb.Controllers
             ViewBag.StartChapterId = startChapterId;
             ViewBag.ReturnUrl = returnUrl;
 
-            ViewBag.BookName = result.Data.Name;
+            ViewBag.BookName = result.IsSussess ? result.Data.Name : string.Empty;
             return View(new BookChapter { BookId = id, ChaperId = startChapterId });
         }
 
@@ -560,6 +571,34 @@ namespace LBSWeb.Controllers
             if (result.IsSussess) _notyf.Success(result.Message);
             else _notyf.Error(result.Message);
             return RedirectToAction("ListCategories");
+        }
+
+        [Authorize(Roles = $"{Role.Manager},{Role.Author}")]
+        [Route("SendMessage")]
+        [HttpPost]
+        public async Task<IActionResult> SendMessage(Messenger messenger)
+        {
+            messenger.CreateBy = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            var result = await _informationService.SendMessage(messenger);
+            return View(result);
+        }
+
+        [Authorize(Roles = $"{Role.Manager}")]
+        [Route("ListChat")]
+        public async Task<IActionResult> ListChat()
+        {
+            var username = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            var result = await _informationService.GetRoomByManager(username, "-1");
+            return View(result.DataList);
+        }
+
+        [Authorize(Roles = $"{Role.Author}")]
+        [Route("GetRoomChat")]
+        public async Task<IActionResult> GetRoomChat()
+        {
+            var username = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            var result = await _informationService.GetRoomByAuthor(username,"-1");
+            return Json(result.Data);
         }
     }
 }

@@ -18,6 +18,7 @@ namespace BusinessObject
             builder.Entity<TemplateEmail>().ToTable("TemplateEmail").HasKey(x => x.Id);
             builder.Entity<Book>().ToTable("Book").HasKey(x => x.Id);
             builder.Entity<UserBook>().ToTable("UserBook").HasKey(x => x.Id);
+            builder.Entity<BookCategory>().ToTable("BookCategory").HasKey(x => x.Id);
             builder.Entity<UserTranscation>().ToTable("UserTranscation").HasKey(x => x.Id);
             builder.Entity<UserTranscationBook>().ToTable("UserTranscationBook").HasKey(x => x.Id);
             builder.Entity<Category>().ToTable("Category").HasKey(x => x.Id);
@@ -27,10 +28,12 @@ namespace BusinessObject
             builder.Entity<Notification>().ToTable("Notification").HasKey(x => x.Id);
             builder.Entity<UserReport>().ToTable("UserReport").HasKey(x => x.Id);
             builder.Entity<UserBookView>().ToTable("UserBookView").HasKey(x => x.Id);
+            builder.Entity<Room>().ToTable("Room").HasKey(x => x.Id);
         }
 
         public virtual DbSet<TemplateEmail> TemplateEmails { get; set; }
         public virtual DbSet<Book> Books { get; set; }
+        public virtual DbSet<BookCategory> BookCategories { get; set; }
         public virtual DbSet<UserBook> UserBooks { get; set; }
         public virtual DbSet<UserTranscation> UserTranscations { get; set; }
         public virtual DbSet<UserTranscationBook> UserTranscationBooks { get; set; }
@@ -42,5 +45,6 @@ namespace BusinessObject
         public virtual DbSet<UserReport> UserReports { get; set; }
         public virtual DbSet<UserReportComment> UserReportComments { get; set; }
         public virtual DbSet<UserBookView> UserBookViews { get; set; }
+        public virtual DbSet<Room> Rooms { get; set; }
     }
 }

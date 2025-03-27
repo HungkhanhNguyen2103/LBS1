@@ -33,6 +33,7 @@
         public static string BOOK_GET_BOOK_CHAPTER = "api/Book/GetBookChapter";
         public static string BOOK_GENERATE_SUMMARY_CHAPTER = "api/Book/GenerateSummary";
         public static string BOOK_GENERATE_POSTER_CHAPTER = "api/Book/GeneratePoster";
+        public static string BOOK_QUICKLY_APPROVE_CHAPTER_CONTENT = "api/Book/QuicklyApproveChapterContent";
         public static string BOOK_GET_DRAFT = "api/Book/GetDrafts";
         public static string BOOK_GET_STATIS_CHAPTER_BOOK = "api/Book/StatisticsChapterBook";
         public static string BOOK_GET_STATIS_BOOK = "api/Book/StatisticsBook";
@@ -54,7 +55,10 @@
         public static string INFO_DETAIL_CONSPECTUS = "api/Information/ConspectusDetail";
         public static string INFO_DELETE_CONSPECTUS = "api/Information/DeleteConspectus";
         public static string INFO_LIST_USERREPORT = "api/Information/ListUserReport";
+        public static string INFO_GET_ROOM_AUTHOR = "api/Information/GetRoomByAuthor";
+        public static string INFO_GET_ROOM_MANAGER = "api/Information/GetRoomByManager";
         public static string INFO_CREATE_USERREPORT = "api/Information/CreateUserReport";
+        public static string INFO_SEND_MESSAGE = "api/Information/SendMessage";
         public static string INFO_DETAIL_USERREPORT = "api/Information/UserReport";
         public static string INFO_CLOSE_USERREPORT = "api/Information/CloseUserReport";
         public static string INFO_OPEN_USERREPORT = "api/Information/OpenUserReport";

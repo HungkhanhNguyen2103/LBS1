@@ -96,7 +96,7 @@ namespace LBSWeb.Service.Book
             return res;
         }
 
-        public async Task<ReponderModel<string>> UpdateBook(BusinessObject.Book model)
+        public async Task<ReponderModel<string>> UpdateBook(BookModel model)
         {
             var res = new ReponderModel<string>();
             if (model == null)
@@ -156,15 +156,15 @@ namespace LBSWeb.Service.Book
             return res;
         }
 
-        public async Task<ReponderModel<BusinessObject.Book>> GetBook(int id)
+        public async Task<ReponderModel<BookModel>> GetBook(int id)
         {
-            var res = new ReponderModel<BusinessObject.Book>();
+            var res = new ReponderModel<BookModel>();
             try
             {
                 string url = PathUrl.BOOK_GET;
                 var param = new Dictionary<string, string>();
                 param.Add("id", id.ToString());
-                res = await _api.Get<ReponderModel<BusinessObject.Book>>(url, param);
+                res = await _api.Get<ReponderModel<BookModel>>(url, param);
 
             }
             catch (Exception ex)
@@ -398,6 +398,28 @@ namespace LBSWeb.Service.Book
                 var param = new Dictionary<string, string>();
                 param.Add("username", username);
                 res = await _api.Get<ReponderModel<StatisticsChapterBook>>(url, param);
+
+            }
+            catch (Exception ex)
+            {
+                res.Message = "Lỗi gọi api!";
+            }
+            return res;
+        }
+
+        public async Task<ReponderModel<string>> QuicklyApproveChapterContent(RequestModel model)
+        {
+            var res = new ReponderModel<string>();
+            if (model == null)
+            {
+                res.Message = "Dữ liệu không hợp lệ";
+                return res;
+            }
+
+            try
+            {
+                string url = PathUrl.BOOK_QUICKLY_APPROVE_CHAPTER_CONTENT;
+                res = await _api.Post<ReponderModel<string>>(url, model);
 
             }
             catch (Exception ex)
