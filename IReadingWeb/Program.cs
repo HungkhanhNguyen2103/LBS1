@@ -75,13 +75,13 @@ var app = builder.Build();
 //    app.UseHsts();
 //}
 
-app.UseCors("AllowSpecificOrigin");
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
 
+app.UseCors("AllowSpecificOrigin");
 
 app.UseNotyf();
 
@@ -93,11 +93,6 @@ app.MapControllerRoute(
     //pattern: "{controller=Account}/{action=Login}/{id?}");
     pattern: "{controller=Account}/{action=Login}/{id?}");
 
-app.UseEndpoints(endpoints =>
-{
-    endpoints.MapHub<ChatHub>("/chathub");
-});
-
-//app.MapHub<ChatHub>("/chathub");
+app.MapHub<ChatHub>("/chathub");
 
 app.Run();
