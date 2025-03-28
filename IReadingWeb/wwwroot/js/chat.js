@@ -1,8 +1,8 @@
 ﻿// chat.js
 const connection = new signalR.HubConnectionBuilder()
     .withUrl("/chathub", {
-        transport: signalR.HttpTransportType.WebSockets, 
-        skipNegotiation: true                          
+        //transport: signalR.HttpTransportType.WebSockets, 
+        withCredentials: true                         
     })
     .withAutomaticReconnect()
     .build();
@@ -20,7 +20,10 @@ connection.on('ReceiveMessage', (user, message) => {
     container.scrollTop = container.scrollHeight;
 });
 
-connection.start().catch(err => console.error(err.toString()));
+connection.start()
+    .then(() => console.log("Connected to SignalR"))
+    .catch(err => console.error("Connection failed:", err));
+//connection.start().catch(err => console.error(err.toString()));
 
 function sendMessage(message) {
     const user = 'test';

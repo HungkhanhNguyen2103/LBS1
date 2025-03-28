@@ -55,10 +55,11 @@ builder.Services.AddNotyf(config =>
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAllOrigins",
-        policy => policy.AllowAnyOrigin()
+    options.AddPolicy("AllowSpecificOrigin",
+        policy => policy.WithOrigins("https://ireading.store")
                         .AllowAnyHeader()
-                        .AllowAnyMethod());
+                        .AllowAnyMethod()
+                        .AllowCredentials());
 });
 
 
@@ -74,7 +75,7 @@ var app = builder.Build();
 //    app.UseHsts();
 //}
 
-app.UseCors("AllowAllOrigins");
+app.UseCors("AllowSpecificOrigin");
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
