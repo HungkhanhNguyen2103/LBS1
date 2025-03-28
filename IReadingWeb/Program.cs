@@ -56,7 +56,7 @@ builder.Services.AddNotyf(config =>
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowSpecificOrigin",
-        policy => policy.WithOrigins("*")
+        policy => policy.AllowAnyOrigin()
                         .AllowAnyHeader()
                         .AllowAnyMethod());
 });
@@ -74,13 +74,12 @@ var app = builder.Build();
 //    app.UseHsts();
 //}
 
+app.UseCors("AllowSpecificOrigin");
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
-
-app.UseCors("AllowSpecificOrigin");
 
 app.UseNotyf();
 
