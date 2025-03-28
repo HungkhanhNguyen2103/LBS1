@@ -1,6 +1,10 @@
 ﻿// chat.js
 const connection = new signalR.HubConnectionBuilder()
-    .withUrl('/chathub')
+    .withUrl("/chathub", {
+        transport: signalR.HttpTransportType.WebSockets, 
+        skipNegotiation: true                          
+    })
+    .withAutomaticReconnect()
     .build();
 
 connection.on('ReceiveMessage', (user, message) => {

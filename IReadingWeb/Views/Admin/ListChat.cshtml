@@ -185,7 +185,7 @@
 
         var roomInfo = listChat.find(c => c.RoomName == roomName);
         roomInfo.Messagers.forEach(item => {
-            console.log(item);
+            //console.log(item);
             if (item.CreateBy == userName) {
                 clientMessageDiv(item.Content);
             }
