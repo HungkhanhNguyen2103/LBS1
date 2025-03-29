@@ -13,7 +13,43 @@
     Tạo mới
 </button> *@
 <style>
+
     .form-control {
+        margin-left: 0px !important;
+    }
+
+    .highlight-bad-word {
+        color: red;
+        font-weight: bold;
+        text-decoration: underline;
+    }
+
+    .ai-feedback {
+        border: 1px solid #8080804d;
+        border-radius: 6px;
+        margin-bottom: 2rem;
+    }
+
+    button {
+        margin-left: 5px;
+    }
+
+    .input-group {
+        padding-left: 5px !important;
+    }
+
+    #loadingSumary, .loadingDiv {
+        position: absolute;
+        top: 50%;
+        right: 50%;
+    }
+
+    .ql-snow {
+        margin-left: 0px !important;
+        border-radius: 0.375rem !important;
+    }
+
+/*     .form-control {
         margin-left: 0px !important;
     }
 
@@ -30,7 +66,7 @@
     .ql-snow{
         margin-left: 0px !important;
         border-radius: 0.375rem !important;
-    }
+    } */
 
 </style>
 <div class="row">
@@ -63,14 +99,27 @@
                             <label for="Name">Tên chương:</label>
                             <input style="width:100%" type="text" asp-for="ChapterName" class="form-control" autofocus>
                         </div>
-                        <div style="display:block" class="input-group input-group-outline mt-4">
-                            <label for="Content">Nội dung chương:</label>
-                            @* <div id="editorContent" style="height:20rem" ></div> *@
-                            <input type="file" style="width:30%;margin-bottom:10px" onchange="changeFile(this)" accept=".docx,.ppt, .pptx,.txt,.pdf" class="form-control">
-                            <textarea style="width:100%" asp-for="Content" oninput="getWordNo()" type="text" class="form-control" rows="8"></textarea>
-                            <label>Số từ: <span id="wordNoCount">0</span></label>
-                            <input type="number" hidden asp-for="WordNo" />
+                        <div class="row input-group input-group-outline mt-4">
+                            <div style="display:block">
+                                <label for="Content">Nội dung chương:</label>
+                                <input type="file" style="width:30%;margin-bottom:10px" onchange="changeFile(this)" accept=".docx,.txt,.pdf" class="form-control">
+                                <div class="row" style="display:flex">
+                                    <div class="col-9">
+                                        @* contenteditable="true" *@
+                                        <div style="height:19rem;overflow: auto;" id="ContentDiv" class="form-control"></div>
+                                        <textarea oninput="getWordNo()" asp-for="Content" type="text" class="d-none form-control" rows="18"></textarea>
+                                        <label>Số từ: <span id="wordNoCount">0</span></label>
+                                        <input type="number" hidden asp-for="WordNo" />
+                                    </div>
+                                    <div class="col-3 ai-feedback" style="position:relative">
+                                        <ul id="requestContent" style="height:18rem;max-height:18rem;overflow: auto;padding-left:16px">
+                                        </ul>
+                                        <div id="loadingDivFeedBack" class="dot-elastic loadingDiv"></div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
+
                         <div class="d-flex ml-0">
                             <button type="button" onclick="GenerateSummary()" class="btn btn-success mt-4">Tạo tóm tắt bằng AI</button>
                         </div>
@@ -90,6 +139,7 @@
                         <button type="submit" class="btn btn-success mt-4">Lưu thông tin</button>
                         @if(ViewBag.ReturnUrl == "Drafts")
                         {
+                            <button type="button" onclick="SaveDraft()" class="btn btn-warning mt-4 ml-2">Lưu bản thảo</button>
                             <button type="button" onclick="window.location.href='/Admin/Drafts'" class="btn btn-secondary mt-4 ml-2">Quay lại</button>
                         }
                         else
@@ -104,114 +154,69 @@
 </div>
 <script src="~/lib/jquery/dist/jquery.js" asp-append-version="true"></script>
 <script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js" asp-append-version="true"></script>
+<script src="https://cdn.jsdelivr.net/npm/mark.js@8.11.1/dist/mark.min.js" asp-append-version="true"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js" asp-append-version="true"></script>
-<script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js" asp-append-version="true"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.4.2/mammoth.browser.min.js" asp-append-version="true"></script>
+<script src="~/js/chapter.js" asp-append-version="true"></script>
 <script type="text/javascript">
     document.getElementById('loadingSumary').classList.add('d-none');
+    document.getElementById('loadingDivFeedBack').classList.add('d-none');
     // document.getElementById('CreatBookId').classList.add('active');
-
-    // const quill = new Quill('#editorContent', {
-    //     theme: 'snow'
-    // });
-
-    // var delta = JSON.parse('@Model.Content');
-    // const formattedContent = quill.clipboard.convert(delta);
-    // quill.setContents(formattedContent);
-    // quill.in
-    const input1 = document.getElementById("Content");
-    const events = [
-        "click", "focus", "blur", "change",
-        "keydown", "keyup", "keypress",
-        "paste", "cut", "copy", "mousedown", "mouseup",
-        "mouseenter", "mouseleave", "mouseover", "mouseout",
-        "drag", "drop", "contextmenu"
-    ];
-
-    events.forEach(event => {
-        input1.addEventListener(event, (e) => {
-            getWordNo();
-        });
-    });
+    
+    const htmlContent = '@Html.Raw(Model.Content)';
+    quill.clipboard.dangerouslyPasteHTML(htmlContent);
 
     getWordNo();
-    function changeFile(input) {
-        document.getElementById("Content").value = "";
-        if (input.files && input.files[0]) {
-            let file = input.files[0];
-            let typeName = file.type;
-            if (typeName.includes('msword')) {
-                notyf.error("Vui lòng chọn file .docx hợp lệ!");
-                getWordNo();
-                return;
-            }
-            if (typeName == "application/vnd.openxmlformats-officedocument.wordprocessingml.document") {
-                const reader = new FileReader();
 
-                reader.onload = function (event) {
-                    const arrayBuffer = event.target.result;
-
-                    mammoth.extractRawText({ arrayBuffer: arrayBuffer })
-                        .then(result => {
-                            document.getElementById("Content").value = result.value;
-                            getWordNo();
-                        })
-                        .catch(err => {
-                            console.error("Lỗi đọc file:", err);
-                            notyf.error("Không thể đọc file Word.");
-                        });
-                };
-
-                reader.readAsArrayBuffer(file);
-            }
-            if (typeName == "text/plain") {
-                //console.log("text");
-                const reader = new FileReader();
-
-                reader.onload = function (e) {
-                    const text = e.target.result;
-                    document.getElementById("Content").value = text;
-                    getWordNo();
-                };
-
-                reader.readAsText(file);
-            }
-            if (typeName == "application/pdf") {
-
-                const reader = new FileReader();
-
-                reader.onload = function () {
-                    const typedArray = new Uint8Array(reader.result);
-
-                    pdfjsLib.getDocument(typedArray).promise.then(async function (pdf) {
-                        let textContent = '';
-
-                        for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
-                            const page = await pdf.getPage(pageNum);
-                            const content = await page.getTextContent();
-                            const strings = content.items.map(item => item.str).join(' ');
-                            textContent += `Trang ${pageNum}:\n${strings}\n\n`;
-                        }
-
-
-                        document.getElementById("Content").value = textContent;
-                        getWordNo();
-                    });
-                };
-
-                reader.readAsArrayBuffer(file);
-            }
-
-        }
+    function SaveDraft() {
+        $('#Type').val('3');
+        $('#formBody').submit();
     }
 
-    function getWordNo(){
-        //var text = quill.root.innerHTML;
-        var text = $('#Content').val();
-        let words = text.length > 0 ? text.split(/\s+/) : [];
+    function checkChapterContentByAI(content) {
+        $('#loadingDivFeedBack').show();
+        let formData = new FormData();
+        formData.append('Data', content);
+        $.ajax(
+            {
+                url: `/Admin/QuicklyApproveChapterContent`,
+                type: "POST",
+                headers:
+                {
+                    "RequestVerificationToken": '@GetAntiXsrfRequestToken()'
+                },
+                data: formData,
+                //dataType: "json",
+                async: true,
+                processData: false,
+                contentType: false,
+                success: function (data) {
+                    $('#loadingDivFeedBack').hide();
+                    //console.log(data);
+                    let matches = data.match(/<li.*?<\/li>/g);
+                    //data = data.replace('<ul>', '').replace('</ul>', '').replace('```html', '').replace('```','');
+                    if (data.includes("li")) $('#requestContent').prepend(matches);
+                    $('#requestContent').prepend("<br>");
 
-        $('#wordNoCount').html(words.length);
-        $('#WordNo').val(words.length);
+                    const matcheWords = [...data.matchAll(/<li.*?>'(.+?)'\s*=>/g)];
+                    const words = matcheWords.map(m => m[1]);
+                    //console.log(words);
+                    highlightBadWordsPreserveFormat(words);
+
+                }
+            }
+        );
     }
+
+
+    // function getWordNo(){
+    //     //var text = quill.root.innerHTML;
+    //     var text = $('#Content').val();
+    //     let words = text.length > 0 ? text.split(/\s+/) : [];
+
+    //     $('#wordNoCount').html(words.length);
+    //     $('#WordNo').val(words.length);
+    // }
 
     function GenerateSummary(){
         $('#loadingSumary').removeClass('d-none');

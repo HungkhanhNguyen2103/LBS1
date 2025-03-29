@@ -11,6 +11,7 @@ namespace LBSWeb.Service.Book
         Task<ReponderModel<string>> DeleteCategory(int id);
         Task<ReponderModel<string>> CreateBook(BookModel bookModel);
         Task<ReponderModel<string>> UpdateBook(BookModel bookModel);
+        Task<ReponderModel<string>> DeleteBook(int id);
         Task<ReponderModel<string>> QuicklyApproveChapterContent(RequestModel model);
         Task<ReponderModel<BookModel>> GetBook(int id);
         Task<ReponderModel<BookViewModel>> GetAllBookByUser(string userName);

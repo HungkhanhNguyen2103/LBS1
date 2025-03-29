@@ -22,6 +22,7 @@
         public static string CATEGORY_DELETE = "api/Book/DeleteCategory";
         public static string BOOK_DELETE_CHAPTER = "api/Book/DeleteChapterBook";
         public static string BOOK_GET = "api/Book/GetBook";
+        public static string BOOK_DELETE = "api/Book/DeleteBook";
         public static string BOOK_APPROVE = "api/Book/ApproveBook";
         public static string BOOK_UPDATE_APPROVE = "api/Book/UpdateApproveBook";
         public static string BOOK_CREATE = "api/Book/CreateBook";

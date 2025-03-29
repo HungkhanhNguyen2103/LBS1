@@ -402,6 +402,14 @@ namespace LBSWeb.Controllers
         }
 
         [Authorize(Roles = $"{Role.Author}")]
+        [Route("DeleteBook")]
+        public async Task<IActionResult> DeleteBook(int id)
+        {
+            var result = await _bookService.DeleteBook(id);
+            return Json(result);
+        }
+
+        [Authorize(Roles = $"{Role.Author}")]
         [Route("Drafts")]
         public async Task<IActionResult> Drafts()
         {
@@ -559,7 +567,7 @@ namespace LBSWeb.Controllers
         public async Task<IActionResult> DeleteCategory(int id)
         {
             var result = await _bookService.DeleteCategory(id);
-            return Json(result.Message);
+            return Json(result);
         }
 
         [Authorize(Roles = $"{Role.Admin},{Role.Manager}")]

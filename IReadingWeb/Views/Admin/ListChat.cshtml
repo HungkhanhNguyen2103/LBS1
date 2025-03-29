@@ -164,14 +164,15 @@
 <script>
     document.getElementById('ListChatId').classList.add('active');
     let currentUser = '';
-    //let currentRoomName = '';
+    let currentRoomName = '';
 
     let listChat = @listChat;
 
 
     function selectUser(name,roomName) {
         currentUser = name;
-        //currentRoomName = roomName;
+        joinRoom(userName,roomName);
+        currentRoomName = roomName;
         // Update header
         document.getElementById('chatHeader').textContent = 'Chat với: ' + name;
 
@@ -208,7 +209,7 @@
         userMsg.textContent = message;
         container.appendChild(userMsg);
 
-        sendMessage(message);
+        sendMessage(currentRoomName,message);
 
         // setTimeout(() => {
         //     const botMsg = document.createElement("div");

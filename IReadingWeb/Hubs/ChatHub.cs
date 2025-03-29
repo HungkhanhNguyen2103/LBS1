@@ -4,10 +4,10 @@ namespace IReadingWeb.Hubs
 {
     public class ChatHub : Hub
     {
-        public async Task JoinRoom(string roomName)
+        public async Task JoinRoom(string user, string roomName)
         {
-            await Groups.AddToGroupAsync(Context.ConnectionId, roomName);
-            await Clients.Group(roomName).SendAsync("ReceiveMessage", "Hệ thống", $"{Context.ConnectionId} đã tham gia {roomName}");
+            await Groups.AddToGroupAsync(user, roomName);
+            await Clients.Group(roomName).SendAsync("ReceiveMessage", "Hệ thống", $"{user} đã tham gia {roomName}");
         }
 
         public async Task LeaveRoom(string roomName)
@@ -23,7 +23,7 @@ namespace IReadingWeb.Hubs
 
         public async Task SendMessageToRoom(string roomName, string user, string message)
         {
-            await Clients.Group(roomName).SendAsync("ReceiveMessageToRoom", user, message);
+            await Clients.OthersInGroup(roomName).SendAsync("ReceiveMessage", user, message);
         }
     }
 }

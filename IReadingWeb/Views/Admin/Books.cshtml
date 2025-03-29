@@ -63,7 +63,7 @@
                                         <div class="d-flex">
                                             <img src="@item.Poster" class="avatar avatar-sm me-3" style="border-radius:5px;width:50px!important;height:50px!important" alt="">
                                             <div>
-                                                <p id="name-@item.Id" class="text-l font-weight-bold mb-0">@item.Name</p>
+                                                <p id="name-@item.Id" class="text-l font-weight-bold mb-0">@(item.Name.Length > 50 ? item.Name.Substring(0, 55) : item.Name)</p>
                                                 <span class="text-secondary text-xs">@item.BookStatus</span>
                                             </div>
                                         </div>                                  
@@ -97,8 +97,11 @@
                                         <button onclick="window.location.href='/Admin/@item.Id/ChapterBooks'" title="Danh sách chương" class="btn1 btn btn-secondary">
                                             <i class="fa-solid fa-list"></i>
                                         </button>
-                                        <button class="@(User.IsInRole("Author") ? "" : "d-none") btn1 btn btn-secondary" onclick="window.location.href='/Admin/UpdateBook/@item.Id'" title="Chỉnh sửa truyện" >
+                                        <button class="@(User.IsInRole("Author") ? "" : "d-none") btn1 btn btn-secondary" onclick="window.location.href='/Admin/UpdateBook/@item.Id'" title="Chỉnh sửa sách" >
                                             <i class="fa-solid fa-pen-to-square"></i>
+                                        </button>
+                                        <button type="button" class="@(User.IsInRole("Author") ? "" : "d-none") btn1 btn btn-secondary" onclick="deleteItem(@item.Id)" title="Xóa chương">
+                                            <i class="fa-solid fa-trash"></i>
                                         </button>
                                         <button type="button" class="@(User.IsInRole("Author") ? "" : "d-none") btn1 btn btn-secondary" onclick="GetChart(@item.Id)" data-toggle="modal" data-target="#exampleModal" title="Thống kê">
                                             <i class="fa-solid fa-chart-simple"></i>
@@ -240,6 +243,33 @@
                 success: function (data) {
                     alert(data);
                     window.location.reload();
+                }
+            }
+        );
+
+    }
+
+    function deleteItem(id) {
+        if (confirm("Bạn có muốn xóa ?") == false) return;
+        //var formData = new FormData();
+        $.ajax(
+            {
+                url: `/Admin/DeleteBook?id=${id}`,
+                type: "GET",
+                headers:
+                {
+                    "RequestVerificationToken": '@GetAntiXsrfRequestToken()'
+                },
+                //data: formData,
+                //dataType: "json",
+                async: true,
+                processData: false,
+                contentType: false,
+                success: function (data) {
+                    notyf.success(data.message);
+                    setTimeout(() => {
+                        window.location.href = '/Admin/Books';
+                    }, 800);
                 }
             }
         );

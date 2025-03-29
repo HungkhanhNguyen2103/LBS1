@@ -27,6 +27,14 @@ namespace LBSAPI.Controllers
             return true;
         }
 
+        [Route("DeleteBook")]
+        [HttpGet]
+        public async Task<ReponderModel<string>> DeleteBook(int id)
+        {
+            var result = await _bookRepository.DeleteBook(id);
+            return result;
+        }
+
         [Route("ApproveBook")]
         [HttpGet]
         public async Task<ReponderModel<string>> ApproveBook(int id)

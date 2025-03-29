@@ -25,6 +25,7 @@ namespace Repositories.IRepository
         Task<ReponderModel<BookChapter>> GetBookChapter(string id);
         Task<ReponderModel<BookChapter>> GetListBookChapter(int bookId);
         Task<ReponderModel<string>> DeleteChapterBook(string id);
+        Task<ReponderModel<string>> DeleteBook(int id);
         Task<ReponderModel<string>> GenerateSummary(string input);
         Task<ReponderModel<string>> GeneratePoster(string input,string summary);
         Task<ReponderModel<string>> GenerateTextToAudio(string input);

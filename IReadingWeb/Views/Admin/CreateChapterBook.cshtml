@@ -18,9 +18,10 @@
     }
 
     .highlight-bad-word {
-        color: #D58B81;
-        text-decoration: underline;
+        color: red;
         font-weight: bold;
+        text-decoration: underline;
+
     }
 
     .ai-feedback{
@@ -92,7 +93,8 @@
                                 <input type="file" style="width:30%;margin-bottom:10px" onchange="changeFile(this)" accept=".docx,.txt,.pdf" class="form-control">
                                 <div class="row" style="display:flex">
                                     <div class="col-9">
-                                        <div contenteditable="true" style="height:19rem;overflow: auto;" id="ContentDiv" class="form-control"></div>
+                                        @* contenteditable="true" *@
+                                        <div style="height:19rem;overflow: auto;" id="ContentDiv" class="form-control"></div>
                                         <textarea oninput="getWordNo()" asp-for="Content" type="text" class="d-none form-control" rows="18"></textarea>
                                         <label>Số từ: <span id="wordNoCount">0</span></label>
                                         <input type="number" hidden asp-for="WordNo" />
@@ -138,85 +140,34 @@
         </div>
     </form>
 </div>
+
 <script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js" asp-append-version="true"></script>
 <script src="https://cdn.jsdelivr.net/npm/mark.js@8.11.1/dist/mark.min.js" asp-append-version="true"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js" asp-append-version="true"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.4.2/mammoth.browser.min.js" asp-append-version="true"></script>
+<script src="~/js/chapter.js" asp-append-version="true"></script>
 <script type="text/javascript">
     document.getElementById('loadingSumary').classList.add('d-none');
     document.getElementById('loadingDivFeedBack').classList.add('d-none');
 
     // document.getElementById('CreatBookId').classList.add('active');
 
-    // const quill = new Quill('#editorContent', {
-    //     theme: 'snow'
-    // });
-
-    const input1 = document.getElementById("ContentDiv");
-    const events = [
-        "click", "focus", "blur", "change", "input",
-        "keydown", "keyup", "keypress",
-        "paste", "cut", "copy", "mousedown", "mouseup",
-        "mouseenter", "mouseleave", "mouseover", "mouseout",
-        "drag", "drop", "contextmenu"
-    ];
-
-    events.forEach(event => {
-        input1.addEventListener(event, (e) => {
-            getWordNo();
-
-        });
-    });
-
-    input1.addEventListener("keyup", () => {
-        quicklyCheckChapterContent();
-    });
-
-    let typingTimer;
-    const doneTypingInterval = 2000;
-    function quicklyCheckChapterContent(){
-        clearTimeout(typingTimer);
-        typingTimer = setTimeout(() => {
-            let content = input1.innerText;
-            checkChapterContentByAI(content);
-        }, doneTypingInterval);
+    function SaveDraft(){
+        $('#Type').val('3');
+        $('#formBody').submit();
     }
 
-    function cleanFormattingExceptBadWords(divId) {
-        const div = document.getElementById(divId);
-
-        const walker = document.createTreeWalker(div, NodeFilter.SHOW_ELEMENT, null, false);
-
-        let nodesToRemoveFormat = [];
-
-        while (walker.nextNode()) {
-            const node = walker.currentNode;
-
-            if (
-                node.nodeType === Node.ELEMENT_NODE &&
-                node.tagName.toLowerCase() !== "span" &&
-                !node.classList.contains("highlight-bad-word")
-            ) {
-                nodesToRemoveFormat.push(node);
-            }
-
-            if (
-                node.tagName.toLowerCase() === "span" &&
-                !node.classList.contains("highlight-bad-word")
-            ) {
-                nodesToRemoveFormat.push(node);
-            }
+    function changeType(){
+        let type = $('#Type').val();
+        if (type == 2) {
+            $("#ChaperId").attr("hidden", false);
+            $('#StartChapterIdText').hide();
         }
-
-        nodesToRemoveFormat.forEach(node => {
-            const parent = node.parentNode;
-            while (node.firstChild) {
-                parent.insertBefore(node.firstChild, node);
-            }
-            parent.removeChild(node);
-        });
+        else if (type == 1) {
+            $("#ChaperId").attr("hidden", true);
+            $('#StartChapterIdText').show();
+        }
     }
-
 
     function checkChapterContentByAI(content) {
         $('#loadingDivFeedBack').show();
@@ -245,123 +196,13 @@
 
                     const matcheWords = [...data.matchAll(/<li.*?>'(.+?)'\s*=>/g)];
                     const words = matcheWords.map(m => m[1]);
+                    //console.log(words);
+                    highlightBadWordsPreserveFormat(words);
 
-                    let instance = new Mark(document.querySelector("#ContentDiv"));
-                    instance.unmark({
-                        done: function () {
-                            instance.mark(words, {
-                                element: "span",
-                                className: "highlight-bad-word"
-                            });
-                        }
-                    });
-
-                    cleanFormattingExceptBadWords('ContentDiv');
                 }
             }
         );
     }
-
-    function changeFile(input) {
-        document.getElementById("ContentDiv").innerText = "";
-        if (input.files && input.files[0]) {
-            let file = input.files[0];
-            let typeName = file.type;
-            if (typeName.includes('msword')){
-                notyf.error("Vui lòng chọn file .docx hợp lệ!");
-                getWordNo();
-                return;
-            }
-            if (typeName == "application/vnd.openxmlformats-officedocument.wordprocessingml.document") {
-                const reader = new FileReader();
-
-                reader.onload = function (event) {
-                    const arrayBuffer = event.target.result;
-
-                    mammoth.extractRawText({ arrayBuffer: arrayBuffer })
-                        .then(result => {
-                            document.getElementById("ContentDiv").innerText = result.value;
-                            getWordNo();
-                        })
-                        .catch(err => {
-                            console.error("Lỗi đọc file:", err);
-                            notyf.error("Không thể đọc file Word.");
-                        });
-                };
-
-                reader.readAsArrayBuffer(file);
-            }
-            if (typeName == "text/plain") {
-                //console.log("text");
-                const reader = new FileReader();
-
-                reader.onload = function (e) {
-                    const text = e.target.result;
-                    document.getElementById("ContentDiv").innerText = text;
-                    getWordNo();
-                };
-
-                reader.readAsText(file);
-            }
-            if (typeName == "application/pdf") {
-
-                const reader = new FileReader();
-
-                reader.onload = function () {
-                    const typedArray = new Uint8Array(reader.result);
-
-                    pdfjsLib.getDocument(typedArray).promise.then(async function (pdf) {
-                        let textContent = '';
-
-                        for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
-                            const page = await pdf.getPage(pageNum);
-                            const content = await page.getTextContent();
-                            const strings = content.items.map(item => item.str).join(' ');
-                            textContent += `Trang ${pageNum}:\n${strings}\n\n`;
-                        }
-
-
-                        document.getElementById("ContentDiv").innerText = textContent;
-                        getWordNo();
-                    });
-                };
-
-                reader.readAsArrayBuffer(file);
-            }
-        
-        }
-    }
-
-
-    function SaveDraft(){
-        $('#Type').val('3');
-        $('#formBody').submit();
-    }
-
-    function changeType(){
-        let type = $('#Type').val();
-        if (type == 2) {
-            $("#ChaperId").attr("hidden", false);
-            $('#StartChapterIdText').hide();
-        }
-        else if (type == 1) {
-            $("#ChaperId").attr("hidden", true);
-            $('#StartChapterIdText').show();
-        }
-    }
-
-    function getWordNo(){
-        // var delta = quill.getContents();
-        // var text = JSON.stringify(delta);
-        var textDiv = $('#ContentDiv').text();
-        $('#Content').val(textDiv);
-        var text = textDiv;
-        let words = text.length > 0 ? text.split(/\s+/) : [];
-
-        $('#wordNoCount').html(words.length);
-        $('#WordNo').val(words.length);
-    }
-
 
 
     function GenerateSummary(){
@@ -372,19 +213,6 @@
         var formData = new FormData();
         formData.append('input', input);
 
-        // const evtSource = new EventSource(`/Admin/GenerateSummary?input=${input}`);
-        // //const eventList = document.querySelector("ul");
-
-        // evtSource.onmessage = (e) => {
-        //     console.log(e);
-        //     $('#Summary').val(e.data);
-        //     // const newElement = document.createElement("li");
-
-        //     // newElement.textContent = `message: ${e.data}`;
-        //     // eventList.appendChild(newElement);
-        // };
-
-        // console.log(obj);
         $.ajax(
             {
                 url: `/Admin/GenerateSummary`,

@@ -144,15 +144,16 @@ namespace Repositories.Repository
             book.Price = bookModel.Price;
             book.BookCategories = bookModel.CategoryIds.Select(c => new BookCategory
             {
+                BookId = book.Id,
                 CategoryId = c
             }).ToList();
             book.SubCategory = bookModel.SubCategory;
-            book.Status = BookStatus.PendingPublication;
+            //book.Status = BookStatus.PendingPublication;
             //Poster = response.Data.Link,
             //CreateDate = DateTime.Now,
             book.ModifyDate = DateTime.Now;
 
-            if (!string.IsNullOrEmpty(bookModel.Poster) && !bookModel.Poster.Contains("https://i.imgur.com"))
+            if (!string.IsNullOrEmpty(bookModel.Poster))
             {
                 if (!bookModel.Poster.Contains("http"))
                 {
@@ -165,7 +166,7 @@ namespace Repositories.Repository
                     }
                     book.Poster = response.Data.Link;
                 }
-                else
+                else if (book.Poster != bookModel.Poster)
                 {
                     var response = await _imageManager.UploadImage(bookModel.Poster, "url");
                     if (!response.Success)
@@ -417,7 +418,7 @@ namespace Repositories.Repository
                 Summary = book.Summary,
                 UserId = book.UserId,
                 ListCategories = book.BookCategories != null ? book.BookCategories.Select(c => c.Category).ToList() : new List<Category>(),
-                CategoryIds = book.BookCategories != null ? book.BookCategories.Select(c => c.Id).ToList() : new List<int>(),
+                CategoryIds = book.BookCategories != null ? book.BookCategories.Select(c => c.CategoryId.Value).ToList() : new List<int>(),
             };
 
             result.Data = bookModel;
@@ -764,6 +765,30 @@ namespace Repositories.Repository
             }).ToList();
             result.IsSussess = true;
             return result;
+        }
+
+        public async Task<ReponderModel<string>> DeleteBook(int id)
+        {
+            try
+            {
+                var result = new ReponderModel<string>();
+                var model = await _lBSDbContext.Books.Include(c => c.BookCategories).FirstOrDefaultAsync(c => c.Id == id);
+                if (model == null)
+                {
+                    result.Message = "Data không hợp lệ";
+                    return result;
+                }
+                _lBSDbContext.Books.Remove(model);
+                await _lBSDbContext.SaveChangesAsync();
+                result.IsSussess = true;
+                result.Message = "Xóa thành công";
+                return result;
+            }
+            catch (Exception ex)
+            {
+
+                throw;
+            }
         }
     }
 }

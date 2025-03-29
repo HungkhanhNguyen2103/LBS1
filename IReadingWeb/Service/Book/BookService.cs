@@ -428,5 +428,23 @@ namespace LBSWeb.Service.Book
             }
             return res;
         }
+
+        public async Task<ReponderModel<string>> DeleteBook(int id)
+        {
+            var res = new ReponderModel<string>();
+            try
+            {
+                string url = PathUrl.BOOK_DELETE;
+                var param = new Dictionary<string, string>();
+                param.Add("id", id.ToString());
+                res = await _api.Get<ReponderModel<string>>(url, param);
+
+            }
+            catch (Exception ex)
+            {
+                res.Message = "Lỗi gọi api!";
+            }
+            return res;
+        }
     }
 }

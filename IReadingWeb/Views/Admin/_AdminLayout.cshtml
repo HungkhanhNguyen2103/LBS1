@@ -412,6 +412,7 @@
         }
 
         function sendMessageShort() {
+            var roomName = $('#RoomName').val();
             const input = document.getElementById("messageInput");
             const message = input.value.trim();
             if (!message) return;
@@ -419,16 +420,16 @@
             clientMessageDiv(message);
 
             //send SignalR
-            sendMessage(message);
+            sendMessage(roomName,message);
 
             // create to db
-            sendMessageToServer(message);
+            //sendMessageToServer(message);
             // setTimeout(() => {
 
             // }, 600);
 
             input.value = "";
-            container.scrollTop = container.scrollHeight;
+            //container.scrollTop = container.scrollHeight;
         }
 
         getRoomChat();
@@ -457,6 +458,7 @@
                             }
                         });
                         $('#RoomName').val(data.roomName);
+                        //joinRoom(userName,data.roomName);
                         container.scrollTop = container.scrollHeight;
                     }
                 }
