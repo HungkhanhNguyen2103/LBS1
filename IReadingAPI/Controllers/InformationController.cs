@@ -23,6 +23,14 @@ namespace LBSAPI.Controllers
             return result;
         }
 
+        [Route("GetListMessageByRoom")]
+        [HttpGet]
+        public async Task<ReponderModel<RoomModel>> GetListMessageByRoom(string roomName)
+        {
+            var result = await _informationRepository.GetListMessageByRoom(roomName);
+            return result;
+        }
+
         [Route("SendMessage")]
         [HttpPost]
         public async Task<ReponderModel<string>> SendMessage(Messenger messenger)

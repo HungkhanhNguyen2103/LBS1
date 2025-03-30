@@ -564,7 +564,8 @@ namespace Repositories.Repository
                 var res = await _aIGeneration.TextGenerateToSpeech(bookChapter.Summary);
                 if (res.IsSussess) bookChapter.AudioUrl = res.Data;
             }
-            bookChapter.Type = 1;
+            else bookChapter.AudioUrl = bookChapterRow.AudioUrl;
+            //bookChapter.Type = 1;
             bookChapter.ModifyDate = DateTime.Now;
 
 
@@ -751,10 +752,16 @@ namespace Repositories.Repository
             return result;
         }
 
-        public async Task<ReponderModel<BookViewModel>> GetAllBookByCategory(string category)
+        public async Task<ReponderModel<BookViewModel>> GetAllBookByCategory(string categories)
         {
             var result = new ReponderModel<BookViewModel>();
-            var listBook = await _lBSDbContext.BookCategories.Include(c => c.Book).Include(c => c.Category).Where(c => c.Category != null && c.Category.Name == category).Select(c => c.Book).Where(c=> c != null && (c.Status == BookStatus.Done || c.Status == BookStatus.Published || c.Status == BookStatus.Continue)).ToListAsync();
+            var listCategory = categories.Split(",").ToList();
+            var listBook = await _lBSDbContext.BookCategories.Include(c => c.Book)
+                            .Include(c => c.Category)
+                            .Where(c => c.Category != null && !string.IsNullOrEmpty(c.Category.Name) && listCategory.Contains(c.Category.Name))
+                            .Select(c => c.Book)
+                            .Where(c=> c != null && (c.Status == BookStatus.Done || c.Status == BookStatus.Published || c.Status == BookStatus.Continue))
+                            .ToListAsync();
             result.DataList = listBook.Select(c => new BookViewModel
             {
                 Id = c.Id,

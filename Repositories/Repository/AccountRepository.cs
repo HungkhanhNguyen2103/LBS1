@@ -3,16 +3,8 @@ using BusinessObject.BaseModel;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Linq;
-using System.Runtime.InteropServices;
 using System.Security.Claims;
-using System.Security.Cryptography;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace Repositories.Repository
 {
@@ -308,6 +300,40 @@ namespace Repositories.Repository
 			List<Claim> claims = new List<Claim>();
 			claims.Add(new Claim(ClaimTypes.PrimarySid, user.Id));
 			claims.Add(new Claim(ClaimTypes.NameIdentifier, user.UserName));
+
+            // add or get room
+            if (role.Contains(Role.Author))
+            {
+                //create new room
+                var roomName = string.Empty;
+                var result = await LBSDbContext.Rooms.FirstOrDefaultAsync(c => c.AuthorUser == user.UserName);    
+                if (result == null)
+                {
+                    var newRoom = new Room
+                    {
+                        RoomName = Guid.NewGuid().ToString(),
+                        AuthorUser = user.UserName
+                    };
+                    LBSDbContext.Rooms.Add(newRoom);
+                    await LBSDbContext.SaveChangesAsync();
+
+                    roomName = newRoom.RoomName;
+                }
+                else roomName = result.RoomName;
+
+                claims.Add(new Claim(ClaimTypes.GroupSid, roomName));
+            }
+            else if (role.Contains(Role.Manager))
+            {
+                var roomResult = await LBSDbContext.Rooms.Where(c => c.ChapterBookId != "-1").ToListAsync();
+                var rooms = roomResult.Count > 0 ? roomResult.Select(c => c.RoomName).ToList() : null;
+                if (rooms != null)
+                {
+                    var listRoomName = string.Join(",", rooms);
+                    claims.Add(new Claim(ClaimTypes.GroupSid, listRoomName));
+                }
+            }
+
 
             var roles = role.Split(",");
             foreach (var role1 in roles)

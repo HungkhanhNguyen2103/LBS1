@@ -597,7 +597,17 @@ namespace LBSWeb.Controllers
         {
             var username = User.FindFirst(ClaimTypes.NameIdentifier).Value;
             var result = await _informationService.GetRoomByManager(username, "-1");
+            ViewBag.FirstRoom = result.DataList.First().RoomName;
+            ViewBag.FirstAuthorFullName = result.DataList.First().AuthorFullName;
             return View(result.DataList);
+        }
+
+        [Authorize(Roles = $"{Role.Manager}")]
+        [Route("GetListMessage")]
+        public async Task<IActionResult> GetListMessage(string roomName)
+        {
+            var result = await _informationService.GetListMessageByRoom(roomName);
+            return Json(result.Data);
         }
 
         [Authorize(Roles = $"{Role.Author}")]

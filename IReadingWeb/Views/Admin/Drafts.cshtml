@@ -16,6 +16,10 @@
         padding: 0;
         margin: 0;
     }
+
+    td p{
+        margin-bottom: 0px !important;
+    }
 </style>
 @* <button type="button" onclick="document.getElementById('formModal').reset();" class="btn btn-success" data-toggle="modal" data-target="#exampleModal">
     Tạo mới
@@ -51,7 +55,7 @@
                                         <p class="mx-3 text-xs font-weight-bold mb-0">@item.ChapterName</p>
                                     </td>
                                     <td>
-                                        <p class="mx-3 text-xs font-weight-bold mb-0">@(item.Content.Length > 50 ? item.Content.Substring(0, 50) + "..." : item.Content)</p>
+                                        <p class="mx-3 text-xs font-weight-bold mb-0">@(item.Content.Length > 50 ? @Html.Raw(item.Content.Substring(0, 50)) + "..." : @Html.Raw(item.Content))</p>
                                     </td>
                                     <td class="align-middle">
                                         <button onclick="window.location.href='/Admin/@item.BookId/UpdateChapterBook/@item.BookChapterId?returnUrl=Drafts'" title="Sửa" class="btn1 btn btn-secondary">

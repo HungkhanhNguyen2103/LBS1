@@ -358,6 +358,7 @@
                             <a class="dropdown-item" href="/Account/AccountInformation">Thông tin cá nhân</a>
                             <a class="dropdown-item" href="/Account/ChangeAccount">Đổi mật khẩu</a>
                             <a class="dropdown-item" href="/Account/Logout">Đăng xuất</a>
+                            @* <button class="dropdown-item" onclick="disconnect($('#RoomName').val())">Đăng xuất</button> *@
                         </div>
                     </div>
                 </div>
@@ -379,7 +380,7 @@
                 </div>
                 <div class="chat-messages1 chatContentAuthor" id="chatMessages"></div>
                 <div class="chat-input1">
-                    <input type="text" id="messageInput" placeholder="Nhập tin nhắn..." />
+                    <input type="text" id="messageInput1" placeholder="Nhập tin nhắn..." />
                     <button type="button" onclick="sendMessageShort()">Gửi</button>
                 </div>
             </div>
@@ -391,7 +392,8 @@
     <script src="~/js/site.js" asp-append-version="true"></script>
     @await Component.InvokeAsync("Notyf")
     @RenderSection("Scripts", required: false)
-    <script>
+    <script type="text/javascript">
+
         let userName = '@userName';
 
         function clientMessageDiv(message) {
@@ -413,7 +415,7 @@
 
         function sendMessageShort() {
             var roomName = $('#RoomName').val();
-            const input = document.getElementById("messageInput");
+            const input = document.getElementById("messageInput1");
             const message = input.value.trim();
             if (!message) return;
 
@@ -422,18 +424,18 @@
             //send SignalR
             sendMessage(roomName,message);
 
-            // create to db
-            //sendMessageToServer(message);
-            // setTimeout(() => {
-
-            // }, 600);
-
             input.value = "";
             //container.scrollTop = container.scrollHeight;
         }
 
-        getRoomChat();
+        document.getElementById("messageInput1").addEventListener("keydown", function (event) {
+            if (event.key === "Enter") {
+                sendMessageShort();
+            }
+        });
 
+        //connectSignalR();
+        getRoomChat();
         function getRoomChat(){
             $.ajax(
                 {
@@ -447,7 +449,7 @@
                     processData: false,
                     contentType: false,
                     success: function (data) {
-                        console.log(data);
+                        //console.log(data);
                         let container = document.getElementById("chatMessages");
                         data.messagers.forEach(item => {
                             if (item.createBy == userName) {
@@ -458,32 +460,9 @@
                             }
                         });
                         $('#RoomName').val(data.roomName);
-                        //joinRoom(userName,data.roomName);
+                        $("#chatMessages").attr("data-roomname", data.roomName);
+                        //joinRoom(data.roomName);
                         container.scrollTop = container.scrollHeight;
-                    }
-                }
-            );
-        }
-
-        function sendMessageToServer(content) {
-            var formData = new FormData();
-            formData.append('RoomId', $('#RoomName').val());
-            formData.append('Content', content);
-            $.ajax(
-                {
-                    url: `/Admin/SendMessage`,
-                    type: "POST",
-                    headers:
-                    {
-                        "RequestVerificationToken": '@GetAntiXsrfRequestToken()'
-                    },
-                    data: formData,
-                    dataType: "json",
-                    async: true,
-                    processData: false,
-                    contentType: false,
-                    success: function (data) {
-                        console.log(data);
                     }
                 }
             );

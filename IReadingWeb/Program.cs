@@ -1,6 +1,7 @@
 using AspNetCoreHero.ToastNotification;
 using AspNetCoreHero.ToastNotification.Extensions;
 using IReadingWeb.Hubs;
+using IReadingWeb.Service.UserConnection;
 using LBSWeb.API;
 using LBSWeb.Service.Book;
 using LBSWeb.Service.Information;
@@ -29,11 +30,12 @@ builder.Services.AddAuthentication(options =>
 builder.Services.AddHttpContextAccessor();
 
 // Declare DI
+
 builder.Services.AddSingleton<WebAPICaller, WebAPICaller>();
 builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<IBookService, BookService>();
 builder.Services.AddScoped<IInformationService, InformationService>();
-
+builder.Services.AddSingleton<IUserConnectionManager, UserConnectionManager>();
 //SignalR DI
 builder.Services.AddSignalR();
 

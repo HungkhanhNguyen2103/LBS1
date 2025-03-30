@@ -29,6 +29,7 @@ namespace Repositories.IRepository
         Task<ReponderModel<string>> OpenUserReport(int id);
         Task<ReponderModel<RoomModel>> GetRoomByAuthor(string username, string chapterBookId);
         Task<ReponderModel<RoomModel>> GetRoomByManager(string username, string chapterBookId);
+        Task<ReponderModel<RoomModel>> GetListMessageByRoom(string roomName);
         Task<ReponderModel<string>> SendMessage(Messenger messenger);
     }
 }

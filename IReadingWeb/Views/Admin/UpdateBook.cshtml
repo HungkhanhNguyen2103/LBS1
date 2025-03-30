@@ -63,7 +63,7 @@
                             </select>
                         </div>
                         <div style="display:block" class="form-group input-group input-group-outline mt-4">
-                            <label>Danh mục con:</label>
+                            <label>Danh mục thêm:</label>
                             <input style="width:100%" type="text" class="form-control" asp-for="SubCategory" />
                         </div>
                         <div class="@(User.IsInRole("Manager") || User.IsInRole("Admin") ? "d-none" : "") d-flex ml-0">

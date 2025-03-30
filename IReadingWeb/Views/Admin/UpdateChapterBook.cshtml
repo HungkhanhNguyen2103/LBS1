@@ -70,7 +70,7 @@
 
 </style>
 <div class="row">
-    <form method="post" asp-action="UpdateChapterBook">
+    <form method="post" id="formBody" asp-action="UpdateChapterBook">
         <div class="col-12">
             <div class="card my-4">
                 <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
@@ -94,6 +94,11 @@
                     </div>
 
                     <div class="table-responsive p-0 m-4 mt-0">
+                        <select style="width:100%" asp-for="Type" class="form-control d-none">
+                            <option value="1">Đăng thường</option>
+                            <option value="2">Chèn chương</option>
+                            <option value="3">Lưu bản thảo</option>
+                        </select>
                         <input style="width:100%" type="number" asp-for="BookId" value="@ViewBag.BookId" class="form-control" hidden>
                         <div style="display:block" class="form-group input-group input-group-outline mt-0">
                             <label for="Name">Tên chương:</label>

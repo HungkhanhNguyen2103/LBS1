@@ -144,6 +144,24 @@ namespace LBSWeb.Service.Information
             return res;
         }
 
+        public async Task<ReponderModel<RoomModel>> GetListMessageByRoom(string roomName)
+        {
+            var res = new ReponderModel<RoomModel>();
+            try
+            {
+                string url = PathUrl.INFO_GET_LISTMESSAGE;
+                var param = new Dictionary<string, string>();
+                param.Add("roomName", roomName);
+                res = await _api.Get<ReponderModel<RoomModel>>(url, param);
+
+            }
+            catch (Exception ex)
+            {
+                res.Message = "Lỗi gọi api!";
+            }
+            return res;
+        }
+
         public async Task<ReponderModel<RoomModel>> GetRoomByAuthor(string username, string chapterBookId)
         {
             var res = new ReponderModel<RoomModel>();

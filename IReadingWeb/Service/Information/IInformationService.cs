@@ -25,5 +25,6 @@ namespace LBSWeb.Service.Information
         Task<ReponderModel<RoomModel>> GetRoomByAuthor(string username, string chapterBookId);
         Task<ReponderModel<RoomModel>> GetRoomByManager(string username, string chapterBookId);
         Task<ReponderModel<string>> SendMessage(Messenger messenger);
+        Task<ReponderModel<RoomModel>> GetListMessageByRoom(string roomName);
     }
 }

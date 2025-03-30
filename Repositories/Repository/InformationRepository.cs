@@ -421,5 +421,39 @@ namespace Repositories.Repository
             result.IsSussess = true;
             return result;
         }
+
+        public async Task<ReponderModel<RoomModel>> GetListMessageByRoom(string roomName)
+        {
+            var reponse = new ReponderModel<RoomModel>();
+
+            var result = await _lBSDbContext.Rooms.FirstOrDefaultAsync(c=> c.RoomName == roomName);
+            if(result == null)
+            {
+                reponse.Message = "Dữ liệu không hợp lệ";
+                return reponse;
+            }
+
+            var filter = Builders<Messenger>.Filter.And(
+                                 Builders<Messenger>.Filter.Eq(c => c.RoomId, result.RoomName),
+                                 Builders<Messenger>.Filter.Or(
+                                     Builders<Messenger>.Filter.Where(p => p.CreateBy == result.AuthorUser),
+                                     Builders<Messenger>.Filter.Where(p => p.To == result.AuthorUser)
+                                 )
+                             );
+            var messengers = await _mongoContext.Messengers.Find(filter).ToListAsync();
+
+            var author = await _accountRepository.GetInformation(result.AuthorUser);
+            var roomModel = new RoomModel
+            {
+                RoomName = result.RoomName,
+                AuthorUser = result.AuthorUser,
+                AuthorFullName = author.Data.FullName,
+                Messagers = messengers,
+            };
+            reponse.Data = roomModel;
+            reponse.IsSussess = true;
+
+            return reponse;
+        }
     }
 }

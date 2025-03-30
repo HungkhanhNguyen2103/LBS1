@@ -3,7 +3,7 @@
 @using Newtonsoft.Json
 @{
     Layout = "~/Views/Admin/_AdminLayout.cshtml";
-    var listChat = Html.Raw(JsonConvert.SerializeObject(Model));
+    //var listChat = Html.Raw(JsonConvert.SerializeObject(Model));
     //var userName = User.FindFirst(ClaimTypes.NameIdentifier).Value;
 }
 @inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Xsrf
@@ -17,6 +17,15 @@
 <style>
     * {
       box-sizing: border-box;
+    }
+
+    .dot {
+        height: 8px;
+        width: 8px;
+        background-color: #fb8c00;
+        border-radius: 50%;
+        display: inline-block;
+        margin-bottom:2px;
     }
 
     body {
@@ -50,7 +59,7 @@
       background-color: #e7e7e7;
     }
 
-    .user.active {
+    .user1.active {
       background-color: #E12B6B;
       color: white;
     }
@@ -142,7 +151,7 @@
                     <div class="user-list" id="userList">
                         @foreach (var item in Model)
                         {
-                            <div class="user1 " onclick="selectUser('@item.AuthorFullName','@item.RoomName')">@item.AuthorFullName</div>
+                            <div class="user1 " onclick="selectUser('@item.AuthorFullName','@item.RoomName')"><span id="@item.RoomName" class="dot d-none"></span> @item.AuthorFullName </div>
                         }
                         @* active *@
                     </div>
@@ -150,9 +159,9 @@
                     <!-- Chat Area -->
                     <div class="chat-area">
                         <div class="chat-header" id="chatHeader">Chat với: Bot</div>
-                        <div class="chat-messages" id="chatMessages"></div>
+                        <div class="chat-messages chatContentManager" id="chatMessages"></div>
                         <div class="chat-input">
-                            <input type="text" id="messageInput" placeholder="Nhập tin nhắn..." />
+                            <input type="text" id="messageInput" autofocus placeholder="Nhập tin nhắn..." />
                             <button type="button" class="btn btn-info mb-0" onclick="sendMessageClient()">Gửi</button>
                         </div>
                     </div>
@@ -163,38 +172,73 @@
 </div>
 <script>
     document.getElementById('ListChatId').classList.add('active');
-    let currentUser = '';
+    //let currentUser = '';
     let currentRoomName = '';
 
-    let listChat = @listChat;
+    selectUser('@ViewBag.FirstAuthorFullName', '@ViewBag.FirstRoom');
 
+    document.getElementById("messageInput").addEventListener("keydown", function (event) {
+        if (event.key === "Enter") {
+            sendMessageClient();
+        }
+    });
 
     function selectUser(name,roomName) {
-        currentUser = name;
-        joinRoom(userName,roomName);
+        var userDiv = document.getElementById(roomName);
+        userDiv.classList.add("d-none");
+        //currentUser = name;
+        //joinRoom(roomName);
         currentRoomName = roomName;
+        $("#chatMessages").attr("data-roomname", roomName);
         // Update header
         document.getElementById('chatHeader').textContent = 'Chat với: ' + name;
 
         // Highlight selected
-        const users = document.querySelectorAll('.user');
+        const users = document.querySelectorAll('.user1');
         users.forEach(u => u.classList.remove('active'));
-        event.target.classList.add('active');
+        if (event != null){
+            event.target.classList.add('active');
+        }
+        else users[0].classList.add('active');
 
         // Clear chat (optional)
         document.getElementById('chatMessages').innerHTML = '';
 
-        var roomInfo = listChat.find(c => c.RoomName == roomName);
-        roomInfo.Messagers.forEach(item => {
-            //console.log(item);
-            if (item.CreateBy == userName) {
-                clientMessageDiv(item.Content);
+        getListMessage(roomName);
+    }
+
+    function getListMessage(roomName) {
+        $.ajax(
+            {
+                url: `/Admin/GetListMessage?roomName=${roomName}`,
+                type: "GET",
+                headers:
+                {
+                    "RequestVerificationToken": '@GetAntiXsrfRequestToken()'
+                },
+                //data: formData,
+                //dataType: "json",
+                async: true,
+                processData: false,
+                contentType: false,
+                success: function (data) {
+                    //console.log(data);
+                    let container = document.getElementById('chatMessages');
+                    var listChat = data.messagers;
+                    if (listChat && listChat.length > 0) { 
+                        listChat.forEach(item => {
+                            if (item.createBy == userName) {
+                                clientMessageDiv(item.content);
+                            }
+                            else if (item.to == userName || item.to == null) {
+                                retriveMessageDiv(item.content);
+                            }
+                        });
+                        container.scrollTop = container.scrollHeight;
+                    }
+                }
             }
-            else if (item.To == userName || item.To == null) {
-                retriveMessageDiv(item.Content);
-            }
-        });
-        //console.log(roomInfo);
+        );
     }
 
     function sendMessageClient() {
@@ -203,22 +247,11 @@
         if (!message) return;
 
         const container = document.getElementById("chatMessages");
-
         const userMsg = document.createElement("div");
         userMsg.className = "message user";
         userMsg.textContent = message;
         container.appendChild(userMsg);
-
         sendMessage(currentRoomName,message);
-
-        // setTimeout(() => {
-        //     const botMsg = document.createElement("div");
-        //     botMsg.className = "message bot";
-        //     botMsg.textContent = currentUser + ": Cảm ơn bạn đã nhắn!";
-        //     container.appendChild(botMsg);
-        //     container.scrollTop = container.scrollHeight;
-        // }, 600);
-
         input.value = "";
         container.scrollTop = container.scrollHeight;
     }
