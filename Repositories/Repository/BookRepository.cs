@@ -136,17 +136,28 @@ namespace Repositories.Repository
                 return result;
             }
 
+            var listOldBookCategory = await _lBSDbContext.BookCategories.Where(c => c.BookId == book.Id && c.CategoryId.HasValue).Select(c => c.CategoryId.Value).ToListAsync();
+
+            // category book remove
+            var listIdsRemove = listOldBookCategory.Except(bookModel.CategoryIds).ToList();
+            var listBookCateRemove = await _lBSDbContext.BookCategories.Where(c => listIdsRemove.Contains(c.CategoryId.Value)).ToListAsync();
+            _lBSDbContext.BookCategories.RemoveRange(listBookCateRemove);
+
+            // category book add
+            var listIdsAdd = bookModel.CategoryIds.Except(listOldBookCategory).ToList();
+            var listBookCateAdd = listIdsAdd.Select(c => new BookCategory
+            {
+                CategoryId = c,
+                BookId = book.Id
+            }).ToList();
+            _lBSDbContext.BookCategories.AddRange(listBookCateAdd);
+
             book.Name = bookModel.Name;
             book.Summary = bookModel.Summary;
             //book.CategoryId = bookModel.CategoryId;
             book.AgeLimitType = bookModel.AgeLimitType;
             book.BookType = bookModel.BookType;
             book.Price = bookModel.Price;
-            book.BookCategories = bookModel.CategoryIds.Select(c => new BookCategory
-            {
-                BookId = book.Id,
-                CategoryId = c
-            }).ToList();
             book.SubCategory = bookModel.SubCategory;
             //book.Status = BookStatus.PendingPublication;
             //Poster = response.Data.Link,
@@ -237,10 +248,10 @@ namespace Repositories.Repository
                 Status = BookStatus.PendingPublication,
                 UserId = bookModel.UserId,
                 SubCategory = bookModel.SubCategory,
-                BookCategories = bookModel.CategoryIds.Select(c => new BookCategory
-                {
-                    CategoryId = c
-                }).ToList(),
+                //BookCategories = bookModel.CategoryIds.Select(c => new BookCategory
+                //{
+                //    CategoryId = c
+                //}).ToList(),
                 //Poster = response.Data.Link,
                 CreateDate = DateTime.Now,
                 ModifyDate = DateTime.Now,
@@ -274,8 +285,19 @@ namespace Repositories.Repository
             else book.Poster = "https://i.imgur.com/KHD58yX.png";
 
             _lBSDbContext.Books.Add(book);
+            await _lBSDbContext.SaveChangesAsync();
             try
             {
+                // create category book
+                foreach (var categoryId in bookModel.CategoryIds)
+                {
+                    _lBSDbContext.BookCategories.Add(new BookCategory
+                    {
+                        BookId = book.Id,
+                        CategoryId = categoryId
+                    });
+                }
+
                 await _lBSDbContext.SaveChangesAsync();
 
                 result.Message = "Cập nhật thành công";
@@ -352,8 +374,9 @@ namespace Repositories.Repository
 
             if (!string.IsNullOrEmpty(bookChapter.Summary))
             {
-                var res = await _aIGeneration.TextGenerateToSpeech(bookChapter.Summary);
-                if (res.IsSussess) bookChapter.AudioUrl = res.Data;
+                // comment sửa lại logic
+                //var res = await _aIGeneration.TextGenerateToSpeech(bookChapter.Summary);
+                //if (res.IsSussess) bookChapter.AudioUrl = res.Data;
             }
 
             bookChapter.ModifyDate = DateTime.Now;
@@ -561,8 +584,9 @@ namespace Repositories.Repository
             }
             if (!string.IsNullOrEmpty(bookChapter.Summary) && bookChapterRow.Summary != bookChapter.Summary)
             {
-                var res = await _aIGeneration.TextGenerateToSpeech(bookChapter.Summary);
-                if (res.IsSussess) bookChapter.AudioUrl = res.Data;
+                // comment sua lai logic
+                //var res = await _aIGeneration.TextGenerateToSpeech(bookChapter.Summary);
+                //if (res.IsSussess) bookChapter.AudioUrl = res.Data;
             }
             else bookChapter.AudioUrl = bookChapterRow.AudioUrl;
             //bookChapter.Type = 1;
@@ -769,7 +793,7 @@ namespace Repositories.Repository
                 Name = c.Name,
                 Poster = c.Poster,
                 Status = c.Status
-            }).ToList();
+            }).DistinctBy(c => c.Id).ToList();
             result.IsSussess = true;
             return result;
         }
