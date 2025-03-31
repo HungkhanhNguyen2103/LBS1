@@ -61,6 +61,7 @@ namespace LBSWeb.Controllers
 
 
         [Authorize]
+        //[IgnoreAntiforgeryToken]
         public async Task<IActionResult> LoginWithGoogle()
         {
             var userClaims = User.Claims;
