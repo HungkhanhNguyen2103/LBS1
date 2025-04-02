@@ -393,14 +393,18 @@ namespace Repositories.Repository
                 var messengers = await _mongoContext.Messengers.Find(filter).ToListAsync();
 
                 var author = await _accountRepository.GetInformation(item.AuthorUser);
-                var roomModel = new RoomModel
+                if (author.IsSussess)
                 {
-                    RoomName = item.RoomName,
-                    AuthorUser = item.AuthorUser,
-                    AuthorFullName = author.Data.FullName,
-                    Messagers = messengers,
-                };
-                reponse.DataList.Add(roomModel);
+                    var roomModel = new RoomModel
+                    {
+                        RoomName = item.RoomName,
+                        AuthorUser = item.AuthorUser,
+                        AuthorFullName = author.Data.FullName,
+                        Messagers = messengers,
+                    };
+                    reponse.DataList.Add(roomModel);
+                }
+
             }
             reponse.IsSussess = true;
 
@@ -454,6 +458,34 @@ namespace Repositories.Repository
             reponse.IsSussess = true;
 
             return reponse;
+        }
+
+        public async Task<ReponderModel<string>> CreateUserReportComment(UserReportComment comment)
+        {
+            var response = new ReponderModel<string>();
+            comment.ModifyDate = DateTime.Now;
+            _lBSDbContext.UserReportComments.Add(comment);
+            await _lBSDbContext.SaveChangesAsync();
+            response.Message = "Tạo thành công";
+            response.IsSussess = true;
+            return response;
+        }
+
+        public async Task<ReponderModel<UserReportCommentModel>> GetListUserReportComment(int userReportId)
+        {
+            var response = new ReponderModel<UserReportCommentModel>();
+            response.DataList = await _lBSDbContext.UserReportComments.Where(c => c.UserReportId == userReportId)
+                .Select(c => new UserReportCommentModel
+                {
+                    Content = c.Content,
+                    CreateBy = c.CreateBy,
+                    Id = c.Id,
+                    Image = c.Image,
+                    ModifyDate = c.ModifyDate.ToString("HH:mm dd/MM/yyyy"),
+                    UserReportId = c.UserReportId
+                }).ToListAsync();
+            response.IsSussess = true;
+            return response;
         }
     }
 }

@@ -42,7 +42,7 @@ builder.Services.AddSignalR();
 // Config Auto ValidateAntiforgery Token
 builder.Services.AddMvc(options =>
 {
-    //options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute());
+    options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute());
 });
 
 builder.Services.AddHttpClient();

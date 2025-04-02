@@ -149,6 +149,9 @@
                                         <span class="title">@item.Title</span>
                                         <p style="margin-bottom:0;font-size:13px">--@item.Content</p>
                                     </div>
+                                    <div style="width:20%">
+                                        <span>@item.CreateBy</span>
+                                    </div>
                                     <div>
                                         <span class="@(item.UserReportStatus == UserReportStatus.Done ? "status" : "status-pending")">@(item.UserReportStatus == UserReportStatus.Done ? "Đã xử lý và đóng" : "Đang xử lý")</span>
                                     </div>
@@ -179,10 +182,16 @@
                         <p id="content"></p>
                         <span style="color: #d9534f;"></span>
 
-                        <div class="comment-box d-none">
+                        <div class="comment-box">
                             <h4 style="font-size:15px">Bình luận</h4>
-                            <textarea class="font-control" placeholder="Thêm bình luận..."></textarea>
-                            <button class="btn btn-warning">Gửi</button>
+                            <input id="userReportId" hidden type="text"/>
+                            <textarea id="contentComment" class="font-control" placeholder="Thêm bình luận..."></textarea>
+                            <button type="button" onclick="submitComment()" class="btn btn-warning mb-4">Gửi</button>
+                        </div>
+                        <div class="comment-list">
+                            <ul id="listCommentReport" style="list-style:none;padding:0">
+                            </ul>
+
                         </div>
                     </div>
                 </div>
@@ -229,7 +238,8 @@
     }
 
     function ClickOpen() {
-        var id = $('#userReportId').html();
+        var id = $('#userReportId').val();
+        var formData = new FormData();
         $.ajax(
             {
                 url: `/Admin/OpenUserReport/${id}`,
@@ -242,17 +252,45 @@
                 processData: false,
                 contentType: false,
                 success: function (data) {
-                    notyf.success(data.message);
-                    setTimeout(() => {
-                        window.location.reload();
-                    }, 800);
+                    formData.append("Content", "Vui lòng kiểm tra lại yêu cầu báo cáo này");
+                    formData.append("UserReportId", id);
+                    $.ajax(
+                        {
+                            url: `/Admin/CreateUserReportComment/${@ViewBag.ReportType}`,
+                            type: "POST",
+                            headers:
+                            {
+                                "RequestVerificationToken": '@GetAntiXsrfRequestToken()'
+                            },
+                            data: formData,
+                            dataType: "json",
+                            async: true,
+                            processData: false,
+                            contentType: false,
+                            success: function (data1) {
+                                if (data1.isSussess == false) {
+                                    notyf.error(data1.message);
+                                    return;
+                                }
+                                notyf.success(data.message);
+                                setTimeout(() => {
+                                    window.location.reload();
+                                }, 800);
+                            }
+                        }
+                    );
+                    // notyf.success(data.message);
+                    // setTimeout(() => {
+                    //     window.location.reload();
+                    // }, 800);
                 }
             }
         );
     }
 
     function ClickDone(){
-        var id = $('#userReportId').html();
+        var id = $('#userReportId').val();
+        var formData = new FormData();
         $.ajax(
             {
                 url: `/Admin/CloseUserReport/${id}`,
@@ -265,10 +303,109 @@
                 processData: false,
                 contentType: false,
                 success: function (data) {
+                    //var userReportId = $('#userReportId').val();
+                    formData.append("Content", "Yêu cầu báo cáo đã được đóng");
+                    formData.append("UserReportId", id);
+                    $.ajax(
+                        {
+                            url: `/Admin/CreateUserReportComment/${@ViewBag.ReportType}`,
+                            type: "POST",
+                            headers:
+                            {
+                                "RequestVerificationToken": '@GetAntiXsrfRequestToken()'
+                            },
+                            data: formData,
+                            dataType: "json",
+                            async: true,
+                            processData: false,
+                            contentType: false,
+                            success: function (data1) {
+                                if (data1.isSussess == false) {
+                                    notyf.error(data1.message);
+                                    return;
+                                }
+                                notyf.success(data.message);
+                                setTimeout(() => {
+                                    window.location.reload();
+                                }, 800);
+                            }
+                        }
+                    );
+
+                }
+            }
+        );
+    }
+
+    function getListCommentReport(userReportId){
+        $('#listCommentReport').html('');
+        $.ajax(
+            {
+                url: `/Admin/GetListUserReportComment?userReportId=${userReportId}`,
+                type: "GET",
+                headers:
+                {
+                    "RequestVerificationToken": '@GetAntiXsrfRequestToken()'
+                },
+                // data: formData,
+                // dataType: "json",
+                async: true,
+                processData: false,
+                contentType: false,
+                success: function (data) {
+                    //console.log(data);
+                    let html = '';
+                    data.forEach(item => {
+                        html += `<li style="border-top: 1px solid #80808082;">
+                                        <h4 style="font-size:15px;margin-top:10px" class="mb-0">${item.createBy}</h4>
+                                        <small>${item.modifyDate}</small>
+                                        <p class="mt-2">${item.content}</p>
+                                 </li>`;
+                    })
+                    $('#listCommentReport').html(html);
+                }
+            }
+        );
+    }
+
+    function submitComment(){
+        var formData = new FormData();
+        var status = $('#UserReportStatus').val();
+        if(status == 0){
+            notyf.error("Vui lòng mở lại yêu cầu & báo cáo trước khi thêm bình luận");
+            return;
+        }
+
+        var content = $("#contentComment").val();
+        if(content == "" || content == null){
+            notyf.error("Cần nhập bình luận");
+            return;
+        }
+        var userReportId = $('#userReportId').val();
+        formData.append("Content", content);
+        formData.append("UserReportId", userReportId);
+        $.ajax(
+            {
+                url: `/Admin/CreateUserReportComment/${@ViewBag.ReportType}`,
+                type: "POST",
+                headers:
+                {
+                    "RequestVerificationToken": '@GetAntiXsrfRequestToken()'
+                },
+                data: formData,
+                dataType: "json",
+                async: true,
+                processData: false,
+                contentType: false,
+                success: function (data) {
+                    //console.log(data);
+                    if (data.isSussess == false) {
+                        notyf.error(data.message);
+                        return;
+                    }
                     notyf.success(data.message);
-                    setTimeout(() => {
-                        window.location.reload();
-                    }, 800);
+                    $("#contentComment").val('');
+                    getListCommentReport(userReportId);
                 }
             }
         );
@@ -277,6 +414,7 @@
     function RenderDetail(id){
         $(".issue-list li").removeClass('active');
         $(`#${id}`).addClass("active");
+        $('#userReportId').val(id);
         //console.log(id);
         $.ajax(
             {
@@ -293,9 +431,12 @@
                 contentType: false,
                 success: function (data) {
                     //console.log(data);
-                    $('#title').html(data.data.title);
-                    $('#content').html(data.data.content);
-                    $('#userReportId').html(data.data.id);
+                    if (data && data.data) {
+                        $('#title').html(data.data.title);
+                        $('#content').html(data.data.content);
+                        $('#userReportId').html(data.data.id);
+                        getListCommentReport(data.data.id)
+                    }
                 }
             }
         );

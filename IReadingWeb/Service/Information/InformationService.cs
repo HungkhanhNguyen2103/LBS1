@@ -90,6 +90,27 @@ namespace LBSWeb.Service.Information
             return res;
         }
 
+        public async Task<ReponderModel<string>> CreateUserReportComment(UserReportComment model)
+        {
+            var res = new ReponderModel<string>();
+            if (model == null)
+            {
+                res.Message = "Thông tin không hợp lệ!";
+                return res;
+            }
+            try
+            {
+                string url = PathUrl.INFO_CREATE_COMMENT_USERREPORT;
+                res = await _api.Post<ReponderModel<string>>(url, model);
+
+            }
+            catch (Exception ex)
+            {
+                res.Message = "Lỗi gọi api!";
+            }
+            return res;
+        }
+
         public async Task<ReponderModel<string>> DeleteBasicKnowledge(int id)
         {
             var res = new ReponderModel<string>();
@@ -153,6 +174,24 @@ namespace LBSWeb.Service.Information
                 var param = new Dictionary<string, string>();
                 param.Add("roomName", roomName);
                 res = await _api.Get<ReponderModel<RoomModel>>(url, param);
+
+            }
+            catch (Exception ex)
+            {
+                res.Message = "Lỗi gọi api!";
+            }
+            return res;
+        }
+
+        public async Task<ReponderModel<UserReportCommentModel>> GetListUserReportComment(int userReportId)
+        {
+            var res = new ReponderModel<UserReportCommentModel>();
+            try
+            {
+                string url = PathUrl.INFO_ALL_COMMENT_USERREPORT;
+                var param = new Dictionary<string, string>();
+                param.Add("userReportId", userReportId.ToString());
+                res = await _api.Get<ReponderModel<UserReportCommentModel>>(url, param);
 
             }
             catch (Exception ex)

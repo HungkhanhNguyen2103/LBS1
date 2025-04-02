@@ -31,6 +31,22 @@ namespace LBSAPI.Controllers
             return result;
         }
 
+        [Route("GetListUserReportComment")]
+        [HttpGet]
+        public async Task<ReponderModel<UserReportCommentModel>> GetListUserReportComment(int userReportId)
+        {
+            var result = await _informationRepository.GetListUserReportComment(userReportId);
+            return result;
+        }
+
+        [Route("CreateUserReportComment")]
+        [HttpPost]
+        public async Task<ReponderModel<string>> CreateUserReportComment(UserReportComment comment)
+        {
+            var result = await _informationRepository.CreateUserReportComment(comment);
+            return result;
+        }
+
         [Route("SendMessage")]
         [HttpPost]
         public async Task<ReponderModel<string>> SendMessage(Messenger messenger)

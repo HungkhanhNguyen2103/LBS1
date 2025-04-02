@@ -181,6 +181,26 @@ namespace LBSWeb.Controllers
         }
 
         [Authorize(Roles = $"{Role.Manager},{Role.Author}")]
+        [Route("CreateUserReportComment/{type}")]
+        [HttpPost]
+        public async Task<IActionResult> CreateUserReportComment(int type,UserReportComment model)
+        {
+            model.CreateBy = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            model.UserId = User.FindFirst(ClaimTypes.PrimarySid).Value;
+            var result = await _informationService.CreateUserReportComment(model);
+            return Json(result);
+        }
+
+        [Authorize(Roles = $"{Role.Manager},{Role.Author}")]
+        [Route("GetListUserReportComment")]
+        [HttpGet]
+        public async Task<IActionResult> GetListUserReportComment(int userReportId)
+        {
+            var result = await _informationService.GetListUserReportComment(userReportId);
+            return Json(result.DataList);
+        }
+
+        [Authorize(Roles = $"{Role.Manager},{Role.Author}")]
         [Route("StatisticsChapterBook/{bookId}")]
         [HttpGet]
         public async Task<IActionResult> StatisticsChapterBook(int bookId)

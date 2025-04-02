@@ -64,6 +64,10 @@
         public static string INFO_CLOSE_USERREPORT = "api/Information/CloseUserReport";
         public static string INFO_OPEN_USERREPORT = "api/Information/OpenUserReport";
         public static string INFO_GET_LISTMESSAGE = "api/Information/GetListMessageByRoom";
+
+        //UserReportComment
+        public static string INFO_ALL_COMMENT_USERREPORT = "api/Information/GetListUserReportComment";
+        public static string INFO_CREATE_COMMENT_USERREPORT = "api/Information/CreateUserReportComment";
     }
 
 }
