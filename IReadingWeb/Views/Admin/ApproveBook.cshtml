@@ -1,7 +1,8 @@
-﻿@{
+﻿@using Newtonsoft.Json
+@{
     Layout = "~/Views/Admin/_AdminLayout.cshtml";
 }
-@* @model Notification *@
+@model List<BookChapterApproveModel>
 @inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Xsrf
 @functions {
     public string GetAntiXsrfRequestToken()
@@ -17,8 +18,44 @@
         margin: 0;
     }
 
+    li.dt-paging-button:hover {
+        background-color: white !important;
+        border: 1px solid white !important;
+        background: white !important;
+    }
+
+    .loadingDiv {
+        position: absolute;
+        top: 50%;
+        right: 50%;
+    }
+
+    #ContentDiv{
+        border: 1px solid #8080804d;
+    }
+
+    ul{
+        padding-left:0px;
+    }
+
+    li {
+        padding-left: 0px;
+    }
+
     .title{
         margin-left:2rem;
+    }
+
+    .highlight-bad-word {
+        color: red;
+        font-weight: bold;
+        text-decoration: underline;
+    }
+
+    .ai-feedback {
+        border: 1px solid #8080804d;
+        border-radius: 6px;
+        margin-bottom: 2rem;
     }
 </style>
 @* <button type="button" onclick="document.getElementById('formModal').reset();" class="btn btn-success" data-toggle="modal" data-target="#exampleModalPost">
@@ -33,27 +70,28 @@
                 </div>
             </div>
             <div class="card-body px-0 pb-2">
-                <div class="table-responsive p-0">
-@*                     <h3 class="title">@Model.Name</h3>
-                    <small class="title">@Model.ModifyDate.ToString("HH:mm-dd/MM/yyyy")</small> *@
-@*                     <p class="title">
-                        @Model.Content
-                    </p> *@
-                    <ul id="ulApprove">
-                        @foreach (string item in @ViewBag.AppoveSupport)
-                        {
-                            <li>@Html.Raw(item)</li>
-                        }
-                    </ul>
-                    <button type="button" onclick="approveBook(@ViewBag.BookId)" style="margin-left:2rem" class="btn btn-success mt-4">Xác nhận duyệt</button>
+                <div class="table-responsive table-responsive1 p-0" style="position:relative">
+                    <table id="tableFeedback" class="table align-items-center mb-0">
+                        <thead>
+                            <tr class="text-center">
+                                <th class="text-left text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Tên chương</th>
+                                <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Xác nhận AI</th>
+                                <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"></th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbodyFeedback">
+                        </tbody>
+                    </table>
+                    <div id="loadingDivFeedBack" class="dot-elastic loadingDiv"></div>
+                    <button type="button" onclick="approveBook(@ViewBag.BookId)" style="margin-left:2rem" class="btn btn-success mt-4">Duyệt nhanh</button>
                     <button type="button" onclick="window.location.href='/Admin/Books'" class="btn btn-secondary mt-4 ml-2">Quay lại</button>
                 </div>
             </div>
         </div>
     </div>
     <!-- Modal -->
-    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel">
+        <div class="modal-dialog modal-xl">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="exampleModalLabel">Nội dung chương</h5>
@@ -61,18 +99,236 @@
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
+                <div class="modal-body" id="modal-body-content">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Feeback modal -->
+    <div class="modal fade" id="exampleModalFeedback" tabindex="-1" aria-labelledby="exampleModalLabel1">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Xác nhận từ AI</h5>
+                    <button type="button" class="btn close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
                 <div class="modal-body" id="modal-body">
+                    <div style="display:block">
+                        @* <label for="Content">Nội dung chương:</label> *@
+                        <div class="row" style="display:flex">
+                            <div class="col-9" style="padding-left: 0;">
+                                <div style="height:19rem;overflow: auto;padding-left:10px" id="ContentDiv" class="form-control"></div>
+                            </div>
+                            <div class="col-3 ai-feedback" style="position:relative">
+                                <div id="loadingDivFeedBackrequestContent" class="dot-elastic loadingDiv d-none"></div>
+                                <ul id="requestContent" style="height:18rem;max-height:18rem;overflow: auto;padding-left:16px">
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+<script src="https://cdn.jsdelivr.net/npm/mark.js/dist/jquery.mark.min.js"></script>
 <script src="~/lib/jquery/dist/jquery.js" asp-append-version="true"></script>
 <script type="text/javascript">
     $(".spContent").on('click', function () {
         var content = $(this).data('content');
         $('#modal-body').html(content);
     });
+    //$('#loadingDivFeedBackrequestContent').hide();
+    GetListAifeedback();
+    let listAifeedbackBackup = [];
+    //console.log(listAifeedback);
+
+    function Aifeedback(chapterId){
+        var item = listAifeedbackBackup.find(c => c.chapterId == chapterId);
+        $('#requestContent').html('');
+        $('#ContentDiv').html(item.content);
+        $('#loadingDivFeedBackrequestContent').removeClass('d-none');
+        checkChapterContentByAI(item.content);
+        //$('#requestContent').html(item.aiFeedback);
+    }
+
+
+    function checkChapterContentByAI(content) {
+        let formData = new FormData();
+        formData.append('Data', content);
+        $.ajax(
+            {
+                url: `/Admin/QuicklyApproveChapterContent`,
+                type: "POST",
+                headers:
+                {
+                    "RequestVerificationToken": '@GetAntiXsrfRequestToken()'
+                },
+                data: formData,
+                //dataType: "json",
+                async: true,
+                processData: false,
+                contentType: false,
+                success: function (data) {
+                    //console.log(data);
+                    $('#loadingDivFeedBackrequestContent').addClass('d-none');
+                    let matches = data.match(/<li.*?<\/li>/g);
+                    //data = data.replace('<ul>', '').replace('</ul>', '').replace('```html', '').replace('```','');
+                    if (data.includes("li")) $('#requestContent').append(matches);
+                    //$('#requestContent').append("<br>");
+
+                    const matcheWords = [...data.matchAll(/<li.*?>'(.+?)'\s*=>/g)];
+                    const words = matcheWords.map(m => m[1]);
+
+                    const editor = document.getElementById("ContentDiv");
+                    const markInstance = new Mark(editor);
+
+                    markInstance.unmark({
+                        done: function () {
+                            markInstance.mark(words, {
+                                separateWordSearch: false,
+                                element: "span",
+                                className: "highlight-bad-word"
+                            });
+                        }
+                    });
+
+                }
+            }
+        );
+    }
+
+    function getContent(chapterId){
+        var item = listAifeedbackBackup.find(c => c.chapterId == chapterId);
+        $('#modal-body-content').html(item.content);
+    }
+
+    function GetListAifeedback(){
+        $('#tbodyFeedback').html('');
+        $.ajax(
+            {
+                url: `/Admin/GetListApproveBook/${@ViewBag.BookId}`,
+                type: "GET",
+                headers:
+                {
+                    "RequestVerificationToken": '@GetAntiXsrfRequestToken()'
+                },
+                //data: formData,
+                //dataType: "json",
+                async: true,
+                processData: false,
+                contentType: false,
+                success: function (listAifeedback) {
+                    let html = '';
+                    $('#loadingDivFeedBack').hide();
+                    listAifeedbackBackup = listAifeedback;
+                    //console.log(listAifeedback);
+                    listAifeedback.forEach(item => {
+                        //console.log(item.aiFeedback)
+                        html += '<tr>';
+                        html += `<td class="text-left">
+                                      <p id="name-${item.chapterId}" class="mx-3 text-xs font-weight-bold mb-0">${item.chapterName}</p>
+                                </td>`;
+                        html += `<td class="text-center">`;
+                        if (item.aiFeedback.includes("không chứa từ ngữ"))
+                            html += `<p class="mx-3 text-xs font-weight-bold mb-0">${item.aiFeedback}</p>`;
+                        else html += `<p onclick="Aifeedback('${item.chapterId}')" data-toggle="modal" data-target="#exampleModalFeedback" class="mx-3 text-xs font-weight-bold mb-0" style="color:blue;cursor:pointer">Chi tiết</p>`;
+                        html += `</td>`;
+                        html += `<td style="padding-left: 1.5rem;" class="align-middle text-center">
+                                      <button onclick="getContent('${item.chapterId}')" type="button" title="Nội dung chương" class="btn1 btn btn-secondary" data-toggle="modal" data-target="#exampleModal">
+                                            <i class="fa-solid fa-info"></i>
+                                      </button>
+                                      <button onclick="approveChapter(${@ViewBag.BookId},'${item.chapterId}')" type="button" title="Duyệt chương" class="btn1 btn btn-secondary">
+                                            <i class="fa-solid fa-check"></i>
+                                      </button>
+                                              <button onclick="declineChapter(${@ViewBag.BookId},'${item.chapterId}')" type="button" title="Không duyệt chương" class="btn1 btn btn-secondary">
+                                            <i class="fa-solid fa-times"></i>
+                                      </button>
+                                          <button onclick="contractAuthor(${@ViewBag.BookId},'${item.chapterId}')" type="button" title="Liên hệ với tác giả" class="btn1 btn btn-secondary">
+                                                 <i class="fa-solid fa-comments-o"></i>
+                                      </button>
+                                 </td>`;
+
+                        html += '</tr>';
+                    });
+                    $('#tbodyFeedback').html(html);
+                    let table = new DataTable('#tableFeedback', {
+                        responsive: true
+                    });
+                }
+            }
+        );
+    }
+
+    function contractAuthor(id,chapterId){
+        window.location.href = `/Admin/ContractAuthor/${id}/${chapterId}`;
+    }
+
+    function approveChapter(id,chapterId) {
+        if (confirm("Bạn có muốn duyệt chương ?") == false) return;
+        //var formData = new FormData();
+        //formData.append("chapterId", chapterId);
+        $.ajax(
+            {
+                url: `/Admin/UpdateApproveChapterBook/${id}?chapterId=${chapterId}`,
+                type: "GET",
+                headers:
+                {
+                    "RequestVerificationToken": '@GetAntiXsrfRequestToken()'
+                },
+                //data: formData,
+                //dataType: "json",
+                async: true,
+                processData: false,
+                contentType: false,
+                success: function (data) {
+                    if (data.IsSussess == false) {
+                        notyf.error(data.message);
+                        return;
+                    }
+                    notyf.success(data.message);
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 800);
+                }
+            }
+        );
+
+    }
+
+    function declineChapter(id, chapterId) {
+        if (confirm("Bạn có muốn hủy duyệt ?") == false) return;
+        //var formData = new FormData();
+        $.ajax(
+            {
+                url: `/Admin/DeclineChapterBook/${id}?chapterId=${chapterId}`,
+                type: "GET",
+                headers:
+                {
+                    "RequestVerificationToken": '@GetAntiXsrfRequestToken()'
+                },
+                //data: formData,
+                //dataType: "json",
+                async: true,
+                processData: false,
+                contentType: false,
+                success: function (data) {
+                    if (data.IsSussess == false) {
+                        notyf.error(data.message);
+                        return;
+                    }
+                    notyf.success(data.message);
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 800);
+                }
+            }
+        );
+
+    }
 
     function approveBook(id) {
         if (confirm("Bạn có muốn duyệt ?") == false) return;

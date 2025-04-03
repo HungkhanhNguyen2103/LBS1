@@ -25,6 +25,8 @@
         public static string BOOK_DELETE = "api/Book/DeleteBook";
         public static string BOOK_APPROVE = "api/Book/ApproveBook";
         public static string BOOK_UPDATE_APPROVE = "api/Book/UpdateApproveBook";
+        public static string BOOK_UPDATE_APPROVE_CHAPTER = "api/Book/UpdateApproveChapterBook";
+        public static string BOOK_DECLINE_CHAPTER = "api/Book/DeclineChapterBook";
         public static string BOOK_CREATE = "api/Book/CreateBook";
         public static string BOOK_UPDATE = "api/Book/UpdateBook";
         public static string BOOK_UPDATE_CHAPTER = "api/Book/UpdateBookChapter";

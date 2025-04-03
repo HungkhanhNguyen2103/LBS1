@@ -33,40 +33,40 @@
                 </div>
             </div>
             <div class="card-body px-0 pb-2">
-                <div class="table-responsive p-0">
-                    <table class="table align-items-center mb-0">
+                <div class="table-responsive table-responsive1 p-0">
+                    <table id="table" class="table align-items-center mb-0">
                         <thead>
                             <tr>
-                                <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">STT</th>
-                                <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Tên chương</th>
-                                <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Xuất bản lúc</th>
-                                <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Số từ</th>
-                                <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Lượt đọc</th>
-                                <th class="text-secondary opacity-7"></th>
+                                <th style="padding-left:2rem" class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">STT</th>
+                                <th class="text-left text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Tên chương</th>
+                                <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Xuất bản lúc</th>
+                                <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Số từ</th>
+                                <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Lượt đọc</th>
+                                <th class="text-center text-secondary opacity-7"></th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach (BookChapter item in ViewBag.ChapterBooks)
                             {
                                 <tr>
-                                    <td class="align-middle" style="padding-left:1.5rem">
+                                    <td class="text-center align-middle" style="padding-left:1.5rem">
                                         <span class="text-secondary text-xs font-weight-bold">@item.ChaperId</span>
                                     </td>
-                                    <td class="align-middle" style="padding-left:1.5rem">
+                                    <td class="text-left align-middle" style="padding-left:1.5rem">
                                         <span class="text-secondary text-xs font-weight-bold">@item.ChapterName</span>
                                     </td>
-                                    <td class="align-middle">
+                                    <td class="text-center align-middle">
                                         <span class="text-secondary text-xs font-weight-bold">@item.ModifyDate.AddHours(7).ToString("HH:mm dd/MM/yyyy")</span>
                                     </td>
-                                    <td class="align-middle">
+                                    <td class="text-center align-middle">
                                         <span class="text-secondary text-xs font-weight-bold">@item.WordNo</span>
                                     </td>
-                                    <td class="align-middle">
+                                    <td class="text-center align-middle">
                                         <span class="text-secondary text-xs font-weight-bold">@item.ViewNo</span>
                                     </td>
                                     @if (User.IsInRole("Author"))
                                     {
-                                        <td class="align-middle">
+                                        <td class="text-center align-middle">
                                             <button onclick="window.location.href='/Admin/@ViewBag.BookId/UpdateChapterBook/@item.Id'" title="Sửa" class="btn1 btn btn-secondary">
                                                 <i class="fa-solid fa-pen-to-square"></i>
                                             </button>
@@ -75,7 +75,14 @@
                                             </button>
                                         </td>
                                     }
-
+                                    @if (User.IsInRole("Manager"))
+                                    {
+                                        <td class="text-center align-middle">
+                                            <button onclick="window.location.href='/Admin/@ViewBag.BookId/UpdateChapterBook/@item.Id'" title="Chi tiết" class="btn1 btn btn-secondary">
+                                                <i class="fa-solid fa-info"></i>
+                                            </button>
+                                        </td>
+                                    }
                                 </tr>
                             }
 
@@ -89,6 +96,9 @@
 
 <script type="text/javascript">
     // document.getElementById('BooksId').classList.add('active');
+    let table = new DataTable('#table', {
+        responsive: true
+    });
 
     function showPopup(id){
         $.ajax(

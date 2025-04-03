@@ -481,9 +481,10 @@ namespace Repositories.Repository
                     CreateBy = c.CreateBy,
                     Id = c.Id,
                     Image = c.Image,
+                    ModifyDateValue = c.ModifyDate,
                     ModifyDate = c.ModifyDate.ToString("HH:mm dd/MM/yyyy"),
                     UserReportId = c.UserReportId
-                }).ToListAsync();
+                }).OrderByDescending(c => c.ModifyDateValue).ToListAsync();
             response.IsSussess = true;
             return response;
         }

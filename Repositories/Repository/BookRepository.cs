@@ -1,6 +1,7 @@
 ﻿using Azure;
 using BusinessObject;
 using BusinessObject.BaseModel;
+using HtmlAgilityPack;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using MongoDB.Bson;
@@ -12,6 +13,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -378,7 +380,7 @@ namespace Repositories.Repository
                 //var res = await _aIGeneration.TextGenerateToSpeech(bookChapter.Summary);
                 //if (res.IsSussess) bookChapter.AudioUrl = res.Data;
             }
-
+            bookChapter.BookType = BookType.PendingApproval;
             bookChapter.ModifyDate = DateTime.Now;
 
             var listBookChapter = await GetListBookChapter(bookChapter.BookId);
@@ -396,7 +398,7 @@ namespace Repositories.Repository
             if (bookChapter.Type == 2)
             {
                 var filter = Builders<BookChapter>.Filter.And(
-                    Builders<BookChapter>.Filter.Where(p => p.ChaperId >= bookChapter.ChaperId),
+                    Builders<BookChapter>.Filter.Where(p => p.ChaperId == bookChapter.ChaperId),
                     Builders<BookChapter>.Filter.Where(p => p.BookId == bookChapter.BookId)
                     );
 
@@ -591,7 +593,7 @@ namespace Repositories.Repository
             else bookChapter.AudioUrl = bookChapterRow.AudioUrl;
             //bookChapter.Type = 1;
             bookChapter.ModifyDate = DateTime.Now;
-
+            bookChapter.BookType = BookType.PendingApproval;
 
             var update = Builders<BookChapter>.Update
                         .Set(c => c.ChapterName, bookChapter.ChapterName)
@@ -650,12 +652,12 @@ namespace Repositories.Repository
             return result;
         }
 
-        public async Task<ReponderModel<string>> ApproveBook(int bookId)
+        public async Task<ReponderModel<BookChapterApproveModel>> ApproveBook(int bookId)
         {
-            var result = new ReponderModel<string>();
+            var result = new ReponderModel<BookChapterApproveModel>();
 
             var book = await _lBSDbContext.Books.FirstOrDefaultAsync(c => c.Id == bookId);
-            if(book == null || book.Status != BookStatus.PendingApproval)
+            if(book == null || (book.Status != BookStatus.PendingApproval && book.Status != BookStatus.Continue && book.Status != BookStatus.Pause && book.Status != BookStatus.Published))
             {
                 result.Message = "Dữ liệu không chính xác";
                 return result;
@@ -663,29 +665,43 @@ namespace Repositories.Repository
 
             //var chapterBook = await GetListBookChapter(bookId);
             var filter = Builders<BookChapter>.Filter.And(
-                            Builders<BookChapter>.Filter.Where(p => p.BookId >= bookId),
-                            Builders<BookChapter>.Filter.Where(p => p.Type != 3)
+                            Builders<BookChapter>.Filter.Where(p => p.BookId == bookId),
+                            Builders<BookChapter>.Filter.Where(p => p.Type != 3),
+                            Builders<BookChapter>.Filter.Where(p => p.BookType == BookType.PendingApproval)
                         );
 
             var sort = Builders<BookChapter>.Sort.Ascending(x => x.ChaperId);
 
             var listBookChapter = await _mongoContext.BookChapters.Find(filter).Sort(sort).ToListAsync();
-            if (listBookChapter.Count < 3)
+            //if (listBookChapter.Count < 3)
+            //{
+            //    result.Message = "Dữ liệu chương sách không chính xác";
+            //    return result;
+            //}
+
+            foreach (var bookChapter in listBookChapter)
             {
-                result.Message = "Dữ liệu chương truyện không chính xác";
-                return result;
-            }
-            // duyet 3 chuong dau tien
-            int i = 0;
-            while (i < 3)
-            {
-                var item = listBookChapter[i];
-                var resultChapter = await _aIGeneration.TextGenerate("Kiểm tra giúp tôi đoạn text có chứa từ ngữ không phù hợp không (format như sau: - Từ ngữ : 'A' => 'vị trí hiển thị câu chữa từ ấy' bạn chỉ cần trả lời theo format này): " + item.Content);
-                var textRender = $@"<span> Tên chương: {item.ChapterName} <br></span>
-                                    <span> Nội dung: <span style='cursor: pointer;color:blue' class='spContent' data-content='{item.Content}' data-toggle='modal' data-target='#exampleModal'>Chi tiết</span> <br></span>
-                                    <span> Xác nhận AI: {resultChapter.Data} </span>";
-                result.DataList.Add(textRender);
-                i++;
+                var promp = $@"Bạn là công cụ kiểm duyệt nội dung. Kiểm tra và phân tích đoạn văn dưới đây giúp tôi đoạn text có chứa từ ngữ hoặc cụm từ không phù hợp (tục tĩu, thù hằn, phân biệt, kích động, bạo lực, tình dục,sai tôn giáo, từ ngữ thuộc chế độ cũ ,v.v.): 
+                            (
+                               - Có xuất hiện: format như sau: Chi tiết
+                               - Không xuất hiện từ ngữ: format như sau: Nội dung không chứa từ ngữ không phù hợp
+                            ) 
+                             Bạn chỉ cần trả lời theo format này, Đây là nội dung đoạn văn: {bookChapter.Content}";
+                if (bookChapter == null)
+                {
+                    result.Message = "Dữ liệu chương sách không tồn tại";
+                    return result;
+                }
+                var chapterApprove = new BookChapterApproveModel
+                {
+                    ChapterId = bookChapter.Id,
+                    ChapterName = bookChapter.ChapterName,
+                    Content = bookChapter.Content,
+                    BookId = bookId,
+                };
+                var resultChapter = await _aIGeneration.TextGenerate(promp);
+                chapterApprove.AiFeedback = resultChapter.Data;
+                result.DataList.Add(chapterApprove);
             }
 
             result.IsSussess = true;
@@ -703,7 +719,19 @@ namespace Repositories.Repository
                 result.Message = "Data không hợp lệ";
                 return result;
             }
-            data.Status = BookStatus.Published;
+            if(data.Status == BookStatus.PendingPublication) data.Status = BookStatus.Published;
+
+            var filter = Builders<BookChapter>.Filter.And(
+                Builders<BookChapter>.Filter.Where(p => p.BookId == bookId),
+                Builders<BookChapter>.Filter.Where(p => p.Type != 3),
+                Builders<BookChapter>.Filter.Where(p => p.BookType == BookType.PendingApproval)
+            );
+
+            var update = Builders<BookChapter>.Update
+                .Set(c => c.BookType, BookType.Free);
+
+            await _mongoContext.BookChapters.UpdateManyAsync(filter, update);
+
             await _lBSDbContext.SaveChangesAsync();
             result.Message = "Duyệt thành công";
             result.IsSussess = true;
@@ -763,12 +791,15 @@ namespace Repositories.Repository
 
         public async Task<ReponderModel<string>> QuicklyApproveChapterContent(string input)
         {
+            var doc = new HtmlDocument();
+            doc.LoadHtml(input);
+            var input2 = doc.DocumentNode.InnerText;
             var promp = $@"Bạn là công cụ kiểm duyệt nội dung. Kiểm tra và phân tích đoạn văn dưới đây giúp tôi đoạn text có chứa từ ngữ hoặc cụm từ không phù hợp (tục tĩu, thù hằn, phân biệt, kích động, bạo lực, tình dục,sai tôn giáo, từ ngữ thuộc chế độ cũ ,v.v.): 
                             (
                                - Có xuất hiện: format như sau: <li style='color:red'>'A' => giải thích</li>
                                - Không xuất hiện từ ngữ: format như sau: <li style='color:green'>Nội dung không chứa từ ngữ không phù hợp</li>
                             ) 
-                             Bạn chỉ cần trả lời theo format này, Đây là nội dung đoạn văn: {input}";
+                             Bạn chỉ cần trả lời theo format này, Đây là nội dung đoạn văn: {input2}";
             var result = new ReponderModel<string>();
             var resultChapter = await _aIGeneration.TextGenerate(promp);
             result.IsSussess = true;
@@ -820,6 +851,66 @@ namespace Repositories.Repository
 
                 throw;
             }
+        }
+
+        public async Task<ReponderModel<string>> UpdateApproveChapterBook(int bookId, string chapterId)
+        {
+            var result = new ReponderModel<string>();
+
+            var data = await _lBSDbContext.Books.FirstOrDefaultAsync(c => c.Id == bookId);
+            if (data == null)
+            {
+                result.Message = "Data không hợp lệ";
+                return result;
+            }
+            if (data.Status == BookStatus.PendingPublication) data.Status = BookStatus.Published;
+
+            var filter = Builders<BookChapter>.Filter.And(
+                Builders<BookChapter>.Filter.Where(p => p.BookId == bookId),
+                Builders<BookChapter>.Filter.Where(p => p.Id == chapterId),
+                Builders<BookChapter>.Filter.Where(p => p.Type != 3),
+                Builders<BookChapter>.Filter.Where(p => p.BookType == BookType.PendingApproval)
+            );
+
+            var update = Builders<BookChapter>.Update
+                .Set(c => c.BookType, BookType.Free);
+
+            await _mongoContext.BookChapters.UpdateOneAsync(filter, update);
+
+            await _lBSDbContext.SaveChangesAsync();
+            result.Message = "Duyệt thành công";
+            result.IsSussess = true;
+            return result;
+        }
+
+        public async Task<ReponderModel<string>> DeclineChapterBook(int bookId, string chapterId)
+        {
+            var result = new ReponderModel<string>();
+
+            var data = await _lBSDbContext.Books.FirstOrDefaultAsync(c => c.Id == bookId);
+            if (data == null)
+            {
+                result.Message = "Data không hợp lệ";
+                return result;
+            }
+            //if (data.Status == BookStatus.PendingPublication) data.Status = BookStatus.Published;
+
+            var filter = Builders<BookChapter>.Filter.And(
+                Builders<BookChapter>.Filter.Where(p => p.BookId == bookId),
+                Builders<BookChapter>.Filter.Where(p => p.Id == chapterId),
+                Builders<BookChapter>.Filter.Where(p => p.Type != 3),
+                Builders<BookChapter>.Filter.Where(p => p.BookType == BookType.PendingApproval)
+            );
+
+            var update = Builders<BookChapter>.Update
+                .Set(c => c.BookType, BookType.Decline);
+
+            await _mongoContext.BookChapters.UpdateOneAsync(filter, update);
+
+            await _lBSDbContext.SaveChangesAsync();
+            result.Message = "thành công";
+            result.IsSussess = true;
+            return result;
         }
     }
 }

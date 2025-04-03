@@ -36,6 +36,9 @@ namespace BusinessObject
     {
         Free = 0,
         Payment = 1,
+        //ChapterBook
+        PendingApproval = 2,
+        Decline = 3,
     }
 
     public enum BookStatus

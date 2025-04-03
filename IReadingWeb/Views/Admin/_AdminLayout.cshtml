@@ -5,6 +5,7 @@
     var claims = User;
     var jwtToken = ViewContext.HttpContext.Request.Cookies["token"];
     string userName = "";
+    var isManager = false;
     if(string.IsNullOrEmpty(jwtToken) && User.Identity.IsAuthenticated)
     {
         ViewContext.HttpContext.Response.Redirect("/Account/Logout");
@@ -12,6 +13,7 @@
     if (!string.IsNullOrEmpty(jwtToken) && User.Identity.IsAuthenticated)
     {
         userName = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+        isManager = User.IsInRole("Manager");
     }
 }
 @inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Xsrf
@@ -42,6 +44,7 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
     <!-- CSS Files -->
     <link href="https://cdn.datatables.net/2.1.8/css/dataTables.dataTables.min.css" asp-append-version="true" rel="stylesheet" />
+    <link href="https://cdn.datatables.net/2.2.2/css/dataTables.bootstrap5.css" asp-append-version="true" rel="stylesheet" />
     <link id="pagestyle" href="~/css/material-dashboard.css?v=3.1.0" asp-append-version="true" rel="stylesheet" />
     <link rel="icon" type="image/png" href="~/images/layoutHome/logo.png" asp-append-version="true">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" asp-append-version="true" crossorigin="anonymous" referrerpolicy="no-referrer" />
@@ -49,6 +52,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.7/signalr.min.js" asp-append-version="true"></script>
     <script src="~/lib/jquery/dist/jquery.js" asp-append-version="true"></script>
     <script src="https://cdn.datatables.net/2.2.2/js/dataTables.min.js" asp-append-version="true"></script>
+    <script src="https://cdn.datatables.net/2.2.2/js/dataTables.bootstrap5.js" asp-append-version="true"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js" asp-append-version="true"></script>
     <script src="~/js/chat.js" defer asp-append-version="true"></script>
 </head>
@@ -63,6 +67,11 @@
         div.dt-container div.dt-layout-row{
             margin: .75em 2rem !important;
             width : 95% !important;
+        }
+        
+        .table-responsive1{
+            margin-left:1.5rem;
+            margin-right:1.5rem;
         }
 
         .btn1 {
@@ -428,15 +437,16 @@
             input.value = "";
             //container.scrollTop = container.scrollHeight;
         }
+        if ('@isManager' == 'False'){
+            document.getElementById("messageInput1").addEventListener("keydown", function (event) {
+                if (event.key === "Enter") {
+                    sendMessageShort();
+                }
+            });
+            getRoomChat();
+        }
 
-        document.getElementById("messageInput1").addEventListener("keydown", function (event) {
-            if (event.key === "Enter") {
-                sendMessageShort();
-            }
-        });
 
-        //connectSignalR();
-        getRoomChat();
         function getRoomChat(){
             $.ajax(
                 {

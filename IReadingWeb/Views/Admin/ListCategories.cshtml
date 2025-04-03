@@ -17,6 +17,12 @@
         padding: 0;
         margin: 0;
     }
+
+    li.dt-paging-button:hover {
+        background-color: white !important;
+        border: 1px solid white !important;
+        background: white !important;
+    }
 </style>
 <button type="button" onclick="document.getElementById('formModal').reset();" class="btn btn-success" data-toggle="modal" data-target="#exampleModal">
     Tạo mới
@@ -30,8 +36,8 @@
                 </div>
             </div>
             <div class="card-body px-0 pb-2">
-                <div class="table-responsive p-0">
-                    <table class="table align-items-center mb-0">
+                <div class="table-responsive table-responsive1 p-0">
+                    <table id="tableList" class="table align-items-center mb-0">
                         <thead>
                             <tr>
                                 <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Tên</th>
@@ -98,7 +104,9 @@
         document.getElementById('post-cate-id').value = id;
         document.getElementById('post-cate-name').value = name;
     }
-
+    let table = new DataTable('#tableList', {
+        responsive: true
+    });
     function deleteItem(id) {
         if (confirm("Bạn có muốn xóa ?") == false) return;
         //var formData = new FormData();

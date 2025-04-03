@@ -138,7 +138,7 @@
                         <option value="0">Yêu cầu đã đóng</option>
                     </select>
                 </div>
-                <div class="table-responsive container p-0">
+                <div class="table-responsive container p-0" style="max-width:100%">
                     <!-- Sidebar -->
                     <div class="sidebar">
                         <ul class="issue-list">
@@ -166,7 +166,7 @@
                     </div>
 
                     <!-- Main Content -->
-                    <div class="@(@ViewBag.ListUserReport.Count == 0 ? "d-none" : "") main">
+                    <div style="overflow:hidden" class="@(@ViewBag.ListUserReport.Count == 0 ? "d-none" : "") main">
                         <div style="display:flex;justify-content:space-between;align-items:end">
                             <h5 id="title"></h5>
                             <h5 id="userReportId" class="d-none"></h5>
@@ -188,8 +188,8 @@
                             <textarea id="contentComment" class="font-control" placeholder="Thêm bình luận..."></textarea>
                             <button type="button" onclick="submitComment()" class="btn btn-warning mb-4">Gửi</button>
                         </div>
-                        <div class="comment-list">
-                            <ul id="listCommentReport" style="list-style:none;padding:0">
+                        <div class="comment-list" >
+                            <ul id="listCommentReport" style="list-style:none;padding:0;height: 20rem;overflow: auto;padding-right: 1rem;">
                             </ul>
 
                         </div>

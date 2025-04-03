@@ -335,15 +335,15 @@ namespace LBSWeb.Service.Book
             return res;
         }
 
-        public async Task<ReponderModel<string>> ApproveBook(int bookId)
+        public async Task<ReponderModel<BookChapterApproveModel>> ApproveBook(int bookId)
         {
-            var res = new ReponderModel<string>();
+            var res = new ReponderModel<BookChapterApproveModel>();
             try
             {
                 string url = PathUrl.BOOK_APPROVE;
                 var param = new Dictionary<string, string>();
                 param.Add("id", bookId.ToString());
-                res = await _api.Get<ReponderModel<string>>(url, param);
+                res = await _api.Get<ReponderModel<BookChapterApproveModel>>(url, param);
 
             }
             catch (Exception ex)
@@ -437,6 +437,44 @@ namespace LBSWeb.Service.Book
                 string url = PathUrl.BOOK_DELETE;
                 var param = new Dictionary<string, string>();
                 param.Add("id", id.ToString());
+                res = await _api.Get<ReponderModel<string>>(url, param);
+
+            }
+            catch (Exception ex)
+            {
+                res.Message = "Lỗi gọi api!";
+            }
+            return res;
+        }
+
+        public async Task<ReponderModel<string>> UpdateApproveChapterBook(int bookId, string chapterId)
+        {
+            var res = new ReponderModel<string>();
+            try
+            {
+                string url = PathUrl.BOOK_UPDATE_APPROVE_CHAPTER;
+                var param = new Dictionary<string, string>();
+                param.Add("bookId", bookId.ToString());
+                param.Add("chapterId", chapterId);
+                res = await _api.Get<ReponderModel<string>>(url, param);
+
+            }
+            catch (Exception ex)
+            {
+                res.Message = "Lỗi gọi api!";
+            }
+            return res;
+        }
+
+        public async Task<ReponderModel<string>> DeclineChapterBook(int id, string chapterId)
+        {
+            var res = new ReponderModel<string>();
+            try
+            {
+                string url = PathUrl.BOOK_DECLINE_CHAPTER;
+                var param = new Dictionary<string, string>();
+                param.Add("bookId", id.ToString());
+                param.Add("chapterId", chapterId);
                 res = await _api.Get<ReponderModel<string>>(url, param);
 
             }

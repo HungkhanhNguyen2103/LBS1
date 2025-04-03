@@ -11,6 +11,7 @@ namespace BusinessObject.BaseModel
         public int Id { get; set; }
         public string? Content { get; set; }
         public string? ModifyDate { get; set; }
+        public DateTime ModifyDateValue { get; set; }
         public string? Image { get; set; }
         public int? UserReportId { get; set; }
         public string? CreateBy { get; set; }

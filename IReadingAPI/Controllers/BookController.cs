@@ -37,9 +37,25 @@ namespace LBSAPI.Controllers
 
         [Route("ApproveBook")]
         [HttpGet]
-        public async Task<ReponderModel<string>> ApproveBook(int id)
+        public async Task<ReponderModel<BookChapterApproveModel>> ApproveBook(int id)
         {
             var result = await _bookRepository.ApproveBook(id);
+            return result;
+        }
+
+        [Route("UpdateApproveChapterBook")]
+        [HttpGet]
+        public async Task<ReponderModel<string>> UpdateApproveChapterBook(int bookId, string chapterId)
+        {
+            var result = await _bookRepository.UpdateApproveChapterBook(bookId, chapterId);
+            return result;
+        }
+
+        [Route("DeclineChapterBook")]
+        [HttpGet]
+        public async Task<ReponderModel<string>> DeclineChapterBook(int bookId, string chapterId)
+        {
+            var result = await _bookRepository.DeclineChapterBook(bookId, chapterId);
             return result;
         }
 

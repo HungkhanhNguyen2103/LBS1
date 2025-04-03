@@ -341,12 +341,22 @@ namespace LBSWeb.Controllers
 
         [Authorize(Roles = $"{Role.Manager}")]
         [Route("ApproveBook/{id}")]
-        public async Task<IActionResult> ApproveBook(int id)
+        public IActionResult ApproveBook(int id)
         {
-            var result = await _bookService.ApproveBook(id);
-            ViewBag.AppoveSupport = result.DataList;
+            //var result = await _bookService.ApproveBook(id);
+            //ViewBag.AppoveSupport = result.DataList;
             ViewBag.BookId = id;
             return View();
+        }
+
+        [Authorize(Roles = $"{Role.Manager}")]
+        [Route("GetListApproveBook/{id}")]
+        public async Task<IActionResult> GetListApproveBook(int id)
+        {
+            var result = await _bookService.ApproveBook(id);
+            //ViewBag.AppoveSupport = result.DataList;
+            //ViewBag.BookId = id;
+            return Json(result.DataList);
         }
 
         [Authorize(Roles = $"{Role.Manager}")]
@@ -390,7 +400,7 @@ namespace LBSWeb.Controllers
             return View(resultBook.Data);
         }
 
-        [Authorize(Roles = $"{Role.Author}")]
+        [Authorize(Roles = $"{Role.Author},{Role.Manager}")]
         [Route("QuicklyApproveChapterContent")]
         [HttpPost]
         public async Task<IActionResult> QuicklyApproveChapterContent(RequestModel model)
@@ -465,13 +475,43 @@ namespace LBSWeb.Controllers
             return Json(result);
         }
 
-        [Authorize(Roles = $"{Role.Author}")]
+        [Authorize(Roles = $"{Role.Author},{Role.Manager}")]
         [Route("{id}/UpdateChapterBook/{chapterId}")]
         public async Task<IActionResult> UpdateChapterBook(int id,string chapterId, string returnUrl)
         {
             ViewBag.BookId = id;
             ViewBag.ReturnUrl = returnUrl;
             var result = await _bookService.GetBook(id);
+            var resultChapterBook = await _bookService.GetBookChapter(chapterId);
+            ViewBag.BookName = result.Data.Name;
+            ViewBag.ChapterId = chapterId;
+            return View(resultChapterBook.Data);
+        }
+
+        [HttpGet]
+        [Authorize(Roles = $"{Role.Manager}")]
+        [Route("UpdateApproveChapterBook/{id}")]
+        public async Task<IActionResult> UpdateApproveChapterBook(int id,string chapterId)
+        {
+            var result = await _bookService.UpdateApproveChapterBook(id,chapterId);
+            return Json(result);
+        }
+
+        [HttpGet]
+        [Authorize(Roles = $"{Role.Manager}")]
+        [Route("DeclineChapterBook/{id}")]
+        public async Task<IActionResult> DeclineChapterBook(int id, string chapterId)
+        {
+            var result = await _bookService.DeclineChapterBook(id, chapterId);
+            return Json(result);
+        }
+
+        [Authorize(Roles = $"{Role.Author},{Role.Manager}")]
+        [Route("ContractAuthor/{bookId}/{chapterId}")]
+        public async Task<IActionResult> ContractAuthor(int bookId,string chapterId)
+        {
+            ViewBag.BookId = bookId;
+            var result = await _bookService.GetBook(bookId);
             var resultChapterBook = await _bookService.GetBookChapter(chapterId);
             ViewBag.BookName = result.Data.Name;
             ViewBag.ChapterId = chapterId;

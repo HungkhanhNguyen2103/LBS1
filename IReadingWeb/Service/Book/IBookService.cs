@@ -24,8 +24,10 @@ namespace LBSWeb.Service.Book
         Task<ReponderModel<ReportModel>> ShortReport();
         Task<ReponderModel<string>> DeleteChapterBook(string id);
         Task<ReponderModel<DraftModel>> GetDrafts(string userName);
-        Task<ReponderModel<string>> ApproveBook(int bookId);
+        Task<ReponderModel<BookChapterApproveModel>> ApproveBook(int bookId);
         Task<ReponderModel<string>> UpdateApproveBook(int bookId);
+        Task<ReponderModel<string>> UpdateApproveChapterBook(int bookId, string chapterId);
+        Task<ReponderModel<string>> DeclineChapterBook(int id, string chapterId);
         Task<ReponderModel<StatisticsChapterBook>> StatisticsChapterBook(int bookId);
         Task<ReponderModel<StatisticsChapterBook>> StatisticsBook(string username);
     }

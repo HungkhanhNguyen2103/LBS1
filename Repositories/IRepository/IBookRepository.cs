@@ -31,9 +31,11 @@ namespace Repositories.IRepository
         Task<ReponderModel<string>> GenerateTextToAudio(string input);
         Task<ReponderModel<string>> GenerateTextToImage(string input);
         Task<ReponderModel<DraftModel>> GetDrafts(string userName);
-        Task<ReponderModel<string>> ApproveBook(int bookId);
+        Task<ReponderModel<BookChapterApproveModel>> ApproveBook(int bookId);
         Task<ReponderModel<string>> QuicklyApproveChapterContent(string input);
         Task<ReponderModel<string>> UpdateApproveBook(int bookId);
+        Task<ReponderModel<string>> UpdateApproveChapterBook(int bookId, string chapterId);
+        Task<ReponderModel<string>> DeclineChapterBook(int id, string chapterId);
         Task<ReponderModel<string>> UpdateBookChapterView(UserBookView model);
         Task<ReponderModel<StatisticsChapterBook>> StatisticsChapterBook(int bookId);
         Task<ReponderModel<StatisticsChapterBook>> StatisticsBook(string username);
