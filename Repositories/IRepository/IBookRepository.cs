@@ -39,5 +39,7 @@ namespace Repositories.IRepository
         Task<ReponderModel<string>> UpdateBookChapterView(UserBookView model);
         Task<ReponderModel<StatisticsChapterBook>> StatisticsChapterBook(int bookId);
         Task<ReponderModel<StatisticsChapterBook>> StatisticsBook(string username);
+        Task<ReponderModel<CommentModel>> GetCommentByBook(int bookId);
+        Task<ReponderModel<string>> UpdateComment(Comment comment);
     }
 }

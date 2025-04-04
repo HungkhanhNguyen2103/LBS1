@@ -463,7 +463,7 @@ namespace Repositories.Repository
         public async Task<ReponderModel<string>> CreateUserReportComment(UserReportComment comment)
         {
             var response = new ReponderModel<string>();
-            comment.ModifyDate = DateTime.Now;
+            comment.ModifyDate = DateTime.UtcNow;
             _lBSDbContext.UserReportComments.Add(comment);
             await _lBSDbContext.SaveChangesAsync();
             response.Message = "Tạo thành công";
@@ -482,7 +482,7 @@ namespace Repositories.Repository
                     Id = c.Id,
                     Image = c.Image,
                     ModifyDateValue = c.ModifyDate,
-                    ModifyDate = c.ModifyDate.ToString("HH:mm dd/MM/yyyy"),
+                    ModifyDate = c.ModifyDate.AddHours(7).ToString("HH:mm dd/MM/yyyy"),
                     UserReportId = c.UserReportId
                 }).OrderByDescending(c => c.ModifyDateValue).ToListAsync();
             response.IsSussess = true;

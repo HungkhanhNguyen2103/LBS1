@@ -2,11 +2,25 @@
     Layout = "~/Views/Account/_AccountLayout.cshtml";
 }
 @model AccountModel
+<style>
+    .user-body{
+        display: flex;
+        justify-content: center;
+        background-color: white;
+    }
+
+    .user-body img{
+        width:10rem;
+    }
+</style>
 <div class="row justify-content-center">
     <div class="col-md-6 col-lg-4">
         <div class="login-wrap p-0">
             <h3 class="mb-4 text-center">Thông tin tài khoản</h3>
             <form asp-action="UpdateInformation" method="post" class="signin-form">
+                <div class="form-group">
+                    <img src="/images/user.png" alt="Avatar"/>
+                </div>
                 <div class="form-group">
                     <input asp-for="UserName" value="@Model.UserName" disabled type="text" class="form-control" placeholder="Tài khoản" required>
                 </div>

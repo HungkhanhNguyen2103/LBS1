@@ -165,50 +165,41 @@
     document.getElementById('loadingDivFeedBack').classList.add('d-none');
     // document.getElementById('CreatBookId').classList.add('active');
 
+        const quill = new Quill('#ContentDiv', {
+        theme: 'snow',
+        modules: {
+            toolbar: [
+                [{ 'header': [1, 2, 3, false] }],
+                ['bold', 'italic', 'strike'],
+                [{ 'background': [] }],
+                [{ 'script': 'sub' }, { 'script': 'super' }],
+                [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                [{ 'indent': '-1' }, { 'indent': '+1' }],
+                [{ 'align': [] }],
+                ['clean']
+            ]
+        }
+    });
+
+    const input1 = document.getElementById("ContentDiv");
+    const events = [
+        "click", "focus", "blur", "change", "input",
+        "keydown", "keyup", "keypress",
+        "paste", "cut", "copy", "mousedown", "mouseup",
+        "mouseenter", "mouseleave", "mouseover", "mouseout",
+        "drag", "drop", "contextmenu"
+    ];
+
+    events.forEach(event => {
+        input1.addEventListener(event, (e) => {
+            getWordNo();
+        });
+    });
+
     const htmlContent = '@Html.Raw(Model.Content)';
     quill.clipboard.dangerouslyPasteHTML(htmlContent);
 
-    //getWordNo();
-
-    function SaveDraft() {
-        $('#Type').val('3');
-        $('#formBody').submit();
-    }
-
-    function checkChapterContentByAI(content) {
-        $('#loadingDivFeedBack').show();
-        let formData = new FormData();
-        formData.append('Data', content);
-        $.ajax(
-            {
-                url: `/Admin/QuicklyApproveChapterContent`,
-                type: "POST",
-                headers:
-                {
-                    "RequestVerificationToken": '@GetAntiXsrfRequestToken()'
-                },
-                data: formData,
-                //dataType: "json",
-                async: true,
-                processData: false,
-                contentType: false,
-                success: function (data) {
-                    $('#loadingDivFeedBack').hide();
-                    //console.log(data);
-                    let matches = data.match(/<li.*?<\/li>/g);
-                    //data = data.replace('<ul>', '').replace('</ul>', '').replace('```html', '').replace('```','');
-                    if (data.includes("li")) $('#requestContent').prepend(matches);
-                    $('#requestContent').prepend("<br>");
-
-                    const matcheWords = [...data.matchAll(/<li.*?>'(.+?)'\s*=>/g)];
-                    const words = matcheWords.map(m => m[1]);
-                    //console.log(words);
-                    highlightBadWordsPreserveFormat(words);
-
-                }
-            }
-        );
-    }
+    getWordNo();
 
 
 </script>

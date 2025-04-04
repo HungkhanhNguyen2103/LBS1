@@ -16,6 +16,38 @@
         padding: 0;
         margin: 0;
     }
+
+    .status-free {
+        color: #42a952;
+        background-color: #dff2de;
+        padding: 5px 10px;
+        border-radius: 12px;
+        font-size: 12px;
+    }
+
+    .status-payment {
+        color: #D84315;
+        background-color: #FFE0B2;
+        padding: 5px 10px;
+        border-radius: 12px;
+        font-size: 12px;
+    }
+
+    .status-pending {
+        color: gray;
+        background-color: #80808069;
+        padding: 5px 10px;
+        border-radius: 12px;
+        font-size: 12px;
+    }
+
+    .status-decline {
+        color: #a94442;
+        background-color: #a944423d;
+        padding: 5px 10px;
+        border-radius: 12px;
+        font-size: 12px;
+    }
 </style>
 @if (User.IsInRole("Author"))
 {
@@ -53,7 +85,7 @@
                                         <span class="text-secondary text-xs font-weight-bold">@item.ChaperId</span>
                                     </td>
                                     <td class="text-left align-middle" style="padding-left:1.5rem">
-                                        <span class="text-secondary text-xs font-weight-bold">@item.ChapterName</span>
+                                        <span class="text-secondary text-xs font-weight-bold">@item.ChapterName <span class="@(item.BookType == BookType.Payment ? "status-payment" : item.BookType == BookType.Free ? "status-free" : item.BookType == BookType.PendingApproval ? "status-pending" : "status-decline")">@(item.BookType == BookType.Payment ? "Trả phí" : item.BookType == BookType.Free ? "Miễn phí" : item.BookType == BookType.PendingApproval ? "Chờ duyệt" : "Hủy duyệt")</span></span>
                                     </td>
                                     <td class="text-center align-middle">
                                         <span class="text-secondary text-xs font-weight-bold">@item.ModifyDate.AddHours(7).ToString("HH:mm dd/MM/yyyy")</span>

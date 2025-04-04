@@ -145,12 +145,19 @@
                             @foreach (UserReport item in @ViewBag.ListUserReport)
                             {
                                 <li id="@item.Id" onclick="RenderDetail(@item.Id)" style="display:flex;align-items:center">
-                                    <div style="width:50%;margin-left:10px">
+                                    <div style="width:40%;margin-left:10px">
                                         <span class="title">@item.Title</span>
-                                        <p style="margin-bottom:0;font-size:13px">--@item.Content</p>
+                                        @if(item.Content.Length > 20)
+                                        {
+                                            <p style="margin-bottom:0;font-size:13px">--@item.Content.Substring(0, 20)</p>
+                                        }
+                                        else
+                                        {
+                                            <p style="margin-bottom:0;font-size:13px">--@item.Content</p>
+                                        }
                                     </div>
-                                    <div style="width:20%">
-                                        <span>@item.CreateBy</span>
+                                    <div style="width:30%">
+                                        <span>@(item.CreateBy.Split("@").Length == 2 ? item.CreateBy.Split("@")[0] : item.CreateBy)</span>
                                     </div>
                                     <div>
                                         <span class="@(item.UserReportStatus == UserReportStatus.Done ? "status" : "status-pending")">@(item.UserReportStatus == UserReportStatus.Done ? "Đã xử lý và đóng" : "Đang xử lý")</span>

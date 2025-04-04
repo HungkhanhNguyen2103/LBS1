@@ -27,6 +27,22 @@ namespace LBSAPI.Controllers
             return true;
         }
 
+        [Route("GetCommentByBook")]
+        [HttpGet]
+        public async Task<ReponderModel<CommentModel>> GetCommentByBook(int bookId)
+        {
+            var result = await _bookRepository.GetCommentByBook(bookId);
+            return result;
+        }
+
+        [Route("UpdateComment")]
+        [HttpPost]
+        public async Task<ReponderModel<string>> UpdateComment(Comment comment)
+        {
+            var result = await _bookRepository.UpdateComment(comment);
+            return result;
+        }
+
         [Route("DeleteBook")]
         [HttpGet]
         public async Task<ReponderModel<string>> DeleteBook(int id)

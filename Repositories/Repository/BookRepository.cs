@@ -164,7 +164,7 @@ namespace Repositories.Repository
             //book.Status = BookStatus.PendingPublication;
             //Poster = response.Data.Link,
             //CreateDate = DateTime.Now,
-            book.ModifyDate = DateTime.Now;
+            book.ModifyDate = DateTime.UtcNow;
 
             if (!string.IsNullOrEmpty(bookModel.Poster))
             {
@@ -255,8 +255,8 @@ namespace Repositories.Repository
                 //    CategoryId = c
                 //}).ToList(),
                 //Poster = response.Data.Link,
-                CreateDate = DateTime.Now,
-                ModifyDate = DateTime.Now,
+                CreateDate = DateTime.UtcNow,
+                ModifyDate = DateTime.UtcNow,
 
             };
 
@@ -719,7 +719,7 @@ namespace Repositories.Repository
                 result.Message = "Data không hợp lệ";
                 return result;
             }
-            if(data.Status == BookStatus.PendingPublication) data.Status = BookStatus.Published;
+            if(data.Status == BookStatus.PendingApproval) data.Status = BookStatus.Published;
 
             var filter = Builders<BookChapter>.Filter.And(
                 Builders<BookChapter>.Filter.Where(p => p.BookId == bookId),
@@ -863,8 +863,8 @@ namespace Repositories.Repository
                 result.Message = "Data không hợp lệ";
                 return result;
             }
-            if (data.Status == BookStatus.PendingPublication) data.Status = BookStatus.Published;
-
+            if (data.Status == BookStatus.PendingApproval) data.Status = BookStatus.Published;
+            await _lBSDbContext.SaveChangesAsync();
             var filter = Builders<BookChapter>.Filter.And(
                 Builders<BookChapter>.Filter.Where(p => p.BookId == bookId),
                 Builders<BookChapter>.Filter.Where(p => p.Id == chapterId),
@@ -877,7 +877,6 @@ namespace Repositories.Repository
 
             await _mongoContext.BookChapters.UpdateOneAsync(filter, update);
 
-            await _lBSDbContext.SaveChangesAsync();
             result.Message = "Duyệt thành công";
             result.IsSussess = true;
             return result;
@@ -910,6 +909,77 @@ namespace Repositories.Repository
             await _lBSDbContext.SaveChangesAsync();
             result.Message = "thành công";
             result.IsSussess = true;
+            return result;
+        }
+
+        public async Task<ReponderModel<CommentModel>> GetCommentByBook(int bookId)
+        {
+            var result = new ReponderModel<CommentModel>();
+            var comments = await _lBSDbContext.Comments.Include(c => c.User).Where(c => c.BookId == bookId).ToListAsync();
+
+            result.DataList = comments.Select(c => new CommentModel
+            {
+                Id = c.Id,
+                BookId = c.BookId,
+                Content = c.Content,
+                FullName = c.User.FullName,
+                CreateDate = GetRelativeTime(c.CreateDate),
+                Rating = c.Rating
+            }).ToList();
+            result.IsSussess = true;
+            return result;
+        }
+
+        private string GetRelativeTime(DateTime inputTime)
+        {
+            var now = DateTime.Now;
+            var diff = now - inputTime;
+
+            if (diff.TotalSeconds < 60)
+                return $"{(int)diff.TotalSeconds} giây trước";
+
+            if (diff.TotalMinutes < 60)
+                return $"{(int)diff.TotalMinutes} phút trước";
+
+            if (diff.TotalHours < 24)
+                return $"{(int)diff.TotalHours} giờ trước";
+
+            return inputTime.ToString("dd/MM/yyyy");
+        }
+
+        public async Task<ReponderModel<string>> UpdateComment(Comment comment)
+        {
+            var result = new ReponderModel<string>();
+            if (comment == null)
+            {
+                result.Message = "Data không hợp lệ";
+                return result;
+            }
+            var commentRow = await _lBSDbContext.Comments.FirstOrDefaultAsync(c => c.Id == comment.Id);
+            if (commentRow == null) 
+            {
+                commentRow = new Comment 
+                {
+                    BookId = comment.BookId,
+                    CreateDate = DateTime.Now,
+                    Content = comment.Content,
+                    CreateBy = comment.CreateBy,
+                    UserId = comment.UserId,
+                    Rating = comment.Rating,
+                };
+                _lBSDbContext.Comments.Add(commentRow); 
+
+            }
+            else
+            {
+                commentRow.Content = comment.Content;
+                commentRow.Rating = comment.Rating;
+                commentRow.CreateDate = DateTime.Now;
+            }
+                
+            await _lBSDbContext.SaveChangesAsync();
+            result.IsSussess = true;
+            result.Message = "Cập nhật thành công";
             return result;
         }
     }

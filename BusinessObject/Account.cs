@@ -7,6 +7,7 @@ namespace BusinessObject
     {
         [Column(TypeName = "nvarchar(100)")]
         public string? FullName { get; set; }
+        public string? Avatar { get; set; }
         public int Gender { get; set; }
         public string? Address { get; set; }
         public int ResetPassword { get; set; }
