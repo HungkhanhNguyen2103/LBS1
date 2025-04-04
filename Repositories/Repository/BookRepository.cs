@@ -955,7 +955,7 @@ namespace Repositories.Repository
                 result.Message = "Data không hợp lệ";
                 return result;
             }
-            var commentRow = await _lBSDbContext.Comments.FirstOrDefaultAsync(c => c.Id == comment.Id);
+            var commentRow = await _lBSDbContext.Comments.FirstOrDefaultAsync(c => c.CreateBy == comment.CreateBy && c.BookId == c.BookId);
             if (commentRow == null) 
             {
                 commentRow = new Comment 
