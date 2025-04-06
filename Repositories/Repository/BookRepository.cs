@@ -442,6 +442,7 @@ namespace Repositories.Repository
                 SubCategory = book.SubCategory,
                 Summary = book.Summary,
                 UserId = book.UserId,
+                //ViewNo = await _lBSDbContext.UserBookViews.Where(c => c.Status == ChapterStatus.Open && c.).CountAsync(),
                 ListCategories = book.BookCategories != null ? book.BookCategories.Select(c => c.Category).ToList() : new List<Category>(),
                 CategoryIds = book.BookCategories != null ? book.BookCategories.Select(c => c.CategoryId.Value).ToList() : new List<int>(),
             };
@@ -932,7 +933,7 @@ namespace Repositories.Repository
 
         private string GetRelativeTime(DateTime inputTime)
         {
-            var now = DateTime.Now;
+            var now = DateTime.UtcNow;
             var diff = now - inputTime;
 
             if (diff.TotalSeconds < 60)
@@ -961,7 +962,7 @@ namespace Repositories.Repository
                 commentRow = new Comment 
                 {
                     BookId = comment.BookId,
-                    CreateDate = DateTime.Now,
+                    CreateDate = DateTime.UtcNow,
                     Content = comment.Content,
                     CreateBy = comment.CreateBy,
                     UserId = comment.UserId,
@@ -974,12 +975,31 @@ namespace Repositories.Repository
             {
                 commentRow.Content = comment.Content;
                 commentRow.Rating = comment.Rating;
-                commentRow.CreateDate = DateTime.Now;
+                commentRow.CreateDate = DateTime.UtcNow;
             }
                 
             await _lBSDbContext.SaveChangesAsync();
             result.IsSussess = true;
             result.Message = "Cập nhật thành công";
+            return result;
+        }
+
+        public async Task<ReponderModel<string>> CreateViewBook(UserBookView model)
+        {
+            var result = new ReponderModel<string>();
+            _lBSDbContext.UserBookViews.Add(model);
+            await _lBSDbContext.SaveChangesAsync();
+            result.IsSussess = true;
+            result.Message = "Thành công";
+            return result;
+        }
+
+        public async Task<ReponderModel<int>> GetViewNo(int bookId,BookTypeStatus type)
+        {
+            var result = new ReponderModel<int>();
+            var viewNo = await _lBSDbContext.UserBookViews.Where(c => c.BookTypeStatus == type && c.BookId == bookId).CountAsync();
+            result.Data = viewNo;
+            result.IsSussess = true;
             return result;
         }
     }

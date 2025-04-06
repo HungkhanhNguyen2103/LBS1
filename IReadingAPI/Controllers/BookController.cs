@@ -188,6 +188,23 @@ namespace LBSAPI.Controllers
             return result;
         }
 
+        [Route("CreateViewBook")]
+        [HttpPost]
+        public async Task<ReponderModel<string>> CreateViewBook(UserBookView userBookView)
+        {
+            var result = await _bookRepository.CreateViewBook(userBookView);
+            return result;
+        }
+
+        [Route("GetViewNo")]
+        [HttpGet]
+        public async Task<ReponderModel<int>> GetViewNo(int bookId, int chapterType)
+        {
+            var chapterTypeEnum = (BookTypeStatus)chapterType;
+            var result = await _bookRepository.GetViewNo(bookId, chapterTypeEnum);
+            return result;
+        }
+
         [Route("DeleteChapterBook")]
         [HttpGet]
         public async Task<ReponderModel<string>> DeleteChapterBook(string id)
