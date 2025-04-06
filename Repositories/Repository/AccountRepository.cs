@@ -1,6 +1,8 @@
 ﻿using BusinessObject;
 using BusinessObject.BaseModel;
+using ImgurAPI.Core;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System.Data;
@@ -10,6 +12,7 @@ namespace Repositories.Repository
 {
     public class AccountRepository : IAccountRepository
     {
+        private ImageManager _imageManager;
         private readonly UserManager<Account> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly LBSDbContext LBSDbContext;
@@ -19,7 +22,8 @@ namespace Repositories.Repository
             UserManager<Account> userManager, 
             RoleManager<IdentityRole> roleManager,
 			IConfiguration configuration,
-            EmailSender emailSender
+            EmailSender emailSender,
+            ImageManager imageManager
             )
         {
             LBSDbContext = lbSDbContext;
@@ -27,6 +31,7 @@ namespace Repositories.Repository
             _roleManager = roleManager;
 			_configuration = configuration;
             _emailSender = emailSender;
+            _imageManager = imageManager;
         }
 
         public async Task<ReponderModel<string>> ConfirmEmail(string? token)
@@ -93,12 +98,14 @@ namespace Repositories.Repository
                 response.Message = "Tài khoản không tồn tại";
                 return response;
             }
+            //var tes = new ImageManager(new Imgur()).
             var userInfo = new AccountModel
             {
                 UserName = username,
                 FullName = user.FullName,
                 Email = user.Email,
                 PhoneNumber = user.PhoneNumber,
+                Avatar = string.IsNullOrEmpty(user.Avatar) ? "https://i.imgur.com/XHyiaIf.png" : user.Avatar,
             };
             response.IsSussess = true;
             response.Data = userInfo;
@@ -185,6 +192,7 @@ namespace Repositories.Repository
                 Email = account.Email,
                 UserName = account.UserName,
                 Address = account.Address,
+                Avatar = "https://i.imgur.com/XHyiaIf.png",
                 FullName = account.FullName,
                 PhoneNumber = account.PhoneNumber,
                 AccountActive = true,
@@ -271,6 +279,19 @@ namespace Repositories.Repository
             }
             userExist.PhoneNumber = account.PhoneNumber;
             userExist.FullName = account.FullName;
+
+            if (!string.IsNullOrEmpty(account.Avatar) && userExist.Avatar != account.Avatar)
+            {
+                account.Avatar = account.Avatar.Split("base64,")[1];
+                var response = await _imageManager.UploadImage(account.Avatar, "base64");
+                if (!response.Success)
+                {
+                    responder.Message = "Lỗi upload ảnh";
+                    return responder;
+                }
+                userExist.Avatar = response.Data.Link;
+            }
+
             await _userManager.UpdateAsync(userExist);
 
             responder.IsSussess = true;
@@ -611,6 +632,7 @@ namespace Repositories.Repository
                     return responder;
                 }
             }
+
 
             if (!userExist.AccountActive)
             {

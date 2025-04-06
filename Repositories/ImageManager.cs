@@ -41,14 +41,22 @@ namespace Repositories
 
         public async Task<ResponseModel<ImageModel>> UploadImage(string imageString,string type)
         {
-
-            var model = new UploadImageModel
+            try
             {
-                Image = imageString,
-                Type = type
-            };
-            var result = await _imgur.UploadImage(model);
-            return result; 
+                var model = new UploadImageModel
+                {
+                    Image = imageString,
+                    Type = type
+                };
+                var result = await _imgur.UploadImage(model);
+                return result;
+            }
+            catch (Exception ex)
+            {
+
+                throw;
+            }
+ 
         }
     }
 }

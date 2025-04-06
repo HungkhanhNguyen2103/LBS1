@@ -19,9 +19,12 @@
         <div class="login-wrap p-0">
             <h3 class="mb-4 text-center">Thông tin tài khoản</h3>
             <form asp-action="UpdateInformation" method="post" class="signin-form">
-                <div class="form-group user-body">
-                    <img src="/images/user.png" alt="Avatar"/>
-                    @* <input type="file" asp-for="A" id=""/> *@
+                <div class="d-flex" style="justify-content:center;cursor:pointer">
+                    <label class="form-group user-body" for="AvatarFile">
+                        <img src="@Model.Avatar" id="AvatarImg" alt="Avatar" style="cursor:pointer"/>
+                        <input type="file" onchange="changeImageFile(this)" accept="image/*" hidden id="AvatarFile" />
+                        <input type="text" hidden value="@Model.Avatar" asp-for="Avatar" />
+                    </label>
                 </div>
                 <div class="form-group">
                     <input asp-for="UserName" value="@Model.UserName" disabled type="text" class="form-control" placeholder="Tài khoản" required>
@@ -45,3 +48,29 @@
         </div>
     </div>
 </div>
+<script>
+
+    function changeImageFile(input) {
+        if (input.files && input.files[0]) {
+
+            var fileSize = input.files[0].size / 1024 / 1024;
+
+            if (fileSize > 2) {
+                notyf.error("Kích thước ảnh quá lớn! Vui lòng chọn ảnh nhỏ hơn 2MB");
+                //$('#image-post').val('https://i.imgur.com/KHD58yX.png');
+                return;
+            }
+
+
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                $(input).next('img').removeClass('d-none');
+                $('#AvatarImg').attr('src', e.target.result);
+                $('#Avatar').val(e.target.result);
+            }
+
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+</script>

@@ -27,7 +27,7 @@ builder.Services.AddSingleton<EmailSender, EmailSender>();
 builder.Services.AddScoped<ImageManager>();
 builder.Services.AddScoped<Imgur>(c =>
 {
-    return new Imgur("577b7aebc4e3478a45dcfe0a537c6026821873c1", "a706e97c0890496e29c9dd00ae7285fdef38d27f");
+    return new Imgur("7a6d2f59908c75714a5313d928c7b3e7fd30f9be", "d4f0cdf58764de7d91a94bd43aafe095e5c1e820");
 });
 builder.Services.AddScoped<IAccountRepository, AccountRepository>();
 builder.Services.AddScoped<IBookRepository, BookRepository>();

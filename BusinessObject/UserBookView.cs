@@ -16,6 +16,7 @@ namespace BusinessObject
         public string? CreateBy { get; set; }
         public string? UserId { get; set; }
         public Account? User { get; set; }
+        public Book? Book { get; set; }
         public DateTime ModifyDate { get; set; }
     }
 
