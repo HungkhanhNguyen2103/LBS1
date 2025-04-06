@@ -997,7 +997,7 @@ namespace Repositories.Repository
         public async Task<ReponderModel<int>> GetViewNo(int bookId,BookTypeStatus type)
         {
             var result = new ReponderModel<int>();
-            var viewNo = await _lBSDbContext.UserBookViews.Where(c => c.BookTypeStatus == type && c.BookId == bookId).CountAsync();
+            var viewNo = await _lBSDbContext.UserBookViews.Where(c => c.BookTypeStatus == type && c.BookId == bookId && c.Status == ChapterStatus.Open).CountAsync();
             result.Data = viewNo;
             result.IsSussess = true;
             return result;
