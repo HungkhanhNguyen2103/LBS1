@@ -742,7 +742,8 @@ namespace Repositories.Repository
         public async Task<ReponderModel<string>> UpdateBookChapterView(UserBookView model)
         {
             var result = new ReponderModel<string>();
-            model.ModifyDate = DateTime.Now;
+            model.CreateDate = DateTime.UtcNow;
+            model.EndDate = DateTime.UtcNow;
             _lBSDbContext.UserBookViews.Add(model);
             await _lBSDbContext.SaveChangesAsync();
             result.Message = "Cập nhật thành công";
@@ -984,11 +985,52 @@ namespace Repositories.Repository
             return result;
         }
 
-        public async Task<ReponderModel<string>> CreateViewBook(UserBookView model)
+        public async Task<ReponderModel<int>> CreateViewBook(UserBookViewModel model)
         {
-            var result = new ReponderModel<string>();
-            _lBSDbContext.UserBookViews.Add(model);
-            await _lBSDbContext.SaveChangesAsync();
+            var result = new ReponderModel<int>();
+            if(model == null)
+            {
+                result.Message = "Dữ liệu không hợp lệ";
+                return result;
+            }
+            if(int.TryParse(model.ChapterId,out int e))
+            {
+                result.Message = "Id chương không hợp lệ";
+                return result;
+            }
+            if (string.IsNullOrEmpty(model.CreateBy))
+            {
+                result.Message = "Username không hợp lệ";
+                return result;
+            }
+            if(model.Status == ChapterStatus.Open)
+            {
+                var data = new UserBookView {
+                    BookId = model.BookId,
+                    BookTypeStatus = model.BookTypeStatus,
+                    ChapterId = model.ChapterId,
+                    CreateBy = model.CreateBy,
+                    UserId = model.UserId,
+                    CreateDate = DateTime.UtcNow,
+                    EndDate = DateTime.MinValue
+                };
+                
+                _lBSDbContext.UserBookViews.Add(data);
+                await _lBSDbContext.SaveChangesAsync();
+                result.Data = data.Id;
+            }
+            else if(model.Status == ChapterStatus.Close)
+            {
+                var resultData = await _lBSDbContext.UserBookViews.FirstOrDefaultAsync(c => c.Id == model.Id);
+                if (resultData == null)
+                {
+                    result.Message = "Dữ liệu không hợp lệ";
+                    return result;
+                }
+                resultData.EndDate = DateTime.UtcNow;
+                await _lBSDbContext.SaveChangesAsync();
+                result.Data = resultData.Id;
+            }
             result.IsSussess = true;
             result.Message = "Thành công";
             return result;
@@ -997,10 +1039,72 @@ namespace Repositories.Repository
         public async Task<ReponderModel<int>> GetViewNo(int bookId,BookTypeStatus type)
         {
             var result = new ReponderModel<int>();
-            var viewNo = await _lBSDbContext.UserBookViews.Where(c => c.BookTypeStatus == type && c.BookId == bookId && c.Status == ChapterStatus.Open).CountAsync();
+            var viewNo = await _lBSDbContext.UserBookViews.Where(c => c.BookTypeStatus == type && c.BookId == bookId).CountAsync();
             result.Data = viewNo;
             result.IsSussess = true;
             return result;
+        }
+
+        public async Task<ReponderModel<UserMinuteModel>> GetListMinuteViewByUser(string userName)
+        {
+            var result = new ReponderModel<UserMinuteModel>();
+            
+            var now = DateTime.UtcNow;
+            var dayOfweek = now.DayOfWeek;
+            var dateNow = now.Date;
+            var startOfWeek = dateNow.AddDays(-(int)dayOfweek + 1);
+            var endOfWeek = startOfWeek.AddDays(7);
+
+            var asQuery = _lBSDbContext.UserBookViews.Where(c => c.CreateBy == userName && c.CreateDate.CompareTo(c.EndDate) < 0 && c.CreateDate.Date >= startOfWeek.Date && c.EndDate <= endOfWeek.Date).AsQueryable();
+            var readMinute = await asQuery.Where(c => c.BookTypeStatus == BookTypeStatus.Read).ToListAsync();
+            var voiceMinute = await asQuery.Where(c => c.BookTypeStatus == BookTypeStatus.Voice).ToListAsync();
+
+            var i = startOfWeek;
+            while (i <= endOfWeek)
+            {
+                var item = new UserMinuteModel
+                {
+                    Day = i,
+                    IsToday = dateNow.CompareTo(i) == 0 ? true : false,
+                    DayOfWeek = i.DayOfWeek,
+                    UserName = userName,
+                    ReadMinute = readMinute.Where(c => c.CreateDate.Date.CompareTo(i.Date) == 0).Sum(c => (int) c.EndDate.Subtract(c.CreateDate).TotalSeconds),
+                    ListenMinute = voiceMinute.Where(c => c.CreateDate.Date.CompareTo(i.Date) == 0).Sum(c => (int) c.EndDate.Subtract(c.CreateDate).TotalSeconds),
+                };
+                result.DataList.Add(item);
+            }
+            return result;
+        }
+
+        public async Task<ReponderModel<string>> AddFavouriteBook(string userName,int bookId)
+        {
+            var reponse = new ReponderModel<string>();
+            var account = await _lBSDbContext.Users.FirstOrDefaultAsync(c => c.UserName == userName);
+            if (account == null)
+            {
+                reponse.Message = "Tài khoản không tồn tại";
+                return reponse;
+            }
+            var favouriteBook = new UserBook
+            {
+                UserName = userName,
+                UserId = account.Id,
+                BookType = UserBookType.Favourite,
+                BookId = bookId
+            };
+            _lBSDbContext.UserBooks.Add(favouriteBook);
+            await _lBSDbContext.SaveChangesAsync();
+            reponse.IsSussess = true;
+            reponse.Message = "Đã thêm vào danh mục yêu thích";
+            return reponse;
+        }
+
+        public async Task<ReponderModel<UserBook>> ListFavouriteBook(string userName)
+        {
+            var reponse = new ReponderModel<UserBook>();
+            reponse.DataList = await _lBSDbContext.UserBooks.Include(c => c.Book).Where(c => c.UserName == userName && c.BookType == UserBookType.Favourite).ToListAsync();
+            reponse.IsSussess = true;
+            return reponse;
         }
     }
 }

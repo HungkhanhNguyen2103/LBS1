@@ -20,8 +20,8 @@
             <h3 class="mb-4 text-center">Thông tin tài khoản</h3>
             <form asp-action="UpdateInformation" method="post" class="signin-form">
                 <div class="d-flex" style="justify-content:center;cursor:pointer">
-                    <label class="form-group user-body" for="AvatarFile">
-                        <img src="@Model.Avatar" id="AvatarImg" alt="Avatar" style="cursor:pointer"/>
+                    <label style="border-radius: 10%;height:10rem" class="form-group user-body" for="AvatarFile">
+                        <img src="@Model.Avatar" id="AvatarImg" alt="Avatar" style="cursor:pointer;border-radius: 10%;height:100%" />
                         <input type="file" onchange="changeImageFile(this)" accept="image/*" hidden id="AvatarFile" />
                         <input type="text" hidden value="@Model.Avatar" asp-for="Avatar" />
                     </label>

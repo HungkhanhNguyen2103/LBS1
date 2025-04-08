@@ -4,24 +4,22 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BusinessObject
+namespace BusinessObject.BaseModel
 {
-    public class UserBookView
+    public class UserBookViewModel
     {
         public int Id { get; set; }
         public int BookId { get; set; }
         public string? ChapterId { get; set; }
+        public ChapterStatus Status { get; set; }
         public BookTypeStatus BookTypeStatus { get; set; }
         public string? CreateBy { get; set; }
         public string? UserId { get; set; }
-        public Account? User { get; set; }
-        public Book? Book { get; set; }
-        public DateTime CreateDate { get; set; }
-        public DateTime EndDate { get; set; }
     }
-    public enum BookTypeStatus
+
+    public enum ChapterStatus
     {
-        Read = 0,
-        Voice = 1,
+        Open = 0,
+        Close = 1,
     }
 }

@@ -190,7 +190,7 @@ namespace LBSAPI.Controllers
 
         [Route("CreateViewBook")]
         [HttpPost]
-        public async Task<ReponderModel<string>> CreateViewBook(UserBookView userBookView)
+        public async Task<ReponderModel<int>> CreateViewBook(UserBookViewModel userBookView)
         {
             var result = await _bookRepository.CreateViewBook(userBookView);
             return result;
@@ -210,6 +210,30 @@ namespace LBSAPI.Controllers
         public async Task<ReponderModel<string>> DeleteChapterBook(string id)
         {
             var result = await _bookRepository.DeleteChapterBook(id);
+            return result;
+        }
+
+        [Route("AddFavouriteBook")]
+        [HttpGet]
+        public async Task<ReponderModel<string>> AddFavouriteBook(string userName,int bookId)
+        {
+            var result = await _bookRepository.AddFavouriteBook(userName,bookId);
+            return result;
+        }
+
+        [Route("ListFavouriteBook")]
+        [HttpGet]
+        public async Task<ReponderModel<UserBook>> ListFavouriteBook(string userName)
+        {
+            var result = await _bookRepository.ListFavouriteBook(userName);
+            return result;
+        }
+
+        [Route("GetListMinuteViewByUser")]
+        [HttpGet]
+        public async Task<ReponderModel<UserMinuteModel>> GetListMinuteViewByUser(string userName)
+        {
+            var result = await _bookRepository.GetListMinuteViewByUser(userName);
             return result;
         }
 

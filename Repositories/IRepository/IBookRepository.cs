@@ -41,7 +41,10 @@ namespace Repositories.IRepository
         Task<ReponderModel<StatisticsChapterBook>> StatisticsBook(string username);
         Task<ReponderModel<CommentModel>> GetCommentByBook(int bookId);
         Task<ReponderModel<string>> UpdateComment(Comment comment);
-        Task<ReponderModel<string>> CreateViewBook(UserBookView model);
+        Task<ReponderModel<int>> CreateViewBook(UserBookViewModel model);
         Task<ReponderModel<int>> GetViewNo(int bookId,BookTypeStatus type);
+        Task<ReponderModel<UserMinuteModel>> GetListMinuteViewByUser(string userName);
+        Task<ReponderModel<string>> AddFavouriteBook(string userName, int bookId);
+        Task<ReponderModel<UserBook>> ListFavouriteBook(string userName);
     }
 }
