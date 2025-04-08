@@ -82,7 +82,7 @@
                                     }
 
                                     <td style="padding-left:1.5rem">
-                                        <span class="text-secondary text-xs font-weight-bold">@(item.NewPulished.Length > 55 ? item.NewPulished.Substring(0, 55) + "..." : item.NewPulished)</span>
+                                        <span class="text-secondary text-xs font-weight-bold">@(item.NewPulished.Length > 35 ? item.NewPulished.Substring(0, 35) + "..." : item.NewPulished)</span>
                                     </td>
                                     <td class="text-center">
                                         <span class="text-secondary text-xs font-weight-bold">@item.NewPulishedDateTime</span>

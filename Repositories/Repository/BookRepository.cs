@@ -368,7 +368,7 @@ namespace Repositories.Repository
                 return result;
             }
 
-            if (string.IsNullOrEmpty(bookChapter.Content))
+            if (string.IsNullOrEmpty(bookChapter.Content) || !HasContent(bookChapter.Content))
             {
                 result.Message = "Nội dung không hợp lệ";
                 return result;
@@ -413,6 +413,13 @@ namespace Repositories.Repository
             result.IsSussess = true;
 
             return result;
+        }
+        private bool HasContent(string html)
+        {
+            var doc = new HtmlDocument();
+            doc.LoadHtml(html);
+            var text = doc.DocumentNode.InnerText;
+            return !string.IsNullOrWhiteSpace(text);
         }
 
         public async Task<ReponderModel<BookModel>> GetBook(int id)
@@ -573,7 +580,7 @@ namespace Repositories.Repository
                 return result;
             }
 
-            if (string.IsNullOrEmpty(bookChapter.Content))
+            if (string.IsNullOrEmpty(bookChapter.Content) || !HasContent(bookChapter.Content))
             {
                 result.Message = "Nội dung không hợp lệ";
                 return result;
@@ -1005,6 +1012,16 @@ namespace Repositories.Repository
             }
             if(model.Status == ChapterStatus.Open)
             {
+                if(model.Id != 0)
+                {
+                    var item = await _lBSDbContext.UserBookViews.FirstOrDefaultAsync(c => c.Id == model.Id);
+                    if (item == null)
+                    {
+                        result.Message = "Dữ liệu không hợp lệ";
+                        return result;
+                    }
+                    item.EndDate = DateTime.UtcNow;
+                }
                 var data = new UserBookView {
                     BookId = model.BookId,
                     BookTypeStatus = model.BookTypeStatus,

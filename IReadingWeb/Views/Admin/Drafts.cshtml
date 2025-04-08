@@ -39,7 +39,7 @@
                             <tr>
                                 <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Tên truyện</th>
                                 <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Chương</th>
-                                <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Nội dung</th>
+                                <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7" style="display:none">Nội dung</th>
                                 @* <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Mô tả</th> *@
                                 <th class="text-secondary opacity-7"></th>
                             </tr>
@@ -54,8 +54,8 @@
                                     <td>
                                         <p class="mx-3 text-xs font-weight-bold mb-0">@item.ChapterName</p>
                                     </td>
-                                    <td>
-                                        <p class="mx-3 text-xs font-weight-bold mb-0">@(item.Content.Length > 50 ? @Html.Raw(item.Content.Substring(0, 50)) + "..." : @Html.Raw(item.Content))</p>
+                                    <td style="display:none">
+                                        <p class="mx-3 text-xs font-weight-bold mb-0"></p>
                                     </td>
                                     <td class="align-middle">
                                         <button onclick="window.location.href='/Admin/@item.BookId/UpdateChapterBook/@item.BookChapterId?returnUrl=Drafts'" title="Sửa" class="btn1 btn btn-secondary">
