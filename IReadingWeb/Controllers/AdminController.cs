@@ -1,6 +1,7 @@
 ﻿using AspNetCoreHero.ToastNotification.Abstractions;
 using BusinessObject;
 using BusinessObject.BaseModel;
+using IReadingWeb.Service.Payment;
 using LBSWeb.Service.Book;
 using LBSWeb.Service.Information;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -18,13 +19,18 @@ namespace LBSWeb.Controllers
     {
         private readonly IBookService _bookService;
         private readonly IInformationService _informationService;
+        private readonly IPaymentService _paymentService;
         private readonly INotyfService _notyf;
 
-        public AdminController(IBookService bookService,IInformationService informationService, INotyfService notyf) 
+        public AdminController(IBookService bookService,
+            IInformationService informationService, 
+            INotyfService notyf,
+            IPaymentService paymentService) 
         {
             _bookService = bookService;
             _informationService = informationService;
             _notyf = notyf;
+            _paymentService = paymentService;
         }
 
         [Authorize(Roles = $"{Role.Admin},{Role.Author},{Role.Manager}")]
@@ -553,6 +559,24 @@ namespace LBSWeb.Controllers
             ViewBag.BookId = bookId;
             var result = await _bookService.GetListBookChapter(bookId);
             ViewBag.ChapterBooks = result.DataList;
+            return View();
+        }
+
+        //[Authorize(Roles = $"{Role.Author},{Role.Manager}")]
+        //[AllowAnonymous]
+        [HttpGet]
+        [Route("PaymentSuccess")]
+        public async Task<IActionResult> PaymentSuccess(string email, int type, int paymentKey , long orderCode)
+        {
+            var result = await _paymentService.PaymentSuccess(email, type, paymentKey, orderCode);
+            if (!result.IsSussess) return Redirect("/Admin/PaymentCancel");
+            return View();
+        }
+
+        //[AllowAnonymous]
+        [Route("PaymentCancel")]
+        public IActionResult PaymentCancel()
+        {
             return View();
         }
 

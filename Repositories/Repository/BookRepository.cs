@@ -376,7 +376,6 @@ namespace Repositories.Repository
 
             if (!string.IsNullOrEmpty(bookChapter.Summary))
             {
-                // comment sửa lại logic
                 //var res = await _aIGeneration.TextGenerateToSpeech(bookChapter.Summary);
                 //if (res.IsSussess) bookChapter.AudioUrl = res.Data;
             }

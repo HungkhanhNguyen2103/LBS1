@@ -4,6 +4,7 @@ using BusinessObject;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BusinessObject.Migrations
 {
     [DbContext(typeof(LBSDbContext))]
-    partial class LBSDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250413034154_UserTranscation")]
+    partial class UserTranscation
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -113,17 +116,17 @@ namespace BusinessObject.Migrations
                             Id = "7d5002bd-f22f-4c7c-bce1-3d22eed213ff",
                             AccessFailedCount = 0,
                             AccountActive = true,
-                            ConcurrencyStamp = "58cc3b32-e6dc-4861-b3f8-4133adc054c7",
+                            ConcurrencyStamp = "c4976961-600f-4bdc-98cf-6e57cee8128c",
                             Email = "admin@gmail.com",
                             EmailConfirmed = false,
                             FullName = "Admin",
                             Gender = 0,
                             LockoutEnabled = false,
                             NormalizedUserName = "ADMIN",
-                            PasswordHash = "AQAAAAIAAYagAAAAEGz/czn2lEvH7TkqXBCOP0ewuXA7WQ9cQrZxPpsfLO6S3Tt+w9TmKTJ8pmmo8LbhOA==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEJ5IFnU+lENPAQx3RQq7Rr/Wo+TQQ12SsoOtymCzVA/byBIZtKCLELFpCyVbpVEc4A==",
                             PhoneNumberConfirmed = false,
                             ResetPassword = 0,
-                            SecurityStamp = "13688f14-e535-4590-81e9-d684f3c2ae39",
+                            SecurityStamp = "97e14dc2-adfe-4a04-96c6-49cfa3f81ba1",
                             SocialAccount = false,
                             TwoFactorEnabled = false,
                             UserName = "admin"
@@ -133,17 +136,17 @@ namespace BusinessObject.Migrations
                             Id = "7d5002bd-f22f-4c7c-bce1-3d22eed213dd",
                             AccessFailedCount = 0,
                             AccountActive = true,
-                            ConcurrencyStamp = "c76d968c-8684-4bb1-80a4-0c04e78353a4",
+                            ConcurrencyStamp = "3af1808c-63fb-4c6e-958f-e8389c607e60",
                             Email = "manager@gmail.com",
                             EmailConfirmed = false,
                             FullName = "Manager",
                             Gender = 0,
                             LockoutEnabled = false,
                             NormalizedUserName = "MANAGER",
-                            PasswordHash = "AQAAAAIAAYagAAAAEMlccEiXUeR29sKcbAMiiL+UY8NZN3yfs1dOiPMu/EUtroEnptai8daKfVuJVRNAww==",
+                            PasswordHash = "AQAAAAIAAYagAAAAENcoAoJP9fLse8Mar2Dn8TQe5XOjhk5PJ/Eck9r6OLfkmzIfBlMDkUjU/BLuYBDdQA==",
                             PhoneNumberConfirmed = false,
                             ResetPassword = 0,
-                            SecurityStamp = "12d861a0-a050-4d9d-99a3-01a6d86d3a22",
+                            SecurityStamp = "1af36c00-03f6-4d2d-ab99-befe8ee92c0a",
                             SocialAccount = false,
                             TwoFactorEnabled = false,
                             UserName = "manager"
@@ -153,17 +156,17 @@ namespace BusinessObject.Migrations
                             Id = "7d5002bd-f22f-4c7c-bce1-3d22eff012ef",
                             AccessFailedCount = 0,
                             AccountActive = true,
-                            ConcurrencyStamp = "8cd33719-0b6e-4d70-a3c1-1787224edc62",
+                            ConcurrencyStamp = "ad5aa046-f28c-46af-9931-faab5637443b",
                             Email = "author@gmail.com",
                             EmailConfirmed = false,
                             FullName = "Author",
                             Gender = 0,
                             LockoutEnabled = false,
                             NormalizedUserName = "AUTHOR",
-                            PasswordHash = "AQAAAAIAAYagAAAAEOrV2N1H7bFhQjQA7U6ozGGzL2+fYCGQztwW+JfvMFCy5WabTwuCITbvbTUbDTJ7mQ==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEOs0Ij3LImlKdXK0vjNTxl5OfxJzaQPuCqNl8LvLBhG3H62IhNjv3ET9J0tcGCD5Zw==",
                             PhoneNumberConfirmed = false,
                             ResetPassword = 0,
-                            SecurityStamp = "d7438b74-6e2c-47fd-ab5d-b721e2794a9d",
+                            SecurityStamp = "ff75dd55-95ee-4dd3-8351-ef27911c5511",
                             SocialAccount = false,
                             TwoFactorEnabled = false,
                             UserName = "author"
@@ -618,16 +621,7 @@ namespace BusinessObject.Migrations
                     b.Property<DateTime>("CreateDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<long>("OrderId")
-                        .HasColumnType("bigint");
-
                     b.Property<int>("PaymentItemId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Price")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Type")
                         .HasColumnType("int");
 
                     b.Property<string>("UserId")

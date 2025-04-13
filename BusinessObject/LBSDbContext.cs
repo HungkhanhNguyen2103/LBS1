@@ -46,5 +46,6 @@ namespace BusinessObject
         public virtual DbSet<UserReportComment> UserReportComments { get; set; }
         public virtual DbSet<UserBookView> UserBookViews { get; set; }
         public virtual DbSet<Room> Rooms { get; set; }
+        public virtual DbSet<PaymentItem> PaymentItems { get; set; }
     }
 }

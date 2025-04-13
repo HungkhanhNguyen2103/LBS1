@@ -6,6 +6,7 @@ using Repositories;
 using Repositories.IRepository;
 using ImgurAPI.Core;
 using Microsoft.Extensions.DependencyInjection;
+using Net.payOS;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,14 +23,18 @@ builder.Services.AddScoped<AIGeneration>(c =>
 
 builder.Services.AddDbContext<LBSDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("LBSConnection")));
 
-
 builder.Services.AddSingleton<EmailSender, EmailSender>();
 builder.Services.AddScoped<ImageManager>();
+builder.Services.AddScoped<PayOS>(c =>
+{
+    return new PayOS("fcbfa365-f706-4bf7-b3df-8be2d236b8a1", "cf7d6e36-22b5-4f85-a16a-15cab19a1550", "91934f6634e4e0909341a6f9e100fa9ffe336cbea42a79ab296de7450082ea80");
+});
 builder.Services.AddScoped<Imgur>(c =>
 {
     return new Imgur("7a6d2f59908c75714a5313d928c7b3e7fd30f9be", "d4f0cdf58764de7d91a94bd43aafe095e5c1e820");
 });
 builder.Services.AddScoped<IAccountRepository, AccountRepository>();
+builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
 builder.Services.AddScoped<IBookRepository, BookRepository>();
 builder.Services.AddScoped<IInformationRepository, InformationRepository>();
 

@@ -10,17 +10,20 @@ namespace BusinessObject
     public class UserTranscation
     {
         public int Id { get; set; }
-        public int Payment { get; set; }
-        public PaymentType PaymentType { get; set; }
+        public PaymentItemType Type { get; set; }
+        public int Price { get; set; }
+        public long OrderId { get; set; }
         public DateTime CreateDate { get; set; }
-        [Column(TypeName = "nvarchar(50)")]
+        public int PaymentItemId { get; set; }
+        public PaymentItem? PaymentItem { get; set; }
+        //public PaymentType PaymentType { get; set; }
         public string? UserName { get; set; }
         public string? UserId { get; set; }
         public Account? User { get; set; }
     }
 
-    public enum PaymentType
-    {
-        MOMO = 0,
-    }
+    //public enum PaymentType
+    //{
+    //    MOMO = 0,
+    //}
 }

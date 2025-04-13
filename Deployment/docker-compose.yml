@@ -9,6 +9,7 @@
             - 7157:8080
         volumes:
             - /root/docker/volumes/ireading_api/content_root_path/wwwroot:/app/wwwroot
+	    - /root/docker/volumes/ireading_api/resource:/app/Resource
         restart: always
         environment: 
             - ASPNETCORE_ENVIRONMENT=Production

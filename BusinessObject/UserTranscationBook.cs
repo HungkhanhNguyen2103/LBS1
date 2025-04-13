@@ -10,16 +10,16 @@ namespace BusinessObject
     public class UserTranscationBook
     {
         public int Id { get; set; }
+        public int Amount { get; set; }
         public DateTime CreateDate { get; set; }
-        public PaymentStatus PaymentStatus { get; set; }
-        [Column(TypeName = "nvarchar(50)")]
+        public string ChapterId { get; set; }
         public string? UserName { get; set; }
         public string? UserId { get; set; }
         public Account? User { get; set; }
     }
 
-    public enum PaymentStatus
-    {
+    //public enum PaymentStatus
+    //{
 
-    }
+    //}
 }

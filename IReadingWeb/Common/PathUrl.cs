@@ -70,6 +70,12 @@
         //UserReportComment
         public static string INFO_ALL_COMMENT_USERREPORT = "api/Information/GetListUserReportComment";
         public static string INFO_CREATE_COMMENT_USERREPORT = "api/Information/CreateUserReportComment";
+
+        //Payment
+        public static string PAYMENT_SUCCESS = "api/Payment/PaymentSuccess";
+        //public static string INFO_ALL_COMMENT_USERREPORT = "api/Information/GetListUserReportComment";
+        //public static string INFO_ALL_COMMENT_USERREPORT = "api/Information/GetListUserReportComment";
+        //public static string INFO_ALL_COMMENT_USERREPORT = "api/Information/GetListUserReportComment";
     }
 
 }

@@ -4,19 +4,13 @@
 
     <meta charset="utf-8">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
-    <title></title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/png" href="~/images/layoutHome/logo.png" asp-append-version="true">
     <style type="text/css">
-        /**
-           * Better fluid images in Internet Explorer.
-           */
         img {
             -ms-interpolation-mode: bicubic;
         }
-        /**
-           * Remove blue links for iOS devices.
-           */
+
         a[x-apple-data-detectors] {
             font-family: inherit !important;
             font-size: inherit !important;
@@ -26,8 +20,8 @@
             text-decoration: none !important;
         }
         /**
-           * Fix centering issues in Android 4.4.
-           */
+                           * Fix centering issues in Android 4.4.
+                           */
         div[style*="margin: 16px 0;"] {
             margin: 0 !important;
         }
@@ -39,8 +33,8 @@
             margin: 0 !important;
         }
         /**
-           * Collapse table borders to avoid space between cells.
-           */
+                           * Collapse table borders to avoid space between cells.
+                           */
         table {
             border-collapse: collapse !important;
         }
@@ -78,7 +72,7 @@
                 <table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px;">
                     <tr>
                         <td align="center" bgcolor="#ffffff" style="padding: 36px 24px 0; font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif; border-top: 3px solid #d4dadf;">
-                            <h1 style="margin: 0; font-size: 32px; font-weight: 700; letter-spacing: -1px; line-height: 48px;">Xác thực email của bạn</h1>
+                            <h1 style="margin: 0; font-size: 32px; font-weight: 700; letter-spacing: -1px; line-height: 48px;">Thanh toán thất bại</h1>
                         </td>
                     </tr>
                 </table>
@@ -89,22 +83,17 @@
                 <table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px;">
                     <tr>
                         <td align="center" bgcolor="#ffffff" style="padding: 12px;">
-                            <img style="width:10rem;height:10rem" src="~/images/confirm.png" />
+                            <img style="width:10rem;height:10rem" src="~/images/false.png" />
                         </td>
                     </tr>
                 </table>
                 <table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px;">
                     <tr>
                         <td align="center" bgcolor="#ffffff" style="padding: 24px; font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif; font-size: 16px; line-height: 24px;">
-                            <p style="margin: 0;">Chúng tôi vừa gửi email xác thực cho bạn. Vui lòng kiểm tra email và xác thực để hoàn tất đăng kí</p>
+                            <p style="margin: 0;">Bạn chưa hoàn tất thanh toán</p>
                         </td>
                     </tr>
                 </table>
-                <div style="justify-content:center;margin-top:2rem;" class=" form-group d-md-flex">
-                    <a href="/" style="text-align:center;padding:0" class="checkbox-wrap checkbox-primary">
-                        Về trang chủ
-                    </a>
-                </div>
             </td>
         </tr>
         <tr>
@@ -125,3 +114,8 @@
 
 </body>
 </html>
+<script>
+    setTimeout(() => {
+        window.location.href = "/";
+    }, 5000);
+</script>
