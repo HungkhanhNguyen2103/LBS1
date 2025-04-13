@@ -41,7 +41,7 @@ function disconnect(roomName) {
 
 if (connection) {
     connection.on('ReceiveMessage', (user, message) => {
-        console.log(message);
+        //console.log(message);
         if (user != "System") {
             let container = document.getElementById("chatMessages");
             var roomNameDiv = container.dataset.roomname;

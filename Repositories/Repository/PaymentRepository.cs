@@ -87,11 +87,11 @@ namespace Repositories.Repository
             }
             catch (Exception)
             {
-
-                throw;
+                result.Message = "Link thanh toán không hợp lệ";
+                return result;
             }
 
-            var user = await _userManager.FindByEmailAsync(email);
+            var user = await _userManager.FindByNameAsync(email);
             if (user == null)
             {
                 result.Message = "Tài khoản không tồn tại";

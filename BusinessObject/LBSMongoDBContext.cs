@@ -17,11 +17,13 @@ namespace BusinessObject
             BookImages = GetCollection<BookImage>(typeof(BookImage).Name);
             BookChapters = GetCollection<BookChapter>(typeof(BookChapter).Name);
             Messengers = GetCollection<Messenger>(typeof(Messenger).Name);
+            BookChapterVoices = GetCollection<BookChapterVoice>(typeof(BookChapterVoice).Name);
         }
 
         public IMongoCollection<BookImage> BookImages { get; set; }
         public IMongoCollection<BookChapter> BookChapters { get; set; }
         public IMongoCollection<Messenger> Messengers { get; set; }
+        public IMongoCollection<BookChapterVoice> BookChapterVoices { get; set; }
 
         private IMongoCollection<T> GetCollection<T>(string collectionName)
         {

@@ -34,11 +34,14 @@
             </div>
             <div class="card-body px-0 pb-2">
                 <div class="table-responsive p-0">
-                    <h3 class="title">@Model.Name</h3>
-                    <small class="title">@Model.ModifyDate.ToString("HH:mm-dd/MM/yyyy")</small>
-                    <p class="title">
-                        @Model.Content
-                    </p>
+                    <h3 class="title mb-0">@Model.Name</h3>
+                    <small class="title">@Model.ModifyDate.ToString("HH:mm dd/MM/yyyy")</small>
+                    <div class="title mt-1">
+                        <p>
+                            @Html.Raw(Model.Content)
+                        </p>
+                    </div>
+
                 </div>
             </div>
         </div>

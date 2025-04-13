@@ -286,12 +286,28 @@ namespace LBSWeb.Controllers
             return View(res.Data);
         }
 
+        [Authorize(Roles = $"{Role.Manager}")]
+        [Route("Notificate/{id}")]
+        public async Task<IActionResult> Notificate(int id)
+        {
+            var res = await _informationService.NotificationDetail(id);
+            return Json(res.Data);
+        }
+
         [Authorize(Roles = $"{Role.Admin},{Role.Author}")]
         [Route("KnowledgeDetail/{id}")]
         public async Task<IActionResult> KnowledgeDetail(int id)
         {
             var res = await _informationService.KnowledgeDetail(id);
             return View(res.Data);
+        }
+
+        [Authorize(Roles = $"{Role.Manager}")]
+        [Route("Knowledge/{id}")]
+        public async Task<IActionResult> Knowledge(int id)
+        {
+            var res = await _informationService.KnowledgeDetail(id);
+            return Json(res.Data);
         }
 
         [Authorize(Roles = $"{Role.Author}")]

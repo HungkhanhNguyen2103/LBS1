@@ -11,7 +11,7 @@ namespace LBSAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class BookController
+    public class BookController : ControllerBase
     {
         private readonly IBookRepository _bookRepository;
         public BookController(IBookRepository bookRepository) 
@@ -65,6 +65,21 @@ namespace LBSAPI.Controllers
         {
             var result = await _bookRepository.UpdateApproveChapterBook(bookId, chapterId);
             return result;
+        }
+
+        [Route("Audio/{fileName}")]
+        [HttpGet]
+        public IActionResult GetAudio(string fileName)
+        {
+            var filePath = Path.Combine(Directory.GetCurrentDirectory(), "Resource", fileName);
+
+            if (!System.IO.File.Exists(filePath))
+            {
+                return NotFound("File không tồn tại");
+            }
+
+            var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
+            return File(stream, "audio/mp3");
         }
 
         [Route("DeclineChapterBook")]

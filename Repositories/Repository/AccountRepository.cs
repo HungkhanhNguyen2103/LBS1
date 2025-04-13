@@ -266,9 +266,9 @@ namespace Repositories.Repository
                 responder.Message = "Data không hợp lệ";
                 return responder;
             }
-            if (!long.TryParse(account.PhoneNumber, out long phoneNumber))
+            if (!long.TryParse(account.PhoneNumber, out long phoneNumber) || account.PhoneNumber.Length != 10)
             {
-                responder.Message = "Số điện thoại không đúng định dạng";
+                responder.Message = "Số điện thoại không đúng định dạng (10 số)";
                 return responder;
             }
             var userExist = await _userManager.FindByNameAsync(account.UserName);
@@ -280,7 +280,7 @@ namespace Repositories.Repository
             userExist.PhoneNumber = account.PhoneNumber;
             userExist.FullName = account.FullName;
 
-            if (!string.IsNullOrEmpty(account.Avatar) && userExist.Avatar != account.Avatar)
+            if (!string.IsNullOrEmpty(account.Avatar) && !account.Avatar.Contains("http") && userExist.Avatar != account.Avatar)
             {
                 account.Avatar = account.Avatar.Split("base64,")[1];
                 var response = await _imageManager.UploadImage(account.Avatar, "base64");

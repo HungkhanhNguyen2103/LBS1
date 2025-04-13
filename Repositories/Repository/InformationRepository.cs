@@ -169,7 +169,7 @@ namespace Repositories.Repository
         public async Task<ReponderModel<Notification>> ListNotification()
         {
             var result = new ReponderModel<Notification>();
-            result.DataList = await _lBSDbContext.Notifications.ToListAsync();
+            result.DataList = await _lBSDbContext.Notifications.OrderByDescending(c => c.ModifyDate).ToListAsync();
             result.IsSussess = true;
             return result;
         }
@@ -284,14 +284,14 @@ namespace Repositories.Repository
             var detail = await _lBSDbContext.Notifications.FirstOrDefaultAsync(c => c.Id == model.Id);
             if (detail == null)
             {
-                model.ModifyDate = DateTime.Now;
+                model.ModifyDate = DateTime.UtcNow;
                 _lBSDbContext.Notifications.Add(model);
             }
             else
             {
                 detail.Name = model.Name;
                 detail.Content = model.Content;
-                detail.ModifyDate = DateTime.Now;
+                detail.ModifyDate = DateTime.UtcNow;
             }
 
             await _lBSDbContext.SaveChangesAsync();

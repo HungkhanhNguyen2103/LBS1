@@ -11,7 +11,7 @@
     }
 }
 
-<button type="button" onclick="document.getElementById('formModal').reset();" class="btn btn-success" data-toggle="modal" data-target="#exampleModal">
+<button type="button" onclick="ResetForm()" class="btn btn-success" data-toggle="modal" data-target="#exampleModal">
     Tạo mới
 </button>
 <div class="row">
@@ -28,6 +28,7 @@
                         <thead>
                             <tr>
                                 <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Tên</th>
+                                <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Thời gian</th>
                                 @* <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Mô tả</th> *@
                                 <th class="text-secondary opacity-7"></th>
                             </tr>
@@ -39,8 +40,11 @@
                                     <td>
                                         <p id="name-@item.Id" class="mx-3 text-xs font-weight-bold mb-0">@item.Name</p>
                                     </td>
+                                    <td>
+                                        <p class="mx-3 text-xs font-weight-bold mb-0">@item.ModifyDate.AddHours(7).ToString("HH:mm dd/MM/yyyy")</p>
+                                    </td>
                                     <td class="align-middle">
-                                        <button type="button" onclick="showPopup(@item.Id,'@item.Name','@item.Content')" title="Sửa" class="btn1 btn btn-secondary" data-toggle="modal" data-target="#exampleModal">
+                                        <button type="button" onclick="showPopup(@item.Id)" title="Sửa" class="btn1 btn btn-secondary" data-toggle="modal" data-target="#exampleModal">
                                             <i class="fa-solid fa-pen-to-square"></i>
                                         </button>
                                         <button type="button" onclick="deleteItem(@item.Id)" title="Xóa" class="btn1 btn btn-secondary">
@@ -59,7 +63,7 @@
 </div>
 <!-- Modal -->
 <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-xl">
         <form id="formModal" class="modal-content" method="post" asp-action="UpdateNotification">
             <div class="modal-header">
                 <h5 class="modal-title" id="exampleModalLabel">Thông báo</h5>
@@ -73,10 +77,22 @@
                     <label for="Name">Tên</label>
                     <input style="width:100%"  type="text" class="form-control" asp-for="Name" required placeholder="Tên">
                 </div>
-                <div style="display:block" class="form-group input-group input-group-outline">
+                <div class="row input-group input-group-outline mt-4">
+                    <div style="display:block">
+                        <label for="Content">Nội dung:</label>
+                        <div class="row" style="display:flex">
+                            <div class="col-12">
+                                @* contenteditable="true" *@
+                                <div style="height:19rem;overflow: auto;" id="ContentDiv" class="form-control"></div>
+                                <textarea asp-for="Content" type="text" class="d-none form-control" rows="18"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+@*                 <div style="display:block" class="form-group input-group input-group-outline">
                     <label for="Content">Nội dung</label>
                     <textarea style="width:100%" type="text" asp-for="Content" class="form-control" placeholder="Nội dung"></textarea>
-                </div>
+                </div> *@
             </div>
             <div class="modal-footer">
                 <button type="submit" class="btn btn-primary">Lưu thông tin</button>
@@ -84,12 +100,83 @@
         </form>
     </div>
 </div>
+<script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js" asp-append-version="true"></script>
 <script type="text/javascript">
     document.getElementById('ListNotificationsId').classList.add('active');
-    function showPopup(id,name,des){
-        document.getElementById('Id').value = id;
-        document.getElementById('Name').value = name;
-        document.getElementById('Content').value = des;
+
+    const quill = new Quill('#ContentDiv', {
+        theme: 'snow',
+        modules: {
+            toolbar: [
+                [{ 'header': [1, 2, 3, false] }],
+                ['bold', 'italic', 'strike'],
+                [{ 'background': [] }],
+                [{ 'script': 'sub' }, { 'script': 'super' }],
+                [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                [{ 'indent': '-1' }, { 'indent': '+1' }],
+                [{ 'align': [] }],
+                ['clean']
+            ]
+        }
+    });
+
+    const input1 = document.getElementById("ContentDiv");
+    const events = [
+        "click", "focus", "blur", "change", "input",
+        "keydown", "keyup", "keypress",
+        "paste", "cut", "copy", "mousedown", "mouseup",
+        "mouseenter", "mouseleave", "mouseover", "mouseout",
+        "drag", "drop", "contextmenu"
+    ];
+
+    events.forEach(event => {
+        input1.addEventListener(event, (e) => {
+            getWordNo();
+        });
+    });
+
+    function getWordNo() {
+        //var textDiv = quill.getText().trim();
+        var textContent = quill.root.innerHTML;
+        $('#Content').val(textContent);
+    }
+
+
+    function showPopup(id){
+        //console.log(id);
+        document.getElementById('Id').value = '';
+        document.getElementById('Name').value = '';
+        document.getElementById('Content').value = '';
+        $.ajax(
+            {
+                url: `/Admin/Notificate/${id}`,
+                type: "GET",
+                headers:
+                {
+                    "RequestVerificationToken": '@GetAntiXsrfRequestToken()'
+                },
+                async: true,
+                processData: false,
+                contentType: false,
+                success: function (data) {
+                    //console.log(data);
+                    document.getElementById('Id').value = data.id;
+                    document.getElementById('Name').value = data.name;
+                    document.getElementById('Content').value = data.content;
+                    quill.clipboard.dangerouslyPasteHTML(data.content);
+                }
+            }
+        );
+        // document.getElementById('Id').value = id;
+        // document.getElementById('Name').value = name;
+        // document.getElementById('Content').value = des;
+
+        // quill.clipboard.dangerouslyPasteHTML(des);
+    }
+
+    function ResetForm(){
+        document.getElementById('formModal').reset();
+        quill.root.innerHTML = '';
     }
 
     function deleteItem(id) {

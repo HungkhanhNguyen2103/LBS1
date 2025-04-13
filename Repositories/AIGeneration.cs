@@ -76,7 +76,7 @@ namespace Repositories
                 {
                     speech.ToStream().CopyTo(stream);
                     result.Message = "Tạo thành công";
-                    result.Data = outputPath;
+                    result.Data = filename;
                     result.IsSussess = true;
                     stream.Close();
                 }

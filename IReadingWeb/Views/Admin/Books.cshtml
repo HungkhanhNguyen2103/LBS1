@@ -145,7 +145,24 @@
     FillStatus();
 
     let table = new DataTable('#table', {
-        responsive: true
+        responsive: true,
+        columnDefs: [
+            {
+                targets: 3, 
+                render: function (data, type, row) {
+                    if (type === 'sort') {
+                        const parts = data.split(' ');
+                        const time = parts[0];
+                        const date = parts[1];
+                        const [hour, minute] = time.split(':');
+                        const [day, month, year] = date.split('/');
+                        return new Date(`${year}-${month}-${day}T${hour}:${minute}:00`).getTime();
+                    }
+                    return data;
+                }
+            }
+        ],
+        order: [[3, 'asc']]
     });
 
     function ChangeSelect(el) {

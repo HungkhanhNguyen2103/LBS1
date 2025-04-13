@@ -17,5 +17,6 @@ namespace BusinessObject.BaseModel
         public BookType BookType { get; set; }
         public string NewPulished { get; set; }
         public string NewPulishedDateTime { get; set; }
+        public DateTime NewPulishedDateTimeFormat { get; set; }
     }
 }
