@@ -752,6 +752,11 @@ namespace Repositories.Repository
                     return result;
                 }
                 var result1 = await UpdateApproveChapterBook(bookId,item.Id);
+                if(!result1.IsSussess)
+                {
+                    result.Message = "Duyệt không thành công";
+                    return result;
+                }
             }
 
             await _lBSDbContext.SaveChangesAsync();
