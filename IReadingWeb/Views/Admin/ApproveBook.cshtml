@@ -269,6 +269,8 @@
 
     function approveChapter(id,chapterId) {
         if (confirm("Bạn có muốn duyệt chương ?") == false) return;
+        $('#tbodyFeedback').html('');
+        $('#loadingDivFeedBack').show();
         //var formData = new FormData();
         //formData.append("chapterId", chapterId);
         $.ajax(
@@ -332,6 +334,8 @@
 
     function approveBook(id) {
         if (confirm("Bạn có muốn duyệt ?") == false) return;
+        $('#tbodyFeedback').html('');
+        $('#loadingDivFeedBack').show();
         //var formData = new FormData();
         $.ajax(
             {

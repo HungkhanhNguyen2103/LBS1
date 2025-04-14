@@ -40,7 +40,7 @@ quill.on('text-change', function () {
             checkChapterContentByAI(content);
         }
         //console.log(content);
-    }, 2000);
+    }, 5000);
 });
 
 function getWordNo() {
