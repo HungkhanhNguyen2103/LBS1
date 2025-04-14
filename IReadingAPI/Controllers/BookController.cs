@@ -79,7 +79,7 @@ namespace LBSAPI.Controllers
             }
 
             var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
-            return File(stream, "audio/mpeg");
+            return File(stream, "audio/mpeg", enableRangeProcessing: true);
         }
 
         [Route("DeclineChapterBook")]
