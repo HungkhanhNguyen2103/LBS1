@@ -79,6 +79,15 @@ namespace LBSAPI.Controllers
             }
 
             var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
+
+            var fileInfo = new FileInfo(filePath);
+            var lastModified = fileInfo.LastWriteTimeUtc.ToString("R"); 
+
+            Response.Headers["Accept-Ranges"] = "bytes";
+            Response.Headers["Last-Modified"] = lastModified;
+            Response.Headers["Cache-Control"] = "public,max-age=1209600";
+            Response.Headers["Expires"] = DateTime.UtcNow.AddYears(100).ToString("R");
+
             return File(stream, "audio/mpeg", enableRangeProcessing: true);
         }
 
