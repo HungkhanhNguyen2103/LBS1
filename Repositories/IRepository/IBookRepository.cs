@@ -23,6 +23,7 @@ namespace Repositories.IRepository
         Task<ReponderModel<string>> CreateBookChapter(BookChapter bookChapter);
         Task<ReponderModel<string>> UpdateBookChapter(BookChapter bookChapter);
         Task<ReponderModel<BookChapter>> GetBookChapter(string id);
+        Task<ReponderModel<BookChapterModel>> GetBookChapterWithVoice(string id);
         Task<ReponderModel<BookChapter>> GetListBookChapter(int bookId);
         Task<ReponderModel<string>> DeleteChapterBook(string id);
         Task<ReponderModel<string>> DeleteBook(int id);
@@ -46,5 +47,6 @@ namespace Repositories.IRepository
         Task<ReponderModel<UserMinuteModel>> GetListMinuteViewByUser(string userName);
         Task<ReponderModel<string>> AddFavouriteBook(string userName, int bookId);
         Task<ReponderModel<UserBook>> ListFavouriteBook(string userName);
+        Task<ReponderModel<BookModel>> SearchBook(string input);
     }
 }

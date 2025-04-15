@@ -99,6 +99,23 @@ namespace LBSAPI.Controllers
             return result;
         }
 
+        [Route("GetBookChapterWithVoice")]
+        [HttpGet]
+        public async Task<ReponderModel<BookChapterModel>> GetBookChapterWithVoice(string chapterId)
+        {
+            var result = await _bookRepository.GetBookChapterWithVoice(chapterId);
+            return result;
+        }
+
+        [Route("SearchBook")]
+        [HttpGet]
+        public async Task<ReponderModel<BookModel>> SearchBook(string input)
+        {
+            var result = await _bookRepository.SearchBook(input);
+            return result;
+        }
+
+
         [Route("UpdateApproveBook")]
         [HttpGet]
         public async Task<ReponderModel<string>> UpdateApproveBook(int id)

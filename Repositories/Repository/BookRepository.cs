@@ -5,6 +5,7 @@ using HtmlAgilityPack;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using MongoDB.Bson;
+using MongoDB.Bson.IO;
 using MongoDB.Bson.Serialization.Serializers;
 using MongoDB.Driver;
 using OpenAI.Chat;
@@ -332,10 +333,11 @@ namespace Repositories.Repository
             {
                 listBook = await _lBSDbContext.Books.ToListAsync();
             }
-            if (roles.Contains(Role.Visitor))
+            if (roles.Contains(Role.Visitor) || roles.Contains(Role.User))
             {
                 listBook = await _lBSDbContext.Books.Where(c => c.Status == BookStatus.Done || c.Status == BookStatus.Published || c.Status == BookStatus.Continue).ToListAsync();
             }
+
 
             result.DataList = new List<BookViewModel>();
             foreach (var item in listBook)
@@ -455,6 +457,15 @@ namespace Repositories.Repository
                 CategoryIds = book.BookCategories != null ? book.BookCategories.Select(c => c.CategoryId.Value).ToList() : new List<int>(),
             };
 
+            var newChapterModel = await GetNewChapterPulished(book);
+            bookModel.IsNewPublishedChapter = string.IsNullOrEmpty(newChapterModel.NewPulished) ? false : true;
+            bookModel.NewPublishedChapter = new NewPublishedChapterModel
+            {
+                Id = newChapterModel.ChapterId,
+                Name = newChapterModel.NewPulished,
+                NewPulishedDateTime = newChapterModel.NewPulishedDateTime,
+            };
+
             result.Data = bookModel;
             result.IsSussess = true;
             return result;
@@ -518,6 +529,7 @@ namespace Repositories.Repository
                 {
                     //Author = lastedBookChapter != null ? lastedBookChapter.CreateBy : string.Empty,
                     BookStatus = BookStatusName.ListBookStatus[(int)book.Status],
+                    ChapterId = lastedBookChapter != null && !string.IsNullOrEmpty(lastedBookChapter.Id)  ? lastedBookChapter.Id : string.Empty,    
                     NewPulished = lastedBookChapter != null && !string.IsNullOrEmpty(lastedBookChapter.ChapterName) ? lastedBookChapter.ChapterName : string.Empty,
                     NewPulishedDateTime = lastedBookChapter != null ? lastedBookChapter.ModifyDate.AddHours(7).ToString("HH:mm dd/MM/yyyy") : string.Empty,
                     NewPulishedDateTimeFormat = lastedBookChapter != null ? lastedBookChapter.ModifyDate.AddHours(7) : DateTime.MinValue,
@@ -1227,6 +1239,78 @@ namespace Repositories.Repository
             var resultContent = await _aIGeneration.TextGenerate(promp);
             result.IsSussess = true;
             result.Data = resultContent.Data;
+            return result;
+        }
+
+        public async Task<ReponderModel<BookChapterModel>> GetBookChapterWithVoice(string id)
+        {
+            var result = new ReponderModel<BookChapterModel>();
+            var filter = Builders<BookChapter>.Filter.Eq(c => c.Id, id);
+            var bookChapter = await _mongoContext.BookChapters.Find(filter).FirstOrDefaultAsync();
+            if (bookChapter == null)
+            {
+                result.Message = "Dữ liệu không tồn tại";
+                return result;
+            }
+
+            var filterVoice = Builders<BookChapterVoice>.Filter.Eq(c => c.ChapterId, id);
+            var bookChapterVoice = await _mongoContext.BookChapterVoices.Find(filterVoice).FirstOrDefaultAsync();
+            if(bookChapterVoice == null)
+            {
+                result.Message = "Dữ liệu audio không tồn tại";
+                return result;
+            }
+
+            //08:36 15 / 04 / 2025
+            var data = new BookChapterModel
+            {
+                Id = id,
+                FileName = bookChapterVoice != null ? bookChapterVoice.FileName : string.Empty,
+                BookId = bookChapter.BookId,
+                BookType = bookChapter.BookType,
+                ChaperId = bookChapter.ChaperId,
+                ChapterName = bookChapter.ChapterName,
+                Content = bookChapter.Content,
+                CreateBy = bookChapter.CreateBy,
+                Price = bookChapter.Price,
+                Summary = bookChapter.Summary,
+                ModifyDate = bookChapter.ModifyDate.AddHours(7).ToString("HH:mm dd/MM/yyyy"),
+                //WordNo = bookChapter.WordNo
+                //ContentWithTime = bookChapterVoice != null ? bookChapterVoice.ContentWithTime : string.Empty,
+            };
+            if (!string.IsNullOrEmpty(bookChapterVoice.ContentWithTime))
+            {
+                var contentWithTimeList = Newtonsoft.Json.JsonConvert.DeserializeObject<List<SummaryTime>>(bookChapterVoice.ContentWithTime);
+                data.ContentWithTime = contentWithTimeList;
+            }
+            result.Data = data;
+            result.Message = "Thành công";
+            result.IsSussess = true;
+            return result;
+        }
+
+        public async Task<ReponderModel<BookModel>> SearchBook(string input)
+        {
+            var result = new ReponderModel<BookModel>();
+            var books = await _lBSDbContext.Books.Include(c => c.BookCategories).ThenInclude(c => c.Category)
+                            .Include(c => c.User)
+                            .Where(c => c.Name.Contains(input) || c.SubCategory.Contains(input) || c.CreateBy.Contains(input) || c.User.FullName.Contains(input))
+                            .Where(c => c.Status == BookStatus.Done || c.Status == BookStatus.Published || c.Status == BookStatus.Continue)
+                            .ToListAsync();
+
+
+            result.IsSussess = true;
+            result.DataList = books.Select(c => new BookModel
+            {
+                BookType = c.BookType,
+                CreateBy = c.CreateBy,
+                Name = c.Name,
+                Id = c.Id,
+                Poster = c.Poster,
+                Price = c.Price,
+                SubCategory = c.SubCategory,
+                Status = c.Status
+            }).ToList();
             return result;
         }
     }

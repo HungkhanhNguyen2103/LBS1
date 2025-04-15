@@ -15,6 +15,7 @@ namespace BusinessObject.BaseModel
         public string BookStatus { get; set; }
         public BookStatus Status { get; set; }
         public BookType BookType { get; set; }
+        public string ChapterId { get; set; }
         public string NewPulished { get; set; }
         public string NewPulishedDateTime { get; set; }
         public DateTime NewPulishedDateTimeFormat { get; set; }

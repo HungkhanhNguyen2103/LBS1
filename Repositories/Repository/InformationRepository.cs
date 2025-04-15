@@ -488,5 +488,13 @@ namespace Repositories.Repository
             response.IsSussess = true;
             return response;
         }
+
+        public async Task<ReponderModel<NoteManager>> GetListNoteManager()
+        {
+            var result = new ReponderModel<NoteManager>();
+            result.DataList = await _lBSDbContext.NoteManagers.ToListAsync();
+            result.IsSussess = true;
+            return result;
+        }
     }
 }

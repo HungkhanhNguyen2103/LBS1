@@ -25,6 +25,15 @@ namespace BusinessObject.BaseModel
         public List<int> CategoryIds { get; set; } = new List<int>();
         public string? SubCategory { get; set; }
         public string? UserId { get; set; }
+        public bool IsNewPublishedChapter { get; set; }
+        public NewPublishedChapterModel NewPublishedChapter { get; set; }
         //public IFormFile? FileUpload { get; set; }
+    }
+
+    public class NewPublishedChapterModel
+    {
+        public string Id { get; set; }
+        public string Name { get; set; }
+        public string NewPulishedDateTime { get; set; }
     }
 }

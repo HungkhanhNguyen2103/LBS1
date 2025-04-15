@@ -29,6 +29,7 @@ namespace BusinessObject
             builder.Entity<UserReport>().ToTable("UserReport").HasKey(x => x.Id);
             builder.Entity<UserBookView>().ToTable("UserBookView").HasKey(x => x.Id);
             builder.Entity<Room>().ToTable("Room").HasKey(x => x.Id);
+            builder.Entity<NoteManager>().ToTable("NoteManager").HasKey(x => x.Id);
         }
 
         public virtual DbSet<TemplateEmail> TemplateEmails { get; set; }
@@ -47,5 +48,6 @@ namespace BusinessObject
         public virtual DbSet<UserBookView> UserBookViews { get; set; }
         public virtual DbSet<Room> Rooms { get; set; }
         public virtual DbSet<PaymentItem> PaymentItems { get; set; }
+        public virtual DbSet<NoteManager> NoteManagers { get; set; }
     }
 }

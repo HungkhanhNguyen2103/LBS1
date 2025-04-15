@@ -2,6 +2,7 @@
 using BusinessObject.BaseModel;
 using Microsoft.AspNetCore.Mvc;
 using Repositories.IRepository;
+using Repositories.Repository;
 
 namespace LBSAPI.Controllers
 {
@@ -13,6 +14,14 @@ namespace LBSAPI.Controllers
         public InformationController(IInformationRepository informationRepository)
         {
             _informationRepository = informationRepository;
+        }
+
+        [Route("GetListNoteManager")]
+        [HttpGet]
+        public async Task<ReponderModel<NoteManager>> GetListNoteManager()
+        {
+            var result = await _informationRepository.GetListNoteManager();
+            return result;
         }
 
         [Route("GetRoomByAuthor")]

@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Org.BouncyCastle.Asn1.Ocsp;
 
 namespace Repositories.IRepository
 {
@@ -33,6 +34,8 @@ namespace Repositories.IRepository
         Task<ReponderModel<string>> SendMessage(Messenger messenger);
         Task<ReponderModel<string>> CreateUserReportComment(UserReportComment comment);
         Task<ReponderModel<UserReportCommentModel>> GetListUserReportComment(int userReportId);
-
+        Task<ReponderModel<NoteManager>> GetListNoteManager();
+        //Task<ReponderModel<NoteManager>> UpdateNoteManager(NoteManager model);
+        
     }
 }
