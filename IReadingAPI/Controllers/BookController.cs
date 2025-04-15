@@ -68,7 +68,7 @@ namespace LBSAPI.Controllers
         }
 
         [Route("Audio/{fileName}")]
-        [HttpGet]
+        [HttpGet, HttpHead]
         public IActionResult GetAudio(string fileName)
         {
             var filePath = Path.Combine(Directory.GetCurrentDirectory(), "Resource", fileName);
