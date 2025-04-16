@@ -379,10 +379,10 @@ namespace Repositories.Repository
                 return result;
             }
 
-            if (!string.IsNullOrEmpty(bookChapter.Summary))
+            if (string.IsNullOrEmpty(bookChapter.Summary))
             {
-                //var res = await _aIGeneration.TextGenerateToSpeech(bookChapter.Summary);
-                //if (res.IsSussess) bookChapter.AudioUrl = res.Data;
+                var res = await GenerateSummary(bookChapter.Content);
+                if (res.IsSussess) bookChapter.Summary = res.Data;
             }
 
             bookChapter.Content = await UploadImageContent(bookChapter.Content);
@@ -650,8 +650,11 @@ namespace Repositories.Repository
                 result.Message = "Dữ liệu không tồn tại";
                 return result;
             }
-            if (!string.IsNullOrEmpty(bookChapter.Summary) && bookChapterRow.Summary != bookChapter.Summary)
+
+            if (string.IsNullOrEmpty(bookChapter.Summary))
             {
+                var res = await GenerateSummary(bookChapter.Content);
+                if (res.IsSussess) bookChapter.Summary = res.Data;
                 // comment sua lai logic
                 //var res = await _aIGeneration.TextGenerateToSpeech(bookChapter.Summary);
                 //if (res.IsSussess) bookChapter.AudioUrl = res.Data;
