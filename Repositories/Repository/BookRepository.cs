@@ -659,7 +659,7 @@ namespace Repositories.Repository
                 //var res = await _aIGeneration.TextGenerateToSpeech(bookChapter.Summary);
                 //if (res.IsSussess) bookChapter.AudioUrl = res.Data;
             }
-            else bookChapter.AudioUrl = bookChapterRow.AudioUrl;
+            //else bookChapter.AudioUrl = bookChapterRow.AudioUrl;
             //bookChapter.Type = 1;
             bookChapter.Content = await UploadImageContent(bookChapter.Content);
             bookChapter.ModifyDate = DateTime.Now;
