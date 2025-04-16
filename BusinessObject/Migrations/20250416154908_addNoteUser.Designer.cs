@@ -4,6 +4,7 @@ using BusinessObject;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BusinessObject.Migrations
 {
     [DbContext(typeof(LBSDbContext))]
-    partial class LBSDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250416154908_addNoteUser")]
+    partial class addNoteUser
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -113,17 +116,17 @@ namespace BusinessObject.Migrations
                             Id = "7d5002bd-f22f-4c7c-bce1-3d22eed213ff",
                             AccessFailedCount = 0,
                             AccountActive = true,
-                            ConcurrencyStamp = "b83bf299-c5d3-41c4-a3f2-77b11d6e2a96",
+                            ConcurrencyStamp = "f39674e8-498f-406e-ad90-f503d254718b",
                             Email = "admin@gmail.com",
                             EmailConfirmed = false,
                             FullName = "Admin",
                             Gender = 0,
                             LockoutEnabled = false,
                             NormalizedUserName = "ADMIN",
-                            PasswordHash = "AQAAAAIAAYagAAAAEEFlBB355OTgV7ARGD/ty9/msF1rKCuEpxOMI4drkfqRo0qaoWC/KgVo+zgH9qXA0w==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEDYrx8UdhrAU1toYUMEtr99dPxslBEoXATqStLlPkp2rp9DmOqiteKKomDaWfxGeYQ==",
                             PhoneNumberConfirmed = false,
                             ResetPassword = 0,
-                            SecurityStamp = "e6bfe8c0-5972-4651-bcec-fdfc3eef03a6",
+                            SecurityStamp = "ab973c95-3729-4f97-a7b5-fbb9684c73c6",
                             SocialAccount = false,
                             TwoFactorEnabled = false,
                             UserName = "admin"
@@ -133,17 +136,17 @@ namespace BusinessObject.Migrations
                             Id = "7d5002bd-f22f-4c7c-bce1-3d22eed213dd",
                             AccessFailedCount = 0,
                             AccountActive = true,
-                            ConcurrencyStamp = "fecf40bf-bc3c-4d95-8db8-dcb14c98dd12",
+                            ConcurrencyStamp = "852f47fd-3944-4249-b4bf-a33ed044e4f9",
                             Email = "manager@gmail.com",
                             EmailConfirmed = false,
                             FullName = "Manager",
                             Gender = 0,
                             LockoutEnabled = false,
                             NormalizedUserName = "MANAGER",
-                            PasswordHash = "AQAAAAIAAYagAAAAEADjci/LY9c4PClf81sLnvgXPOhAxvRcWN7q2WGJh+yiKbt6PY9eMbns57etA+qawQ==",
+                            PasswordHash = "AQAAAAIAAYagAAAAENWPJOdd4WdbN2yfrag4ejOXJEbNojEhECZDVNFDdL1uRzabccIT7irn4N6ssU2GQw==",
                             PhoneNumberConfirmed = false,
                             ResetPassword = 0,
-                            SecurityStamp = "b8988e66-f435-4663-9104-fdafedef9ccf",
+                            SecurityStamp = "d7073915-e791-4fe3-a620-2738fd1cb6bd",
                             SocialAccount = false,
                             TwoFactorEnabled = false,
                             UserName = "manager"
@@ -153,17 +156,17 @@ namespace BusinessObject.Migrations
                             Id = "7d5002bd-f22f-4c7c-bce1-3d22eff012ef",
                             AccessFailedCount = 0,
                             AccountActive = true,
-                            ConcurrencyStamp = "0685159e-ae8b-41f1-a90d-e288b74981d8",
+                            ConcurrencyStamp = "eddc21d3-7911-4c88-aa10-71ce209843a3",
                             Email = "author@gmail.com",
                             EmailConfirmed = false,
                             FullName = "Author",
                             Gender = 0,
                             LockoutEnabled = false,
                             NormalizedUserName = "AUTHOR",
-                            PasswordHash = "AQAAAAIAAYagAAAAEE2K18KNEA1MIOX7NQrfLSdWg83a3O2JCPiHERvuZ+YrMnaoA8PAeyNaRxZrBLuF6Q==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEB3owuPJWk+BSxuv1D0ipoeQDqTgEwAFjmK+oeav3Xsb6uD4Snho04KEC0UUhy4iJg==",
                             PhoneNumberConfirmed = false,
                             ResetPassword = 0,
-                            SecurityStamp = "ca1d2c73-4be9-46dc-aafb-a53b7cec6ed6",
+                            SecurityStamp = "f9d6e667-1c75-470a-94ca-52999b2f47f9",
                             SocialAccount = false,
                             TwoFactorEnabled = false,
                             UserName = "author"
@@ -373,46 +376,6 @@ namespace BusinessObject.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("NoteManager", (string)null);
-                });
-
-            modelBuilder.Entity("BusinessObject.NoteUser", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("ChapterId")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Color")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("CreateDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("End")
-                        .HasColumnType("int");
-
-                    b.Property<string>("NoteContent")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("SelectedText")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("Start")
-                        .HasColumnType("int");
-
-                    b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("UserName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("NoteUser", (string)null);
                 });
 
             modelBuilder.Entity("BusinessObject.Notification", b =>

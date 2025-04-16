@@ -26,7 +26,7 @@ namespace BusinessObject.BaseModel
         public string? SubCategory { get; set; }
         public string? UserId { get; set; }
         public bool IsNewPublishedChapter { get; set; }
-        public NewPublishedChapterModel NewPublishedChapter { get; set; }
+        public NewPublishedChapterModel? NewPublishedChapter { get; set; }
         //public IFormFile? FileUpload { get; set; }
     }
 

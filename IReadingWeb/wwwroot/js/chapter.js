@@ -1,18 +1,50 @@
 ﻿const quill = new Quill('#ContentDiv', {
     theme: 'snow',
     modules: {
-        toolbar: [
-            [{ 'header': [1, 2, 3, false] }],
-            ['bold', 'italic', 'strike'],
-            [{ 'background': [] }],
-            [{ 'script': 'sub' }, { 'script': 'super' }],
-            [{ 'list': 'ordered' }, { 'list': 'bullet' }],
-            [{ 'indent': '-1' }, { 'indent': '+1' }],
-            [{ 'align': [] }],
-            ['clean']
-        ]
+        toolbar: {
+            container: [
+                [{ 'header': [1, 2, 3, false] }],
+                ['bold', 'italic', 'strike'],
+                ['image'],
+                [{ 'background': [] }],
+                [{ 'script': 'sub' }, { 'script': 'super' }],
+                [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                [{ 'indent': '-1' }, { 'indent': '+1' }],
+                [{ 'align': [] }],
+                ['clean']
+            ],
+            handlers: {
+                image: imageHandler
+            }
+        }
+
     }
 });
+
+function imageHandler() {
+    const input = document.createElement('input');
+    input.setAttribute('type', 'file');
+    input.setAttribute('accept', 'image/*');
+    input.click();
+
+    input.onchange = () => {
+        const file = input.files[0];
+
+        // Kiểm tra kích thước ảnh
+        if (file && file.size > 2 * 1024 * 1024) {
+            alert('Ảnh không được vượt quá 2MB!');
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const base64ImageSrc = e.target.result;
+            const range = quill.getSelection();
+            quill.insertEmbed(range.index, 'image', base64ImageSrc);
+        };
+        reader.readAsDataURL(file);
+    };
+}
 
 const input1 = document.getElementById("ContentDiv");
 const events = [

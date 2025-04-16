@@ -48,5 +48,8 @@ namespace Repositories.IRepository
         Task<ReponderModel<string>> AddFavouriteBook(string userName, int bookId);
         Task<ReponderModel<UserBook>> ListFavouriteBook(string userName);
         Task<ReponderModel<BookModel>> SearchBook(string input);
+        Task<ReponderModel<NoteUser>> GetListNote(string username);
+        Task<ReponderModel<string>> UpdateNoteUser(NoteUser note);
+        Task<ReponderModel<string>> DeleteNoteUser(int id);
     }
 }

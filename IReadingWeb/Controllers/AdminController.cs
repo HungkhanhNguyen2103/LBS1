@@ -505,7 +505,8 @@ namespace LBSWeb.Controllers
             ViewBag.ReturnUrl = returnUrl;
             var result = await _bookService.GetBook(id);
             var resultChapterBook = await _bookService.GetBookChapter(chapterId);
-            ViewBag.BookName = result.Data.Name;
+            ViewBag.BookName = "";
+            if (result.IsSussess) ViewBag.BookName = result.Data.Name;
             ViewBag.ChapterId = chapterId;
             return View(resultChapterBook.Data);
         }
@@ -642,8 +643,8 @@ namespace LBSWeb.Controllers
 
         [HttpPost]
         [Authorize(Roles = $"{Role.Author}")]
-        [Route("Admin/CreateChapterBook")]
-        public async Task<IActionResult> CreateChapterBook(BookChapter bookChapter)
+        [Route("{id}/CreateChapterBook")]
+        public async Task<IActionResult> CreateChapterBook(BookChapter bookChapter, string returnUrl = "")
         {
             bookChapter.CreateBy = User.FindFirst(ClaimTypes.NameIdentifier).Value;
             bookChapter.UserId = User.FindFirst(ClaimTypes.PrimarySid).Value;
@@ -656,6 +657,7 @@ namespace LBSWeb.Controllers
             }
             else
             {
+                //ViewBag.ReturnUrl = returnUrl;
                 _notyf.Error(result.Message);
                 return View(bookChapter);
             }

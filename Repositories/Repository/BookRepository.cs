@@ -329,11 +329,11 @@ namespace Repositories.Repository
             {
                 listBook = await _lBSDbContext.Books.Where(c => c.CreateBy == userName).ToListAsync();
             }
-            if (roles.Contains(Role.Manager))
+            else if (roles.Contains(Role.Manager))
             {
                 listBook = await _lBSDbContext.Books.ToListAsync();
             }
-            if (roles.Contains(Role.Visitor) || roles.Contains(Role.User))
+            else if (roles.Contains(Role.Visitor))
             {
                 listBook = await _lBSDbContext.Books.Where(c => c.Status == BookStatus.Done || c.Status == BookStatus.Published || c.Status == BookStatus.Continue).ToListAsync();
             }
@@ -359,6 +359,7 @@ namespace Repositories.Repository
 
         public async Task<ReponderModel<string>> CreateBookChapter(BookChapter bookChapter)
         {
+            bookChapter.Id = null;
             var result = new ReponderModel<string>();
             if (bookChapter == null)
             {
@@ -383,6 +384,8 @@ namespace Repositories.Repository
                 //var res = await _aIGeneration.TextGenerateToSpeech(bookChapter.Summary);
                 //if (res.IsSussess) bookChapter.AudioUrl = res.Data;
             }
+
+            bookChapter.Content = await UploadImageContent(bookChapter.Content);
             bookChapter.BookType = BookType.PendingApproval;
             bookChapter.ModifyDate = DateTime.Now;
 
@@ -409,7 +412,16 @@ namespace Repositories.Repository
 
                 await _mongoContext.BookChapters.UpdateManyAsync(filter, update);
             }
-            await _mongoContext.BookChapters.InsertOneAsync(bookChapter);
+            try
+            {
+                await _mongoContext.BookChapters.InsertOneAsync(bookChapter);
+            }
+            catch (Exception ex)
+            {
+                result.Message = ex.Message;
+                return result;
+            }
+
 
 
             result.Message = "Cập nhật thành công";
@@ -417,6 +429,38 @@ namespace Repositories.Repository
 
             return result;
         }
+
+        private async Task<string> UploadImageContent(string html)
+        {
+            var doc = new HtmlDocument();
+            doc.LoadHtml(html);
+            var imgNodes = doc.DocumentNode.SelectNodes("//img");
+            //var srcList = new List<string>();
+
+            if (imgNodes != null)
+            {
+                foreach (var img in imgNodes)
+                {
+                    var src = img.GetAttributeValue("src", null);
+                    if (!string.IsNullOrEmpty(src))
+                    {
+                        //srcList.Add(src);
+                        if (src.Contains("base64"))
+                        {
+                            var src1 = src.Split("base64,")[1];
+                            var result = await _imageManager.UploadImage(src1, "base64");
+                            if (result.Success)
+                            {
+                                html = html.Replace(src, result.Data.Link);
+                            }
+                        }
+                        
+                    }
+                }
+            }
+            return html;
+        }
+
         private bool HasContent(string html)
         {
             var doc = new HtmlDocument();
@@ -614,6 +658,7 @@ namespace Repositories.Repository
             }
             else bookChapter.AudioUrl = bookChapterRow.AudioUrl;
             //bookChapter.Type = 1;
+            bookChapter.Content = await UploadImageContent(bookChapter.Content);
             bookChapter.ModifyDate = DateTime.Now;
             bookChapter.BookType = BookType.PendingApproval;
 
@@ -1311,6 +1356,59 @@ namespace Repositories.Repository
                 SubCategory = c.SubCategory,
                 Status = c.Status
             }).ToList();
+            return result;
+        }
+
+        public async Task<ReponderModel<NoteUser>> GetListNote(string username)
+        {
+            var result = new ReponderModel<NoteUser>();
+            result.DataList = await _lBSDbContext.NoteUsers.Where(c => c.UserName == username).ToListAsync();
+            result.IsSussess = true;
+            return result;
+        }
+
+        public async Task<ReponderModel<string>> UpdateNoteUser(NoteUser note)
+        {
+            var result = new ReponderModel<string>();
+            if (note == null)
+            {
+                result.Message = "Data không hợp lệ";
+                return result;
+            }
+            var noteData = await _lBSDbContext.NoteUsers.FirstOrDefaultAsync(c => c.Id == note.Id);
+            if(noteData == null)
+            {
+                note.CreateDate = DateTime.UtcNow;
+                _lBSDbContext.NoteUsers.Add(note);
+            }
+            else
+            {
+                noteData.ChapterId = noteData.ChapterId;
+                noteData.NoteContent = note.NoteContent;
+                noteData.SelectedText = note.SelectedText;
+                noteData.Start = note.Start;
+                noteData.End = note.End;
+                noteData.CreateDate = DateTime.UtcNow;
+            }
+            await _lBSDbContext.SaveChangesAsync();
+            result.IsSussess = true;
+            result.Message = "Cập nhật thành công";
+            return result;
+        }
+
+        public async Task<ReponderModel<string>> DeleteNoteUser(int id)
+        {
+            var result = new ReponderModel<string>();
+            var noteData = await _lBSDbContext.NoteUsers.FirstOrDefaultAsync(c => c.Id == id);
+            if (noteData == null)
+            {
+                result.Message = "Data không hợp lệ";
+                return result;
+            }
+            _lBSDbContext.NoteUsers.Remove(noteData);
+            await _lBSDbContext.SaveChangesAsync();
+            result.IsSussess = true;
+            result.Message = "Xóa thành công";
             return result;
         }
     }

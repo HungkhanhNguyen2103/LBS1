@@ -150,6 +150,10 @@
     document.getElementById('loadingSumary').classList.add('d-none');
     document.getElementById('loadingDivFeedBack').classList.add('d-none');
 
+    const htmlContent = '@Html.Raw(Model.Content)';
+    quill.clipboard.dangerouslyPasteHTML(htmlContent);
+
+    getWordNo();
     // document.getElementById('CreatBookId').classList.add('active');
 
     function SaveDraft(){

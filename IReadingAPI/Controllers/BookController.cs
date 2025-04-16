@@ -172,6 +172,30 @@ namespace LBSAPI.Controllers
             return result;
         }
 
+        [Route("GetListNote")]
+        [HttpGet]
+        public async Task<ReponderModel<NoteUser>> GetListNote(string username)
+        {
+            var result = await _bookRepository.GetListNote(username);
+            return result;
+        }
+
+        [Route("UpdateNoteUser")]
+        [HttpPost]
+        public async Task<ReponderModel<string>> UpdateNoteUser(NoteUser note)
+        {
+            var result = await _bookRepository.UpdateNoteUser(note);
+            return result;
+        }
+
+        [Route("DeleteNoteUser")]
+        [HttpGet]
+        public async Task<ReponderModel<string>> DeleteNoteUser(int id)
+        {
+            var result = await _bookRepository.DeleteNoteUser(id);
+            return result;
+        }
+
         [Route("UpdateBook")]
         [HttpPost]
         public async Task<ReponderModel<string>> UpdateBook(BookModel bookModel)
