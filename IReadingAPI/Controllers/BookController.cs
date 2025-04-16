@@ -174,9 +174,9 @@ namespace LBSAPI.Controllers
 
         [Route("GetListNote")]
         [HttpGet]
-        public async Task<ReponderModel<NoteUser>> GetListNote(string username)
+        public async Task<ReponderModel<NoteUser>> GetListNote(string username, string chapterId)
         {
-            var result = await _bookRepository.GetListNote(username);
+            var result = await _bookRepository.GetListNote(username,chapterId);
             return result;
         }
 

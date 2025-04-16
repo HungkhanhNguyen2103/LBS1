@@ -1359,10 +1359,10 @@ namespace Repositories.Repository
             return result;
         }
 
-        public async Task<ReponderModel<NoteUser>> GetListNote(string username)
+        public async Task<ReponderModel<NoteUser>> GetListNote(string username,string chapterId)
         {
             var result = new ReponderModel<NoteUser>();
-            result.DataList = await _lBSDbContext.NoteUsers.Where(c => c.UserName == username).ToListAsync();
+            result.DataList = await _lBSDbContext.NoteUsers.Where(c => c.UserName == username && c.ChapterId == chapterId).ToListAsync();
             result.IsSussess = true;
             return result;
         }
