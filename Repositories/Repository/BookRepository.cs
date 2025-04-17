@@ -590,7 +590,7 @@ namespace Repositories.Repository
 
         public async Task<ReponderModel<string>> GenerateSummary(string input)
         {
-            var result = await _aIGeneration.TextGenerate("Tạo tóm tắt tổi thiểu 200 từ được lấy dữ liệu từ đoạn text: " + input);
+            var result = await _aIGeneration.TextGenerate("Tạo tóm tắt tổi thiểu 200 từ được lấy dữ liệu từ đoạn text (bỏ qua phần hình ảnh hay url hình ảnh, chỉ tập trung vào text): " + input);
             return result;
         }
 
@@ -1216,7 +1216,7 @@ namespace Repositories.Repository
             return result;
         }
 
-        public async Task<ReponderModel<string>> AddFavouriteBook(string userName, int bookId)
+        public async Task<ReponderModel<string>> AddOrRemoveFavouriteBook(string userName, int bookId)
         {
             var reponse = new ReponderModel<string>();
             var account = await _lBSDbContext.Users.FirstOrDefaultAsync(c => c.UserName == userName);
@@ -1225,17 +1225,25 @@ namespace Repositories.Repository
                 reponse.Message = "Tài khoản không tồn tại";
                 return reponse;
             }
-            var favouriteBook = new UserBook
+            var favouriteBook = await _lBSDbContext.UserBooks.FirstOrDefaultAsync(c => c.UserName == userName && c.BookId == bookId && c.BookType == UserBookType.Favourite);
+            if(favouriteBook == null)
             {
-                UserName = userName,
-                UserId = account.Id,
-                BookType = UserBookType.Favourite,
-                BookId = bookId
-            };
-            _lBSDbContext.UserBooks.Add(favouriteBook);
+                favouriteBook = new UserBook
+                {
+                    UserName = userName,
+                    UserId = account.Id,
+                    BookType = UserBookType.Favourite,
+                    BookId = bookId
+                };
+                _lBSDbContext.UserBooks.Add(favouriteBook);
+            }
+            else
+            {
+                _lBSDbContext.UserBooks.Remove(favouriteBook);
+            }
             await _lBSDbContext.SaveChangesAsync();
             reponse.IsSussess = true;
-            reponse.Message = "Đã thêm vào danh mục yêu thích";
+            reponse.Message = "Cập nhật thành công";
             return reponse;
         }
 
@@ -1346,6 +1354,7 @@ namespace Repositories.Repository
                             .Where(c => c.Status == BookStatus.Done || c.Status == BookStatus.Published || c.Status == BookStatus.Continue)
                             .ToListAsync();
 
+            var bookWithCategories = await _lBSDbContext.BookCategories.Include(c => c.Category).Include(c => c.Book).Where(c => c.Category.Name.Contains(input)).ToListAsync();
 
             result.IsSussess = true;
             result.DataList = books.Select(c => new BookModel
@@ -1412,6 +1421,76 @@ namespace Repositories.Repository
             await _lBSDbContext.SaveChangesAsync();
             result.IsSussess = true;
             result.Message = "Xóa thành công";
+            return result;
+        }
+
+        public async Task<ReponderModel<BookRatingModel>> GetTop10BookRating()
+        {
+            var result = new ReponderModel<BookRatingModel>();
+            // get 10 book co lượt đánh giá cao nhất
+            var books = await (from book in _lBSDbContext.Books
+                               join comment in _lBSDbContext.Comments
+                               on book.Id equals comment.BookId
+                               where book.Status == BookStatus.Done 
+                               || book.Status == BookStatus.Published 
+                               || book.Status == BookStatus.Continue
+                               group comment.Rating by new { book.Id, book.Name,book.Poster } into g
+                               orderby g.Average() descending
+                               select new BookRatingModel
+                               {
+                                   Id = g.Key.Id,
+                                   Poster = g.Key.Poster,
+                                   Name = g.Key.Name,
+                                   Rating = g.Average()
+                               }).Take(10).ToListAsync();
+            result.DataList = books;
+            result.IsSussess = true;
+            return result;
+        }
+
+        public async Task<ReponderModel<BookModel>> GetTop10NewBook()
+        {
+            var result = new ReponderModel<BookModel>();
+            // get 10 book mới nhất
+            var books = await _lBSDbContext.Books.Where(c => c.Status == BookStatus.Continue 
+            || c.Status == BookStatus.Done 
+            || c.Status == BookStatus.Published).OrderByDescending(c => c.CreateDate).Take(10).ToListAsync();
+
+            result.DataList = books.Select(c => new BookModel
+            {
+                BookType = c.BookType,
+                CreateBy = c.CreateBy,
+                Name = c.Name,
+                Id = c.Id,
+                Poster = c.Poster,
+                Price = c.Price,
+                SubCategory = c.SubCategory,
+                Status = c.Status
+            }).ToList();
+            result.IsSussess = true;
+            return result;
+        }
+
+        public async Task<ReponderModel<BookModel>> GetTop10FavoriteBook()
+        {
+            var result = new ReponderModel<BookModel>();
+            // get 10 book co lượt yêu thích cao nhất
+            var books = await(from book in _lBSDbContext.Books
+                              join userBook in _lBSDbContext.UserBooks
+                              on book.Id equals userBook.BookId
+                              where book.Status == BookStatus.Done
+                              || book.Status == BookStatus.Published
+                              || book.Status == BookStatus.Continue
+                              group userBook.BookId by new { book.Id, book.Name, book.Poster } into g
+                              orderby g.Count() descending
+                              select new BookModel
+                              {
+                                  Id = g.Key.Id,
+                                  Poster = g.Key.Poster,
+                                  Name = g.Key.Name
+                              }).Take(10).ToListAsync();
+            result.DataList = books;
+            result.IsSussess = true;
             return result;
         }
     }

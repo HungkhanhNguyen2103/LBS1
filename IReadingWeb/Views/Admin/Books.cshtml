@@ -69,7 +69,7 @@
                                         <div class="d-flex">
                                             <img src="@item.Poster" class="avatar avatar-sm me-3" style="border-radius:5px;width:50px!important;height:50px!important" alt="">
                                             <div>
-                                                <p id="name-@item.Id" class="text-l font-weight-bold mb-0">@(item.Name.Length > 55 ? item.Name.Substring(0, 55) + "..." : item.Name)</p>
+                                                <p id="name-@item.Id" class="text-l font-weight-bold mb-0">@(item.Name.Length > 35 ? item.Name.Substring(0, 35) + "..." : item.Name)</p>
                                                 <span class="text-secondary text-xs">@item.BookStatus</span>
                                             </div>
                                         </div>                                  

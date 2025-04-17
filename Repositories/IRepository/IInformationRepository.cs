@@ -35,7 +35,8 @@ namespace Repositories.IRepository
         Task<ReponderModel<string>> CreateUserReportComment(UserReportComment comment);
         Task<ReponderModel<UserReportCommentModel>> GetListUserReportComment(int userReportId);
         Task<ReponderModel<NoteManager>> GetListNoteManager();
+        Task<ReponderModel<UserProfileModel>> GetUserProfile(string username);
         //Task<ReponderModel<NoteManager>> UpdateNoteManager(NoteManager model);
-        
+
     }
 }

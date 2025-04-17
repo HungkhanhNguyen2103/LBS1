@@ -4,6 +4,7 @@ using BusinessObject;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BusinessObject.Migrations
 {
     [DbContext(typeof(LBSDbContext))]
-    partial class LBSDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250417100301_addColumnUserTranscation")]
+    partial class addColumnUserTranscation
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -113,17 +116,17 @@ namespace BusinessObject.Migrations
                             Id = "7d5002bd-f22f-4c7c-bce1-3d22eed213ff",
                             AccessFailedCount = 0,
                             AccountActive = true,
-                            ConcurrencyStamp = "21b5157f-46f7-4526-8125-b96b2985a16d",
+                            ConcurrencyStamp = "a7675d59-3d85-48a0-874a-09ced30ed6e6",
                             Email = "admin@gmail.com",
                             EmailConfirmed = false,
                             FullName = "Admin",
                             Gender = 0,
                             LockoutEnabled = false,
                             NormalizedUserName = "ADMIN",
-                            PasswordHash = "AQAAAAIAAYagAAAAEKdU1G+hr/K0LrpOj9qSLPLJ1ORtgHSEgL8OnrtDZuDcUDbFBXE+OY5obj4Y8V+apg==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEMe7L+Qq9S2QsGurQCVEJEXhpRqxLLQimtFi6IyWMtImvHKnsSzd8yxkiup2bzwqAw==",
                             PhoneNumberConfirmed = false,
                             ResetPassword = 0,
-                            SecurityStamp = "6746e978-febb-4518-836b-420b53120c7a",
+                            SecurityStamp = "743626e3-0d91-491c-9557-f8b18ae94888",
                             SocialAccount = false,
                             TwoFactorEnabled = false,
                             UserName = "admin"
@@ -133,17 +136,17 @@ namespace BusinessObject.Migrations
                             Id = "7d5002bd-f22f-4c7c-bce1-3d22eed213dd",
                             AccessFailedCount = 0,
                             AccountActive = true,
-                            ConcurrencyStamp = "25262bfd-2474-49b4-a88d-07fed36745dc",
+                            ConcurrencyStamp = "10b9dfeb-47a1-425c-9912-287991f3d1a1",
                             Email = "manager@gmail.com",
                             EmailConfirmed = false,
                             FullName = "Manager",
                             Gender = 0,
                             LockoutEnabled = false,
                             NormalizedUserName = "MANAGER",
-                            PasswordHash = "AQAAAAIAAYagAAAAEMYud5P3Uj5LxdtPmfnne2cqgdM+wszDEqd6EzzVn/Cph5uSmjUfoUmPkTLNDKzO7Q==",
+                            PasswordHash = "AQAAAAIAAYagAAAAENuo2COZ8bik7lYfo1FWdSXK0PiK1IDe6K1LbvLWYy/3ncZ8ub4rTZnwkY53ouEZdA==",
                             PhoneNumberConfirmed = false,
                             ResetPassword = 0,
-                            SecurityStamp = "a30d2346-7e41-4b84-8bb5-117a68c384b9",
+                            SecurityStamp = "03f3bb44-c212-43e7-952f-a20607edaf46",
                             SocialAccount = false,
                             TwoFactorEnabled = false,
                             UserName = "manager"
@@ -153,17 +156,17 @@ namespace BusinessObject.Migrations
                             Id = "7d5002bd-f22f-4c7c-bce1-3d22eff012ef",
                             AccessFailedCount = 0,
                             AccountActive = true,
-                            ConcurrencyStamp = "fa5258c0-a174-438c-961a-6e21939aa4d0",
+                            ConcurrencyStamp = "d622d414-c37b-48ee-99b4-50f7c5671906",
                             Email = "author@gmail.com",
                             EmailConfirmed = false,
                             FullName = "Author",
                             Gender = 0,
                             LockoutEnabled = false,
                             NormalizedUserName = "AUTHOR",
-                            PasswordHash = "AQAAAAIAAYagAAAAEPg/t4UCM98MCJvEH37/8XHKct7AfIEuhAgp4zFB9tdaYvUEUzlksST4ruOvzwbTRA==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEMISiEgybg41MFRQG+grO58uretMAAcngoMBubyMRzMeBGZ2Bt/pykLy99q42MjWbQ==",
                             PhoneNumberConfirmed = false,
                             ResetPassword = 0,
-                            SecurityStamp = "7d57e3c2-4e6d-4a92-983b-fa88891bec47",
+                            SecurityStamp = "b409e5e6-ea13-4cd6-af09-45144ca33997",
                             SocialAccount = false,
                             TwoFactorEnabled = false,
                             UserName = "author"
@@ -349,28 +352,6 @@ namespace BusinessObject.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Conspectus", (string)null);
-                });
-
-            modelBuilder.Entity("BusinessObject.MeilisearchLog", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreateDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Message")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("Status")
-                        .HasColumnType("bit");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("MeilisearchLogs");
                 });
 
             modelBuilder.Entity("BusinessObject.NoteManager", b =>

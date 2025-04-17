@@ -105,17 +105,48 @@ namespace Repositories.Repository
                 return result;
             }
 
+
+            // hủy gói vẫn còn giá trị với member
+            var typeEnum = (PaymentItemType)type;
+            var userMemberOld = await _lBSDbContext.UserTranscations.FirstOrDefaultAsync(c => c.UserName == user.UserName && c.Type == PaymentItemType.Membership && c.ExpireDate != null && c.ExpireDate > DateTime.UtcNow);
+            if (typeEnum == PaymentItemType.Membership && userMemberOld != null)
+            {
+                userMemberOld.ExpireDate = null;
+            }
+            //end
+
             var userTranscation = new UserTranscation
             {
                 PaymentItemId = paymentKey,
-                Type = (PaymentItemType)type,
+                Type = typeEnum,
                 Price = paymentItem.Amount,
                 UserId = user.Id,
                 OrderId = orderId,
                 UserName = user.UserName,
-                CreateDate = DateTime.UtcNow
+                CreateDate = DateTime.UtcNow,
             };
+
+            switch (paymentKey)
+            {
+                //IREADING 3 THÁNG
+                case 5:
+                    userTranscation.ExpireDate = DateTime.UtcNow.AddMonths(3);
+                    break;
+                //IREADING 6 THÁNG
+                case 6:
+                    userTranscation.ExpireDate = DateTime.UtcNow.AddMonths(6);
+                    break;
+                //IREADING 7 THÁNG
+                case 7:
+                    userTranscation.ExpireDate = DateTime.UtcNow.AddMonths(12);
+                    break;
+                default:
+                    userTranscation.ExpireDate = null;
+                    break;
+            }
+
             _lBSDbContext.UserTranscations.Add(userTranscation);
+
             await _lBSDbContext.SaveChangesAsync();
             result.Message = "Thanh toán thành công";
             result.IsSussess = true;

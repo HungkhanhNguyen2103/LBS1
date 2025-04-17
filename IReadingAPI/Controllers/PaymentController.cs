@@ -30,6 +30,7 @@ namespace IReadingAPI.Controllers
             return result;
         }
 
+
         [Route("GetListPayment")]
         [HttpGet]
         public async Task<ReponderModel<PaymentItem>> GetListPayment(int type)

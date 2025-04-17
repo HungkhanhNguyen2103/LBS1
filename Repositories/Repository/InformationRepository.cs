@@ -496,5 +496,46 @@ namespace Repositories.Repository
             result.IsSussess = true;
             return result;
         }
+
+        public async Task<ReponderModel<UserProfileModel>> GetUserProfile(string username)
+        {
+            var result = new ReponderModel<UserProfileModel>();
+            var profile = await _accountRepository.GetInformation(username);
+            if (profile == null) { 
+                result.Message = "Thông tin không hợp lệ";
+                return result;
+            }
+
+            var item = new UserProfileModel
+            {
+                UserName = profile.Data.UserName,
+                FullName = profile.Data.FullName,
+                Avatar = profile.Data.Avatar,      
+            };
+            var now = DateTime.UtcNow;
+            var paidPackage = await _lBSDbContext.UserTranscations.Include(c => c.PaymentItem).Where(c => c.UserName == username).ToListAsync();
+            if(paidPackage != null && paidPackage.Count > 0)
+            {
+                item.ClamPoint = paidPackage.Where(c => c.PaymentItem != null).Sum(c => c.PaymentItem.Amount);
+                var activeMemberPaid = paidPackage.Where(c => c.ExpireDate != null && c.ExpireDate > now).FirstOrDefault();
+                if (activeMemberPaid != null) { 
+                    item.PaymentName = activeMemberPaid.PaymentItem.PaymentName;
+                    item.CreateDate = activeMemberPaid.CreateDate.AddHours(7);
+                    item.ExpireDate = activeMemberPaid.ExpireDate.Value.AddHours(7);
+                }
+                else
+                {
+                    item.PaymentName = "Tài khoản thường";
+                }
+            }
+            else
+            {
+                item.PaymentName = "Tài khoản thường";
+                item.ClamPoint = 0;
+            }
+            result.Data = item;
+            result.IsSussess = true;
+            return result;
+        }
     }
 }

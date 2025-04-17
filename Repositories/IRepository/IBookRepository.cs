@@ -45,11 +45,15 @@ namespace Repositories.IRepository
         Task<ReponderModel<int>> CreateViewBook(UserBookViewModel model);
         Task<ReponderModel<int>> GetViewNo(int bookId,BookTypeStatus type);
         Task<ReponderModel<UserMinuteModel>> GetListMinuteViewByUser(string userName);
-        Task<ReponderModel<string>> AddFavouriteBook(string userName, int bookId);
+        Task<ReponderModel<string>> AddOrRemoveFavouriteBook(string userName, int bookId);
         Task<ReponderModel<UserBook>> ListFavouriteBook(string userName);
         Task<ReponderModel<BookModel>> SearchBook(string input);
         Task<ReponderModel<NoteUser>> GetListNote(string username,string chapterId);
         Task<ReponderModel<string>> UpdateNoteUser(NoteUser note);
         Task<ReponderModel<string>> DeleteNoteUser(int id);
+        Task<ReponderModel<BookRatingModel>> GetTop10BookRating();
+        Task<ReponderModel<BookModel>> GetTop10NewBook();
+        Task<ReponderModel<BookModel>> GetTop10FavoriteBook();
+
     }
 }

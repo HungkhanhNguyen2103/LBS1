@@ -24,6 +24,14 @@ namespace LBSAPI.Controllers
             return result;
         }
 
+        [Route("GetUserProfile")]
+        [HttpGet]
+        public async Task<ReponderModel<UserProfileModel>> GetUserProfile(string username)
+        {
+            var result = await _informationRepository.GetUserProfile(username);
+            return result;
+        }
+
         [Route("GetRoomByAuthor")]
         [HttpGet]
         public async Task<ReponderModel<RoomModel>> GetRoomByAuthor(string username, string chapterBookId)

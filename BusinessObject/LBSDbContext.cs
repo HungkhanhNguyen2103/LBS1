@@ -51,5 +51,6 @@ namespace BusinessObject
         public virtual DbSet<PaymentItem> PaymentItems { get; set; }
         public virtual DbSet<NoteManager> NoteManagers { get; set; }
         public virtual DbSet<NoteUser> NoteUsers { get; set; }
+        public virtual DbSet<MeilisearchLog> MeilisearchLogs { get; set; }
     }
 }

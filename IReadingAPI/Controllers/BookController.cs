@@ -180,6 +180,22 @@ namespace LBSAPI.Controllers
             return result;
         }
 
+        [Route("GetTop10BookRating")]
+        [HttpGet]
+        public async Task<ReponderModel<BookRatingModel>> GetTop10BookRating()
+        {
+            var result = await _bookRepository.GetTop10BookRating();
+            return result;
+        }
+
+        [Route("GetTop10NewBook")]
+        [HttpGet]
+        public async Task<ReponderModel<BookModel>> GetTop10NewBook()
+        {
+            var result = await _bookRepository.GetTop10NewBook();
+            return result;
+        }
+
         [Route("UpdateNoteUser")]
         [HttpPost]
         public async Task<ReponderModel<string>> UpdateNoteUser(NoteUser note)
@@ -278,11 +294,19 @@ namespace LBSAPI.Controllers
             return result;
         }
 
-        [Route("AddFavouriteBook")]
+        [Route("AddOrRemoveFavouriteBook")]
         [HttpGet]
-        public async Task<ReponderModel<string>> AddFavouriteBook(string userName,int bookId)
+        public async Task<ReponderModel<string>> AddOrRemoveFavouriteBook(string userName,int bookId)
         {
-            var result = await _bookRepository.AddFavouriteBook(userName,bookId);
+            var result = await _bookRepository.AddOrRemoveFavouriteBook(userName,bookId);
+            return result;
+        }
+
+        [Route("GetTop10FavoriteBook")]
+        [HttpGet]
+        public async Task<ReponderModel<BookModel>> GetTop10FavoriteBook()
+        {
+            var result = await _bookRepository.GetTop10FavoriteBook();
             return result;
         }
 
