@@ -33,7 +33,7 @@ namespace IReadingAPI
                 }
 
                 // Lặp lại mỗi 1 giờ 
-                await Task.Delay(TimeSpan.FromHours(1), stoppingToken);
+                //await Task.Delay(TimeSpan.FromHours(1), stoppingToken);
             }
         }
     }
