@@ -7,6 +7,7 @@ using Repositories.IRepository;
 using ImgurAPI.Core;
 using Microsoft.Extensions.DependencyInjection;
 using Net.payOS;
+using IReadingAPI;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,6 +23,9 @@ builder.Services.AddScoped<AIGeneration>(c =>
     new AIGeneration(AIConfiguration.Key));
 
 builder.Services.AddDbContext<LBSDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("LBSConnection")));
+
+builder.Services.AddScoped<IBookIndexingRepository, BookIndexingRepository>();
+builder.Services.AddHostedService<BackgroundTask>();
 
 builder.Services.AddSingleton<EmailSender, EmailSender>();
 builder.Services.AddScoped<ImageManager>();

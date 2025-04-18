@@ -9,7 +9,7 @@
             - 7157:8080
         volumes:
             - /root/docker/volumes/ireading_api/content_root_path/wwwroot:/app/wwwroot
-	    - /root/docker/volumes/ireading_api/resource:/app/Resource
+            - /root/docker/volumes/ireading_api/resource:/app/Resource
         restart: always
         environment: 
             - ASPNETCORE_ENVIRONMENT=Production
@@ -32,6 +32,16 @@
             # - CONNECTION_STRING=Server=mssqlserver;Database=LWEYS;User=sa;Password=0123654798aA@;TrustServerCertificate=True
             - API_URL=https://ireading.store/
     
+    # meilisearch:
+       # image: getmeili/meilisearch:v1.7
+       # container_name: meilisearch
+       # ports:
+           # - 7700:8080
+       # volumes:
+           # - /root/docker/volumes/meili_data:/meili_data
+       # environment:
+           # - MEILI_MASTER_KEY=d0552b41536279a0ad88bd595327b96f01176a60c2243e906c52ac02375f9bc1
+       # restart: always
 
     # Server=mssqlserver
     # Server=103.56.163.69
@@ -40,7 +50,7 @@
         # container_name: redis_server
         # ports:
             # - 6379:6379
-        # restart: always
+        # # restart: always
     # mssqlserver:
         # image: mcr.microsoft.com/mssql/server
         # container_name: mssqlserver
@@ -49,8 +59,8 @@
             # - 1433:1433
         # restart: always
         # environment:
-            # sa_password: sep490g68_capstonproject
-            # accept_eula: y
-            # mssql_pid: express
+            # SA_PASSWORD: SEP490G68_Capstonproject
+            # ACCEPT_EULA: Y
+            # MSSQL_PID: Express
         # volumes:
-            # - /root/data/mssqlserver/data:/var/opt/mssql/data
+            # - /root/data/MSSQLSERVER/DATA:/var/opt/mssql/data

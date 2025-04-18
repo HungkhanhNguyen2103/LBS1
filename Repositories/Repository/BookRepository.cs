@@ -2,8 +2,11 @@
 using BusinessObject;
 using BusinessObject.BaseModel;
 using HtmlAgilityPack;
+using Meilisearch;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Microsoft.Extensions.Configuration;
 using MongoDB.Bson;
 using MongoDB.Bson.IO;
 using MongoDB.Bson.Serialization.Serializers;
@@ -26,14 +29,19 @@ namespace Repositories.Repository
         private readonly LBSDbContext _lBSDbContext;
         private ImageManager _imageManager;
         private AIGeneration _aIGeneration;
+        private readonly IConfiguration _configuration;
         private IAccountRepository _accountRepository;
-        public BookRepository(LBSMongoDBContext mongoContext, LBSDbContext lBSDbContext, ImageManager imageManager, AIGeneration aIGeneration, IAccountRepository accountRepository)
+        public BookRepository(LBSMongoDBContext mongoContext, 
+            LBSDbContext lBSDbContext, ImageManager imageManager, 
+            AIGeneration aIGeneration, IAccountRepository accountRepository,
+            IConfiguration configuration)
         {
             _mongoContext = mongoContext;
             _lBSDbContext = lBSDbContext;
             _imageManager = imageManager;
             _aIGeneration = aIGeneration;
             _accountRepository = accountRepository;
+            _configuration = configuration;
         }
 
         public async Task<ReponderModel<string>> UpdateCategory(Category model)
@@ -1348,25 +1356,23 @@ namespace Repositories.Repository
         public async Task<ReponderModel<BookModel>> SearchBook(string input)
         {
             var result = new ReponderModel<BookModel>();
-            var books = await _lBSDbContext.Books.Include(c => c.BookCategories).ThenInclude(c => c.Category)
-                            .Include(c => c.User)
-                            .Where(c => c.Name.Contains(input) || c.SubCategory.Contains(input) || c.CreateBy.Contains(input) || c.User.FullName.Contains(input))
-                            .Where(c => c.Status == BookStatus.Done || c.Status == BookStatus.Published || c.Status == BookStatus.Continue)
-                            .ToListAsync();
+            var key = _configuration["Meilisearch:Key"];
+            var client = new MeilisearchClient("https://ireading.store/search/", key);
+            var index = client.Index("books");
 
-            var bookWithCategories = await _lBSDbContext.BookCategories.Include(c => c.Category).Include(c => c.Book).Where(c => c.Category.Name.Contains(input)).ToListAsync();
-
-            result.IsSussess = true;
-            result.DataList = books.Select(c => new BookModel
+            var result1 = await index.SearchAsync<BookIndexModel>(input, new SearchQuery
             {
-                BookType = c.BookType,
-                CreateBy = c.CreateBy,
+                //Limit = 20
+            });
+            var response = result1.Hits;
+            result.IsSussess = true;
+            result.DataList = result1.Hits.Select(c => new BookModel
+            {
                 Name = c.Name,
                 Id = c.Id,
                 Poster = c.Poster,
-                Price = c.Price,
-                SubCategory = c.SubCategory,
-                Status = c.Status
+                CreateBy = c.Author,
+                Categories = c.Categories
             }).ToList();
             return result;
         }

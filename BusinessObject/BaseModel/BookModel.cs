@@ -22,6 +22,7 @@ namespace BusinessObject.BaseModel
         public DateTime ModifyDate { get; set; }
         public string? CreateBy { get; set; }
         public List<Category> ListCategories { get; set; } = new List<Category>();
+        public List<string> Categories { get; set; } = new List<string>();
         public List<int> CategoryIds { get; set; } = new List<int>();
         public string? SubCategory { get; set; }
         public string? UserId { get; set; }
