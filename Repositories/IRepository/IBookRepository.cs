@@ -19,6 +19,7 @@ namespace Repositories.IRepository
         Task<ReponderModel<BookModel>> GetBook(int id);
         Task<ReponderModel<string>> CreateBook(BookModel bookModel);
         Task<ReponderModel<BookViewModel>> GetAllBookByUser(string userName);
+        Task<ReponderModel<BookHomePageModel>> GetBookHomePage();
         Task<ReponderModel<BookViewModel>> GetAllBookByCategory(string category);
         Task<ReponderModel<string>> CreateBookChapter(BookChapter bookChapter);
         Task<ReponderModel<bool>> CheckPaidWithBookChapter(string username, int bookId);

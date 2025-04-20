@@ -298,7 +298,7 @@ namespace Repositories.Repository
             userExist.PhoneNumber = account.PhoneNumber;
             userExist.FullName = account.FullName;
 
-            if (!string.IsNullOrEmpty(account.Avatar) && !account.Avatar.Contains("http") && userExist.Avatar != account.Avatar)
+            if (!string.IsNullOrEmpty(account.Avatar) && account.Avatar.Contains("base64,") && userExist.Avatar != account.Avatar)
             {
                 account.Avatar = account.Avatar.Split("base64,")[1];
                 var response = await _imageManager.UploadImage(account.Avatar, "base64");

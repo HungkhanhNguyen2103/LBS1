@@ -1468,13 +1468,16 @@ namespace Repositories.Repository
                                where book.Status == BookStatus.Done 
                                || book.Status == BookStatus.Published 
                                || book.Status == BookStatus.Continue
-                               group comment.Rating by new { book.Id, book.Name,book.Poster } into g
+                               group comment.Rating by new { book.Id, book.Name,book.Poster,book.Status,book.BookType,book.Price } into g
                                orderby g.Average() descending
                                select new BookRatingModel
                                {
                                    Id = g.Key.Id,
                                    Poster = g.Key.Poster,
                                    Name = g.Key.Name,
+                                   BookType = g.Key.BookType,
+                                   Status = g.Key.Status,
+                                   Price = g.Key.Price,
                                    Rating = g.Average()
                                }).Take(10).ToListAsync();
             result.DataList = books;
@@ -1576,9 +1579,69 @@ namespace Repositories.Repository
 
             var listBookChapter = await _mongoContext.BookChapters.Find(filter).ToListAsync();
             // toi thieu 10 chương
-            result.Data = listBookChapter.Count >= 3 ? true : false;
+            result.Data = listBookChapter.Count >= 10 ? true : false;
             result.IsSussess = true;
             return result;
+        }
+
+        public async Task<ReponderModel<BookHomePageModel>> GetBookHomePage()
+        {
+            var result = new ReponderModel<BookHomePageModel>();
+            // top 10 Rating
+            var result10Rating = await GetTop10BookRating();
+            var item10Rating = new BookHomePageModel
+            {
+                CategoryId = -1,
+                CategoryName = "Top 10 sách đánh giá cao nhất",
+                Books = result10Rating.DataList.Select(c => new BookModel
+                {
+                    Id = c.Id,
+                    Name = c.Name,
+                    Poster = c.Poster,
+                    BookType = c.BookType,
+                    Status = c.Status,
+                    Price = c.Price
+                }).ToList()
+            };
+            result.DataList.Add(item10Rating);
+
+            //top 10 new book
+            var result10New = await GetTop10NewBook();
+            var item10New = new BookHomePageModel
+            {
+                CategoryId = -1,
+                CategoryName = "Top 10 sách mới nhất",
+                Books = result10New.DataList.Select(c => new BookModel
+                {
+                    Id = c.Id,
+                    Name = c.Name,
+                    Poster = c.Poster,
+                    BookType = c.BookType,
+                    Status = c.Status,
+                    Price = c.Price
+                }).ToList()
+            };
+            result.DataList.Add(item10New);
+
+            //top 10 favorite book
+            var result10Favorite = await GetTop10FavoriteBook();
+            var item10Favorite = new BookHomePageModel
+            {
+                CategoryId = -1,
+                CategoryName = "Top 10 sách được yêu thích nhất",
+                Books = result10Favorite.DataList.Select(c => new BookModel
+                {
+                    Id = c.Id,
+                    Name = c.Name,
+                    Poster = c.Poster,
+                    BookType = c.BookType,
+                    Status = c.Status,
+                    Price = c.Price
+                }).ToList()
+            };
+            result.DataList.Add(item10Favorite);
+
+            throw new NotImplementedException();
         }
     }
 }

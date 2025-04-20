@@ -46,6 +46,15 @@ namespace Repositories.Repository
 
                 await index.DeleteAllDocumentsAsync();
                 await index.AddDocumentsAsync(books);
+
+
+                await index.UpdateSearchableAttributesAsync(new[]
+                {
+                   "Name",
+                   "Author",
+                   "Categories"
+                });
+
                 var log = new MeilisearchLog
                 {
                     CreateDate = DateTime.UtcNow,
