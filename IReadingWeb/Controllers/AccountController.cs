@@ -112,16 +112,16 @@ namespace LBSWeb.Controllers
                 _notyf.Error(result.Message);
                 return Redirect("/");
             }
-            var claims = TokenUtil.ValidateToken(token, _configuration["Tokens:Key"], _configuration["Tokens:Issuer"]);
-            if (claims != null)
-            {
-                HttpContext.Response.Cookies.Append("token", token, new CookieOptions { MaxAge = TimeSpan.FromMinutes(45) });
-                var claimsIdentity = new ClaimsIdentity(
-                    claims.Claims, CookieAuthenticationDefaults.AuthenticationScheme);
-                await HttpContext.SignInAsync(
-                    CookieAuthenticationDefaults.AuthenticationScheme,
-                    new ClaimsPrincipal(claimsIdentity));
-            }
+            //var claims = TokenUtil.ValidateToken(token, _configuration["Tokens:Key"], _configuration["Tokens:Issuer"]);
+            //if (claims != null)
+            //{
+            //    HttpContext.Response.Cookies.Append("token", token, new CookieOptions { MaxAge = TimeSpan.FromMinutes(45) });
+            //    var claimsIdentity = new ClaimsIdentity(
+            //        claims.Claims, CookieAuthenticationDefaults.AuthenticationScheme);
+            //    await HttpContext.SignInAsync(
+            //        CookieAuthenticationDefaults.AuthenticationScheme,
+            //        new ClaimsPrincipal(claimsIdentity));
+            //}
             return View();
         }
 

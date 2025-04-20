@@ -68,7 +68,7 @@ namespace Repositories.Repository
             user.EmailConfirmed = true;
 
             var deviceToken = claims.FindFirst(ClaimTypes.Locality);
-            if (deviceToken != null)
+            if (deviceToken != null && !string.IsNullOrEmpty(deviceToken.ToString()))
             {
                 var tokenApp = deviceToken.Value;
                 var result = await _googleCredentialService.SendToDevice(tokenApp,token);

@@ -517,9 +517,14 @@ namespace Repositories.Repository
             };
             var now = DateTime.UtcNow;
             var paidPackage = await _lBSDbContext.UserTranscations.Include(c => c.PaymentItem).Where(c => c.UserName == username).ToListAsync();
+            var userTranscations = await _lBSDbContext.UserTranscationBooks.Where(c => c.UserName == username).ToListAsync();
             if(paidPackage != null && paidPackage.Count > 0)
             {
                 item.ClamPoint = paidPackage.Where(c => c.PaymentItem != null).Sum(c => c.PaymentItem.Amount);
+                var transcationsAmount = userTranscations.Count > 0 ? userTranscations.Sum(c => c.Amount) : 0;
+
+                item.ClamPoint -= transcationsAmount;
+
                 var activeMemberPaid = paidPackage.Where(c => c.ExpireDate != null && c.ExpireDate > now).FirstOrDefault();
                 if (activeMemberPaid != null) { 
                     item.PaymentName = activeMemberPaid.PaymentItem.PaymentName;
