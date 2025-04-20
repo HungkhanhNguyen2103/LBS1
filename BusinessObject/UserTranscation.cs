@@ -12,6 +12,7 @@ namespace BusinessObject
         public int Id { get; set; }
         public PaymentItemType Type { get; set; }
         public int Price { get; set; }
+        public int Amount { get; set; }
         public long OrderId { get; set; }
         public DateTime CreateDate { get; set; }
         public DateTime? ExpireDate { get; set; }

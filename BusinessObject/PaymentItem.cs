@@ -16,6 +16,7 @@ namespace BusinessObject
         public PaymentItemType Type { get; set; }
         // gia tien
         public int AmountMoney { get; set; }
+        public int ExpiredMinute { get; set; }
     }
 
     public enum PaymentItemType

@@ -56,6 +56,7 @@ namespace Repositories.IRepository
         Task<ReponderModel<BookRatingModel>> GetTop10BookRating();
         Task<ReponderModel<BookModel>> GetTop10NewBook();
         Task<ReponderModel<BookModel>> GetTop10FavoriteBook();
+        Task<ReponderModel<CategoryModel>> GetTop10CategoryView();
         Task<ReponderModel<string>> UpdateCommentUser(CommentUser comment);
         Task<ReponderModel<string>> GetListCommentByChapter(string chapterId);
 

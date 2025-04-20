@@ -4,6 +4,7 @@ using BusinessObject.BaseModel;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using MongoDB.Driver;
 using Net.payOS;
 using Net.payOS.Types;
 using Repositories.IRepository;
@@ -19,14 +20,16 @@ namespace Repositories.Repository
 {
     public class PaymentRepository : IPaymentRepository
     {
+        private readonly LBSMongoDBContext _mongoContext;
         private readonly LBSDbContext _lBSDbContext;
         private readonly PayOS _payOS;
         private readonly UserManager<Account> _userManager;
-        public PaymentRepository(PayOS payOS, LBSDbContext lBSDbContext, UserManager<Account> userManager)
+        public PaymentRepository(PayOS payOS, LBSDbContext lBSDbContext, UserManager<Account> userManager, LBSMongoDBContext mongoDBContext)
         {
             _payOS = payOS;
             _lBSDbContext = lBSDbContext;
             _userManager = userManager;
+            _mongoContext = mongoDBContext;
         }
         public async Task<ReponderModel<string>> CreatePaymentLink(PaymentRequestModel model)
         {
@@ -57,6 +60,56 @@ namespace Repositories.Repository
             return result;
         }
 
+        public async Task<ReponderModel<UserTranscationBookModel>> GetHistoryPayment(string username)
+        {
+            var result = new ReponderModel<UserTranscationBookModel>();
+            var userTransication = await _lBSDbContext.UserTranscations.Include(c => c.PaymentItem).Where(x => x.UserName == username).ToListAsync();
+            foreach (var item in userTransication)
+            {
+                result.DataList.Add(new UserTranscationBookModel
+                {
+                    Id = item.Id,
+                    PaymentName = item.PaymentItem.PaymentName,
+                    PaymentNameEnum = PaymentNameEnum.Deposit,
+                    Price = item.PaymentItem.Amount,
+                    CreateDate = item.CreateDate.ToString("HH:mm dd-MM-yyyy"),
+                });
+            }
+
+            var userTranscationBook = await _lBSDbContext.UserTranscationBooks.Include(c => c.Book).Where(x => x.UserName == username).ToListAsync();
+
+            var chapterIds = userTranscationBook.Where(c => !string.IsNullOrEmpty(c.ChapterId)).Select(c => c.ChapterId).ToList();
+            var filter = Builders<BookChapter>.Filter.In(c => c.Id, chapterIds);
+            var chapters = await _mongoContext.BookChapters.Find(filter).ToListAsync();
+            foreach (var item in userTranscationBook)
+            {
+                var paymentName = string.Empty;
+                if(item.BookId != -1)
+                {
+                    var book = await _lBSDbContext.Books.FirstOrDefaultAsync(x => x.Id == item.BookId);
+                    paymentName = $"Mở khóa sách {book.Name}";
+                }
+                else if (!string.IsNullOrEmpty(item.ChapterId))
+                {
+                    var chapter = chapters.FirstOrDefault(c => c.Id == item.ChapterId);
+                    paymentName = $"Thanh toán chương {chapter.ChapterName}";
+                }
+
+                result.DataList.Add(new UserTranscationBookModel
+                {
+                    Id = item.Id,
+                    PaymentName = paymentName,
+                    PaymentNameEnum = PaymentNameEnum.Pay,
+                    Price = item.Amount,
+                    CreateDate = item.CreateDate.ToString("HH:mm dd-MM-yyyy"),
+                    CreateDateFormat = item.CreateDate,
+                });
+            }
+            result.DataList = result.DataList.OrderByDescending(c => c.CreateDateFormat).ToList();    
+            result.IsSussess = true;
+            return result;
+        }
+
         public async Task<ReponderModel<PaymentItem>> GetListPayment(PaymentItemType type)
         {
             var result = new ReponderModel<PaymentItem>();
@@ -64,6 +117,60 @@ namespace Repositories.Repository
             result.DataList = paymentItems; 
             result.IsSussess = true;
             return result;
+        }
+
+        public async Task<ReponderModel<string>> PaymentItem(UserTranscationBook userTranscationBook)
+        {
+            var result = new ReponderModel<string>();
+            if(userTranscationBook == null)
+            {
+                result.Message = "Dữ liệu không hợp lệ";
+                return result;
+            }
+
+            var user = await _userManager.FindByNameAsync(userTranscationBook.UserName);
+            if(user == null)
+            {
+                result.Message = "Không tồn tại người dùng";
+                return result;
+            }
+
+            var filter = Builders<BookChapter>.Filter.Eq(c => c.Id, userTranscationBook.ChapterId);
+            var chapter = await _mongoContext.BookChapters.Find(filter).FirstOrDefaultAsync();
+            if(chapter == null)
+            {
+                result.Message = "Không tồn tại chương";
+                return result;
+            }
+
+            var asQuery = _lBSDbContext.UserTranscationBooks.Where(c => c.UserName == userTranscationBook.UserName).AsQueryable();
+            if (!string.IsNullOrEmpty(userTranscationBook.ChapterId))
+            {
+                var resultPayment = await asQuery.FirstOrDefaultAsync(x => x.ChapterId == userTranscationBook.ChapterId);
+                if(resultPayment != null)
+                {
+                    result.Message = "Chương đã được thanh toán";
+                    return result;
+                }
+            }
+            else if (userTranscationBook.BookId != -1)
+            {
+                var resultPayment = await asQuery.FirstOrDefaultAsync(x => x.BookId == userTranscationBook.BookId);
+                if (resultPayment != null)
+                {
+                    result.Message = "Sách đã được thanh toán";
+                    return result;
+                }
+            }
+            userTranscationBook.Amount = chapter.Price;
+            userTranscationBook.CreateDate = DateTime.UtcNow;
+            _lBSDbContext.UserTranscationBooks.Add(userTranscationBook);
+
+            await _lBSDbContext.SaveChangesAsync();
+            result.Message = "Thanh toán thành công";
+            result.IsSussess = true;
+            return result;
+
         }
 
         public async Task<ReponderModel<string>> PaymentSuccess(string email, int type, int paymentKey, long orderId)
@@ -123,28 +230,15 @@ namespace Repositories.Repository
                 UserId = user.Id,
                 OrderId = orderId,
                 UserName = user.UserName,
+                Amount = paymentItem.Amount,
                 CreateDate = DateTime.UtcNow,
             };
 
-            switch (paymentKey)
+            if(paymentItem.ExpiredMinute != 0)
             {
-                //IREADING 3 THÁNG
-                case 5:
-                    userTranscation.ExpireDate = DateTime.UtcNow.AddMonths(3);
-                    break;
-                //IREADING 6 THÁNG
-                case 6:
-                    userTranscation.ExpireDate = DateTime.UtcNow.AddMonths(6);
-                    break;
-                //IREADING 7 THÁNG
-                case 7:
-                    userTranscation.ExpireDate = DateTime.UtcNow.AddMonths(12);
-                    break;
-                default:
-                    userTranscation.ExpireDate = null;
-                    break;
+                userTranscation.ExpireDate = DateTime.UtcNow.AddMinutes(paymentItem.ExpiredMinute);
             }
-
+            
             _lBSDbContext.UserTranscations.Add(userTranscation);
 
             await _lBSDbContext.SaveChangesAsync();

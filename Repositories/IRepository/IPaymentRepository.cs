@@ -12,6 +12,8 @@ namespace Repositories.IRepository
     {
         Task<ReponderModel<string>> CreatePaymentLink(PaymentRequestModel model);
         Task<ReponderModel<PaymentItem>> GetListPayment(PaymentItemType type);
-        Task<ReponderModel<string>> PaymentSuccess(string email,int type,int paymentKey, long orderId);
+        Task<ReponderModel<string>> PaymentSuccess(string email,int type,int paymentKey, long orderId);  
+        Task<ReponderModel<string>> PaymentItem(UserTranscationBook userTranscationBook);
+        Task<ReponderModel<UserTranscationBookModel>> GetHistoryPayment(string username);
     }
 }

@@ -946,7 +946,8 @@ namespace Repositories.Repository
                 Author = c.CreateBy,
                 Name = c.Name,
                 Poster = c.Poster,
-                Status = c.Status
+                Status = c.Status,
+                Price = c.Price
             }).DistinctBy(c => c.Id).ToList();
             result.IsSussess = true;
             return result;
@@ -1641,7 +1642,56 @@ namespace Repositories.Repository
             };
             result.DataList.Add(item10Favorite);
 
-            throw new NotImplementedException();
+            //top 10 book by category nhieu view nhat
+            var categories = await GetTop10CategoryView();
+            foreach (var item in categories.DataList)
+            {
+                var resultCategory = await GetAllBookByCategory(item.Name);
+                var itemCategory = new BookHomePageModel
+                {
+                    CategoryId = item.Id,
+                    CategoryName = item.Name,
+                    Books = resultCategory.DataList.Select(c => new BookModel
+                    {
+                        Id = c.Id,
+                        Name = c.Name,
+                        Poster = c.Poster,
+                        BookType = c.BookType,
+                        Status = c.Status,
+                        Price = c.Price
+                    }).Take(10).ToList()
+                };
+                result.DataList.Add(itemCategory);
+            }
+            result.IsSussess = true;
+            return result;
+        }
+
+        public async Task<ReponderModel<CategoryModel>> GetTop10CategoryView()
+        {
+            var result = new ReponderModel<CategoryModel>();
+            // get 10 category co lượt xem cao nhất
+            var categories = await (from book in _lBSDbContext.Books
+                                    join bookCategory in _lBSDbContext.BookCategories
+                                    on book.Id equals bookCategory.BookId
+                                    join category in _lBSDbContext.Categories
+                                    on bookCategory.CategoryId equals category.Id
+                                    join bookView in _lBSDbContext.UserBookViews
+                                    on book.Id equals bookView.BookId
+                                    where book.Status == BookStatus.Done
+                                    || book.Status == BookStatus.Published
+                                    || book.Status == BookStatus.Continue
+                                    group bookView.BookId by new { category.Id, category.Name } into g
+                                    orderby g.Count() descending
+                                    select new CategoryModel
+                                    {
+                                        Id = g.Key.Id,
+                                        Name = g.Key.Name,
+                                        ViewNo = g.Count()
+                                    }).Take(10).ToListAsync();
+            result.DataList = categories;
+            result.IsSussess = true;
+            return result;
         }
     }
 }

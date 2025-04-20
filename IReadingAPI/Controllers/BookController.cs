@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using OpenAI.Chat;
 using Repositories;
 using Repositories.IRepository;
+using System;
 using System.Net;
 using System.Text;
 
@@ -172,6 +173,21 @@ namespace LBSAPI.Controllers
             return result;
         }
 
+        [Route("GetBookHomePage")]
+        [HttpGet]
+        public async Task<ReponderModel<BookHomePageModel>> GetBookHomePage()
+        {
+            var result = await _bookRepository.GetBookHomePage();
+            return result;
+        }
+
+        [Route("GetTop10CategoryView")]
+        [HttpGet]
+        public async Task<ReponderModel<CategoryModel>> GetTop10CategoryView()
+        {
+            var result = await _bookRepository.GetTop10CategoryView();
+            return result;
+        }
 
         [Route("CheckPaidWithBookChapter")]
         [HttpGet]

@@ -5,6 +5,7 @@ using Net.payOS;
 using Repositories.IRepository;
 using Repositories.Repository;
 using BusinessObject;
+using MailKit.Search;
 
 namespace IReadingAPI.Controllers
 {
@@ -45,6 +46,22 @@ namespace IReadingAPI.Controllers
         public async Task<ReponderModel<string>> PaymentSuccess(string email, int type , int paymentKey,long orderId)
         {
             var result = await _paymentRepository.PaymentSuccess(email,type,paymentKey, orderId);
+            return result;
+        }
+
+        [Route("PaymentItem")]
+        [HttpPost]
+        public async Task<ReponderModel<string>> PaymentItem(UserTranscationBook userTranscationBook)
+        {
+            var result = await _paymentRepository.PaymentItem(userTranscationBook);
+            return result;
+        }
+
+        [Route("PaymentItem")]
+        [HttpGet]
+        public async Task<ReponderModel<UserTranscationBookModel>> GetHistoryPayment(string username)
+        {
+            var result = await _paymentRepository.GetHistoryPayment(username);
             return result;
         }
     }
