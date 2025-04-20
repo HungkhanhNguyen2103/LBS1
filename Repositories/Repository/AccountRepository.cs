@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Repositories.IRepository;
 using System.Data;
 using System.Security.Claims;
 
@@ -15,15 +16,18 @@ namespace Repositories.Repository
         private ImageManager _imageManager;
         private readonly UserManager<Account> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
+        //private readonly INotificationRepository _notificationRepository;
         private readonly LBSDbContext LBSDbContext;
 		private readonly IConfiguration _configuration;
         private EmailSender _emailSender;
+        private GoogleCredentialService _googleCredentialService;
         public AccountRepository(LBSDbContext lbSDbContext,
             UserManager<Account> userManager, 
             RoleManager<IdentityRole> roleManager,
 			IConfiguration configuration,
             EmailSender emailSender,
-            ImageManager imageManager
+            ImageManager imageManager,
+            GoogleCredentialService googleCredentialService
             )
         {
             LBSDbContext = lbSDbContext;
@@ -32,6 +36,7 @@ namespace Repositories.Repository
 			_configuration = configuration;
             _emailSender = emailSender;
             _imageManager = imageManager;
+            _googleCredentialService = googleCredentialService;
         }
 
         public async Task<ReponderModel<string>> ConfirmEmail(string? token)
@@ -61,6 +66,19 @@ namespace Repositories.Repository
                 return response;
             }
             user.EmailConfirmed = true;
+
+            var deviceToken = claims.FindFirst(ClaimTypes.Locality);
+            if (deviceToken != null)
+            {
+                var tokenApp = deviceToken.Value;
+                var result = await _googleCredentialService.SendToDevice(tokenApp,token);
+                if (!result.IsSussess)
+                {
+                    result.Message = "Lỗi gửi thông báo đến thiết bị";
+                    return result;
+                }
+            }
+
             await _userManager.UpdateAsync(user);
 
             response.Message = "Xác thực thành công";
@@ -222,7 +240,7 @@ namespace Repositories.Repository
                     roles = $"{Role.User}";
                 }
 				
-                responder.Data = await EncodeSha256(user, roles, true,user.ResetPassword);
+                responder.Data = await EncodeSha256(user, roles, true,user.ResetPassword,account.DeviceToken);
 
 
                 //Send Email 
@@ -301,7 +319,7 @@ namespace Repositories.Repository
             return responder;
         }
 
-        private async Task<string> EncodeSha256(Account user, string role,bool emailConfirm = true,int resetPassword = 0)
+        private async Task<string> EncodeSha256(Account user, string role,bool emailConfirm = true,int resetPassword = 0, string deviceToken = "")
 		{
 			string token = string.Empty;
 			var key = _configuration["Tokens:Key"];
@@ -321,6 +339,8 @@ namespace Repositories.Repository
 			List<Claim> claims = new List<Claim>();
 			claims.Add(new Claim(ClaimTypes.PrimarySid, user.Id));
 			claims.Add(new Claim(ClaimTypes.NameIdentifier, user.UserName));
+			claims.Add(new Claim(ClaimTypes.Locality, deviceToken));
+			claims.Add(new Claim(ClaimTypes.Email, user.EmailConfirmed.ToString()));
 
             // add or get room
             if (role.Contains(Role.Author))
@@ -667,6 +687,20 @@ namespace Repositories.Repository
             if (user == null) return result;
             var roles = await _userManager.GetRolesAsync(user);
             result = roles.ToList();
+            return result;
+        }
+
+        public async Task<ReponderModel<bool>> CheckConfirmEmail(string userName)
+        {
+            var result = new ReponderModel<bool>();
+            var user = await _userManager.FindByNameAsync(userName);
+            if(user == null)
+            {
+                result.Message = "Tài khoản không tồn tại";
+                return result;
+            }
+            result.Data = user.EmailConfirmed;
+            result.IsSussess = true;
             return result;
         }
     }

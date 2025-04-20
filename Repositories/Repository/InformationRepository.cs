@@ -506,11 +506,14 @@ namespace Repositories.Repository
                 return result;
             }
 
+            var isConfirm = await _accountRepository.CheckConfirmEmail(username);
+
             var item = new UserProfileModel
             {
                 UserName = profile.Data.UserName,
                 FullName = profile.Data.FullName,
-                Avatar = profile.Data.Avatar,      
+                Avatar = profile.Data.Avatar,  
+                IsComfirm = isConfirm.IsSussess && isConfirm.Data,
             };
             var now = DateTime.UtcNow;
             var paidPackage = await _lBSDbContext.UserTranscations.Include(c => c.PaymentItem).Where(c => c.UserName == username).ToListAsync();

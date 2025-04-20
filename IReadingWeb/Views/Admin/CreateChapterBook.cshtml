@@ -122,7 +122,15 @@
 
                         <div style="display:block" class="form-group input-group input-group-outline mt-4">
                             <label for="Name">Thu phí:</label>
-                            <input style="width:100%" type="number" disabled asp-for="Price" class="form-control">
+                            @if(ViewBag.PaidChapter == true)
+                            {
+                                <input style="width:100%" type="number" asp-for="Price" class="form-control">
+                            }
+                            else
+                            {
+                                <input style="width:100%" type="number" disabled asp-for="Price" class="form-control">
+                            }
+                            
                         </div>
                         <button type="submit" class="btn btn-success mt-4">Lưu thông tin</button>
                         <button type="button" onclick="SaveDraft()" class="btn btn-warning mt-4 ml-2">Lưu bản thảo</button>

@@ -12,6 +12,7 @@ namespace BusinessObject
         public string? UserName { get; set; }
         public string? UserId { get; set; }
         public string? ChapterId { get; set; }
+        public int? BookId { get; set; }
         public int Start { get; set; }
         public int End { get; set; }
         public string? SelectedText { get; set; }

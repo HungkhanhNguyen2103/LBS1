@@ -24,6 +24,7 @@ namespace Repositories.Repository
         Task<ReponderModel<string>> LoginWithGoogle(string email,string fullname, int registerType);
         Task<ReponderModel<ReportModel>> ShortReport();
         Task<List<string>> GetRolesByUserName(string userName);
+        Task<ReponderModel<bool>> CheckConfirmEmail(string userName);
 
     }
 }

@@ -30,5 +30,6 @@ namespace LBSWeb.Service.Book
         Task<ReponderModel<string>> DeclineChapterBook(int id, string chapterId);
         Task<ReponderModel<StatisticsChapterBook>> StatisticsChapterBook(int bookId);
         Task<ReponderModel<StatisticsChapterBook>> StatisticsBook(string username);
+        Task<ReponderModel<bool>> CheckPaidWithBookChapter(string username, int bookId);
     }
 }

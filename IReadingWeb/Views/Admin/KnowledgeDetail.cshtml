@@ -35,9 +35,12 @@
             <div class="card-body px-0 pb-2">
                 <div class="table-responsive p-0">
                       <h3 class="title">@Model.Title</h3>
-                    <p class="title">
-                          @Model.Content
-                      </p>
+                      <div class="title">
+                        <p class="title">
+                            @Html.Raw(@Model.Content)
+                        </p>
+                      </div>
+
                       <div style="text-align:center">
                         <button type="button" onclick="window.location.href='/Admin/BasicKnowledge'" class="btn btn-secondary mt-4">Quay lại</button>
                       </div>

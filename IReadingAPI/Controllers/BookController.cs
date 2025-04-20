@@ -172,11 +172,20 @@ namespace LBSAPI.Controllers
             return result;
         }
 
+
+        [Route("CheckPaidWithBookChapter")]
+        [HttpGet]
+        public async Task<ReponderModel<bool>> CheckPaidWithBookChapter(string username, int bookId)
+        {
+            var result = await _bookRepository.CheckPaidWithBookChapter(username, bookId);
+            return result;
+        }
+
         [Route("GetListNote")]
         [HttpGet]
-        public async Task<ReponderModel<NoteUser>> GetListNote(string username, string chapterId)
+        public async Task<ReponderModel<NoteUser>> GetListNote(string username, int bookId)
         {
-            var result = await _bookRepository.GetListNote(username,chapterId);
+            var result = await _bookRepository.GetListNote(username, bookId);
             return result;
         }
 

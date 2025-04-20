@@ -21,6 +21,7 @@ namespace Repositories.IRepository
         Task<ReponderModel<BookViewModel>> GetAllBookByUser(string userName);
         Task<ReponderModel<BookViewModel>> GetAllBookByCategory(string category);
         Task<ReponderModel<string>> CreateBookChapter(BookChapter bookChapter);
+        Task<ReponderModel<bool>> CheckPaidWithBookChapter(string username, int bookId);
         Task<ReponderModel<string>> UpdateBookChapter(BookChapter bookChapter);
         Task<ReponderModel<BookChapter>> GetBookChapter(string id);
         Task<ReponderModel<BookChapterModel>> GetBookChapterWithVoice(string id);
@@ -48,12 +49,14 @@ namespace Repositories.IRepository
         Task<ReponderModel<string>> AddOrRemoveFavouriteBook(string userName, int bookId);
         Task<ReponderModel<UserBook>> ListFavouriteBook(string userName);
         Task<ReponderModel<BookModel>> SearchBook(string input);
-        Task<ReponderModel<NoteUser>> GetListNote(string username,string chapterId);
+        Task<ReponderModel<NoteUser>> GetListNote(string username,int bookId);
         Task<ReponderModel<string>> UpdateNoteUser(NoteUser note);
         Task<ReponderModel<string>> DeleteNoteUser(int id);
         Task<ReponderModel<BookRatingModel>> GetTop10BookRating();
         Task<ReponderModel<BookModel>> GetTop10NewBook();
         Task<ReponderModel<BookModel>> GetTop10FavoriteBook();
+        Task<ReponderModel<string>> UpdateCommentUser(CommentUser comment);
+        Task<ReponderModel<string>> GetListCommentByChapter(string chapterId);
 
     }
 }

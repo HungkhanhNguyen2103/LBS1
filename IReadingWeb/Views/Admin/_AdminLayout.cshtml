@@ -10,6 +10,18 @@
     {
         ViewContext.HttpContext.Response.Redirect("/Account/Logout");
     }
+    if(string.IsNullOrEmpty(jwtToken) && !User.Identity.IsAuthenticated)
+    {
+        if(claims != null)
+        {
+            var isConfirmEmail = User.FindFirst(ClaimTypes.Email).Value;
+            if (string.IsNullOrEmpty(isConfirmEmail) || isConfirmEmail == "False")
+            {
+                ViewContext.HttpContext.Response.Redirect("/Account/EmailReConfirm");
+            }
+        }
+        ViewContext.HttpContext.Response.Redirect("/Account/EmailReConfirm");
+    }
     if (!string.IsNullOrEmpty(jwtToken) && User.Identity.IsAuthenticated)
     {
         userName = User.FindFirst(ClaimTypes.NameIdentifier).Value;

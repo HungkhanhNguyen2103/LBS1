@@ -475,12 +475,15 @@ namespace LBSWeb.Controllers
         [Route("{id}/CreateChapterBook")]
         public async Task<IActionResult> CreateChapterBook(int id,string returnUrl = "")
         {
+            var username = User.FindFirst(ClaimTypes.NameIdentifier).Value;
             ViewBag.BookId = id;         
             var result = await _bookService.GetBook(id);
             var resultChapterBook = await _bookService.GetListBookChapter(id);
 
             var startChapterId = resultChapterBook.DataList.Count + 1;
 
+            var resultPaid = await _bookService.CheckPaidWithBookChapter(username, id);
+            ViewBag.PaidChapter = resultPaid.Data;
             ViewBag.StartChapterId = startChapterId;
             ViewBag.ReturnUrl = returnUrl;
 
@@ -501,10 +504,13 @@ namespace LBSWeb.Controllers
         [Route("{id}/UpdateChapterBook/{chapterId}")]
         public async Task<IActionResult> UpdateChapterBook(int id,string chapterId, string returnUrl)
         {
+            var username = User.FindFirst(ClaimTypes.NameIdentifier).Value;
             ViewBag.BookId = id;
             ViewBag.ReturnUrl = returnUrl;
             var result = await _bookService.GetBook(id);
             var resultChapterBook = await _bookService.GetBookChapter(chapterId);
+            var resultPaid = await _bookService.CheckPaidWithBookChapter(username, id);
+            ViewBag.PaidChapter = resultPaid.Data;
             ViewBag.BookName = "";
             if (result.IsSussess) ViewBag.BookName = result.Data.Name;
             ViewBag.ChapterId = chapterId;

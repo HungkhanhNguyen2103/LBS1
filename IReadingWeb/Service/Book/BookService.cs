@@ -484,5 +484,24 @@ namespace LBSWeb.Service.Book
             }
             return res;
         }
+
+        public async Task<ReponderModel<bool>> CheckPaidWithBookChapter(string username, int bookId)
+        {
+            var res = new ReponderModel<bool>();
+            try
+            {
+                string url = PathUrl.BOOK_PAID_CHAPTER;
+                var param = new Dictionary<string, string>();
+                param.Add("bookId", bookId.ToString());
+                param.Add("username", username);
+                res = await _api.Get<ReponderModel<bool>>(url, param);
+
+            }
+            catch (Exception ex)
+            {
+                res.Message = "Lỗi gọi api!";
+            }
+            return res;
+        }
     }
 }

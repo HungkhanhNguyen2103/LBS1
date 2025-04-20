@@ -26,6 +26,7 @@ namespace BusinessObject.BaseModel
         // 0 - User
         // 1 - Author
         public int RegisterType { get; set; }
+        public string? DeviceToken { get; set; }
     }
 
     public class AccountViewModel : AccountModel

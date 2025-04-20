@@ -32,6 +32,7 @@
         public static string BOOK_UPDATE_CHAPTER = "api/Book/UpdateBookChapter";
         public static string BOOK_GET_BY_USER = "api/Book/GetAllBookByUser";
         public static string BOOK_CREATE_CHAPTER = "api/Book/CreateBookChapter";
+        public static string BOOK_PAID_CHAPTER = "api/Book/CheckPaidWithBookChapter";
         public static string BOOK_GET_CHAPTER = "api/Book/GetListBookChapter";
         public static string BOOK_GET_BOOK_CHAPTER = "api/Book/GetBookChapter";
         public static string BOOK_GENERATE_SUMMARY_CHAPTER = "api/Book/GenerateSummary";

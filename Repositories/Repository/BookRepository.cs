@@ -393,6 +393,12 @@ namespace Repositories.Repository
                 if (res.IsSussess) bookChapter.Summary = res.Data;
             }
 
+            if(bookChapter.Price < 0)
+            {
+                result.Message = "Giá tiền không hợp lệ";
+                return result;
+            }
+
             bookChapter.Content = await UploadImageContent(bookChapter.Content);
             bookChapter.BookType = BookType.PendingApproval;
             bookChapter.ModifyDate = DateTime.Now;
@@ -659,6 +665,12 @@ namespace Repositories.Repository
                 return result;
             }
 
+            if (bookChapter.Price < 0)
+            {
+                result.Message = "Giá tiền không hợp lệ";
+                return result;
+            }
+
             if (string.IsNullOrEmpty(bookChapter.Summary))
             {
                 var res = await GenerateSummary(bookChapter.Content);
@@ -807,10 +819,25 @@ namespace Repositories.Repository
 
             var listBookChapter = await _mongoContext.BookChapters.Find(filter).ToListAsync();
 
-            var update = Builders<BookChapter>.Update
+            var filterFree = Builders<BookChapter>.Filter.And(
+                                Builders<BookChapter>.Filter.Where(p => p.BookId == bookId),
+                                Builders<BookChapter>.Filter.Where(p => p.Type != 3),
+                                Builders<BookChapter>.Filter.Where(p => p.BookType == BookType.PendingApproval),
+                                Builders<BookChapter>.Filter.Eq(p => p.Price,0)
+                            );
+            var updateFree = Builders<BookChapter>.Update
                 .Set(c => c.BookType, BookType.Free);
+            await _mongoContext.BookChapters.UpdateManyAsync(filterFree, updateFree);
 
-            await _mongoContext.BookChapters.UpdateManyAsync(filter, update);
+            var filterPaid = Builders<BookChapter>.Filter.And(
+                    Builders<BookChapter>.Filter.Where(p => p.BookId == bookId),
+                    Builders<BookChapter>.Filter.Where(p => p.Type != 3),
+                    Builders<BookChapter>.Filter.Where(p => p.BookType == BookType.PendingApproval),
+                    Builders<BookChapter>.Filter.Ne(p => p.Price, 0)
+                );
+            var updatePaid = Builders<BookChapter>.Update
+                .Set(c => c.BookType, BookType.Payment);
+            await _mongoContext.BookChapters.UpdateManyAsync(filterPaid, updatePaid);
 
             foreach (var item in listBookChapter)
             {
@@ -1011,7 +1038,7 @@ namespace Repositories.Repository
 
 
             var update = Builders<BookChapter>.Update
-                .Set(c => c.BookType, BookType.Free);
+                .Set(c => c.BookType, bookChapter.Price != 0 ? BookType.Payment : BookType.Free);
 
             await _mongoContext.BookChapters.UpdateOneAsync(filter, update);
 
@@ -1362,7 +1389,7 @@ namespace Repositories.Repository
 
             var result1 = await index.SearchAsync<BookIndexModel>(input, new SearchQuery
             {
-                //Limit = 20
+                Limit = 20
             });
             var response = result1.Hits;
             result.IsSussess = true;
@@ -1377,10 +1404,10 @@ namespace Repositories.Repository
             return result;
         }
 
-        public async Task<ReponderModel<NoteUser>> GetListNote(string username,string chapterId)
+        public async Task<ReponderModel<NoteUser>> GetListNote(string username,int bookId)
         {
             var result = new ReponderModel<NoteUser>();
-            result.DataList = await _lBSDbContext.NoteUsers.Where(c => c.UserName == username && c.ChapterId == chapterId).ToListAsync();
+            result.DataList = await _lBSDbContext.NoteUsers.Where(c => c.UserName == username && c.BookId == bookId).ToListAsync();
             result.IsSussess = true;
             return result;
         }
@@ -1401,7 +1428,8 @@ namespace Repositories.Repository
             }
             else
             {
-                noteData.ChapterId = noteData.ChapterId;
+                noteData.BookId = note.BookId;
+                noteData.ChapterId = note.ChapterId;
                 noteData.NoteContent = note.NoteContent;
                 noteData.SelectedText = note.SelectedText;
                 noteData.Start = note.Start;
@@ -1496,6 +1524,59 @@ namespace Repositories.Repository
                                   Name = g.Key.Name
                               }).Take(10).ToListAsync();
             result.DataList = books;
+            result.IsSussess = true;
+            return result;
+        }
+
+        public async Task<ReponderModel<string>> UpdateCommentUser(CommentUser comment)
+        {
+            var result = new ReponderModel<string>();
+            if (comment == null)
+            {
+                result.Message = "Data không hợp lệ";
+                return result;
+            }
+            var commentRow = await _lBSDbContext.CommentUsers.FirstOrDefaultAsync(c => c.Id == comment.Id);
+            if (commentRow == null)
+            {
+                comment.ModifyDate = DateTime.UtcNow;
+                _lBSDbContext.CommentUsers.Add(comment);
+            }
+            else
+            {
+                commentRow.Content = comment.Content;
+                commentRow.ModifyDate = DateTime.UtcNow;
+            }
+            await _lBSDbContext.SaveChangesAsync();
+            result.IsSussess = true;
+            result.Message = "Cập nhật thành công";
+            return result;
+        }
+
+        public async Task<ReponderModel<string>> GetListCommentByChapter(string chapterId)
+        {
+            var result = new ReponderModel<string>();
+            var reponse = await _lBSDbContext.CommentUsers.Where(c => c.ChapterId == chapterId).ToListAsync();
+            //foreach (var item in reponse)
+            //{
+            //    var userComment
+            //}
+            throw new NotImplementedException();
+        }
+
+        public async Task<ReponderModel<bool>> CheckPaidWithBookChapter(string username,int bookId)
+        {
+            var result = new ReponderModel<bool>();
+            var filter = Builders<BookChapter>.Filter.And(
+                Builders<BookChapter>.Filter.Where(p => p.BookId == bookId),
+                Builders<BookChapter>.Filter.Where(p => p.CreateBy == username),
+                Builders<BookChapter>.Filter.Where(p => p.Type != 3),
+                Builders<BookChapter>.Filter.Where(p => p.BookType == BookType.Free || p.BookType == BookType.Payment)
+            );
+
+            var listBookChapter = await _mongoContext.BookChapters.Find(filter).ToListAsync();
+            // toi thieu 10 chương
+            result.Data = listBookChapter.Count >= 3 ? true : false;
             result.IsSussess = true;
             return result;
         }

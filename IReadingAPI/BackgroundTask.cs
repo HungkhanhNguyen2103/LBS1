@@ -32,8 +32,8 @@ namespace IReadingAPI
                     }
                 }
 
-                // Lặp lại mỗi 1 giờ 
-                //await Task.Delay(TimeSpan.FromHours(1), stoppingToken);
+                // Lặp lại mỗi 3 giờ 
+                await Task.Delay(TimeSpan.FromHours(3), stoppingToken);
             }
         }
     }
