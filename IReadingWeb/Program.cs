@@ -8,6 +8,8 @@ using LBSWeb.Service.Book;
 using LBSWeb.Service.Information;
 using LBSWeb.Services.Account;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.Google;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -17,10 +19,10 @@ builder.Services.AddControllersWithViews();
 
 builder.Services.AddAuthentication(options =>
 {
-    options.DefaultScheme = "Cookies";
-    options.DefaultChallengeScheme = "Google";
+    options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme;
 })
-//.AddCookie("Cookies")
+.AddCookie()
 .AddGoogle("Google", options =>
 {
     options.ClientId = builder.Configuration["GoogleKey:ClientId"].ToString();
@@ -66,7 +68,7 @@ builder.Services.AddCors(options =>
 });
 
 
-builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie();
+//builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie();
 
 var app = builder.Build();
 
@@ -81,11 +83,24 @@ var app = builder.Build();
 app.UseCors("AllowSpecificOrigin");
 
 app.UseHttpsRedirection();
+
+app.UseForwardedHeaders(new ForwardedHeadersOptions
+{
+    ForwardedHeaders = ForwardedHeaders.XForwardedProto | ForwardedHeaders.XForwardedFor
+});
+
 app.UseStaticFiles();
 
 app.UseRouting();
 
 app.UseNotyf();
+
+app.UseCookiePolicy(new CookiePolicyOptions
+{
+    MinimumSameSitePolicy = SameSiteMode.None,
+    Secure = CookieSecurePolicy.Always
+});
+
 
 app.UseAuthentication();
 app.UseAuthorization();
