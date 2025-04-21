@@ -1700,5 +1700,13 @@ namespace Repositories.Repository
             result.IsSussess = true;
             return result;
         }
+
+        public async Task<ReponderModel<string>> GetAnalysis(string input)
+        {
+            var prompt = $@"Bạn là công cụ phân tích nội dung. Hãy phân tích đoạn văn dưới đây giúp tôi (tối đa 200 từ): 
+                           Đây là nội dung đoạn văn: {input}";
+            var resultData = await _aIGeneration.TextGenerate(prompt);
+            return resultData;
+        }
     }
 }

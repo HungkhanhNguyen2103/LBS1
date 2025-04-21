@@ -173,6 +173,14 @@ namespace LBSAPI.Controllers
             return result;
         }
 
+        [Route("GetAnalysis")]
+        [HttpGet]
+        public async Task<ReponderModel<string>> GetAnalysis(string input)
+        {
+            var result = await _bookRepository.GetAnalysis(input);
+            return result;
+        }
+
         [Route("GetBookHomePage")]
         [HttpGet]
         public async Task<ReponderModel<BookHomePageModel>> GetBookHomePage()

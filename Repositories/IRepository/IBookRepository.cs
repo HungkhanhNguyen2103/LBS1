@@ -59,6 +59,7 @@ namespace Repositories.IRepository
         Task<ReponderModel<CategoryModel>> GetTop10CategoryView();
         Task<ReponderModel<string>> UpdateCommentUser(CommentUser comment);
         Task<ReponderModel<string>> GetListCommentByChapter(string chapterId);
+        Task<ReponderModel<string>> GetAnalysis(string input);
 
     }
 }
