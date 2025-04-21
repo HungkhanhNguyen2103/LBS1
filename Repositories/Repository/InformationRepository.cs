@@ -501,6 +501,7 @@ namespace Repositories.Repository
         public async Task<ReponderModel<UserProfileModel>> GetUserProfile(string username)
         {
             var result = new ReponderModel<UserProfileModel>();
+            var now = DateTime.UtcNow;
             var profile = await _accountRepository.GetInformation(username);
             if (profile == null) { 
                 result.Message = "Thông tin không hợp lệ";
@@ -513,10 +514,40 @@ namespace Repositories.Repository
             {
                 UserName = profile.Data.UserName,
                 FullName = profile.Data.FullName,
-                Avatar = profile.Data.Avatar,  
-                IsComfirm = isConfirm.IsSussess && isConfirm.Data,
+                Avatar = profile.Data.Avatar,
+                IsConfirm = isConfirm.IsSussess && isConfirm.Data,
             };
-            var now = DateTime.UtcNow;
+
+            // get int minute
+            // BookTypeStatus : 0 Read, 1: VOice
+            var listViewBook = await _lBSDbContext.UserBookViews.Where(c => c.CreateBy == username && c.CreateDate.Date == now.Date && c.EndDate != DateTime.MinValue).ToListAsync();
+
+            var listViewRead = listViewBook.Where(c => c.BookTypeStatus == BookTypeStatus.Read).ToList();
+            foreach (var view in listViewRead)
+            {
+                if(view.EndDate.Date == now.Date)
+                {
+                    item.MinuteRead += (int) view.EndDate.Subtract(view.CreateDate).TotalMinutes; 
+                }
+                else
+                {
+                    item.MinuteRead += (int) view.EndDate.Date.Subtract(view.CreateDate).TotalMinutes;
+                }
+            }
+
+            var listViewListen = listViewBook.Where(c => c.BookTypeStatus == BookTypeStatus.Voice).ToList();
+            foreach (var view in listViewListen)
+            {
+                if (view.EndDate.Date == now.Date)
+                {
+                    item.MinuteListen += (int)view.EndDate.Subtract(view.CreateDate).TotalMinutes;
+                }
+                else
+                {
+                    item.MinuteListen += (int)view.EndDate.Date.Subtract(view.CreateDate).TotalMinutes;
+                }
+            }
+
             var paidPackage = await _lBSDbContext.UserTranscations.Include(c => c.PaymentItem).Where(c => c.UserName == username).ToListAsync();
             var userTranscations = await _lBSDbContext.UserTranscationBooks.Where(c => c.UserName == username).ToListAsync();
             if(paidPackage != null && paidPackage.Count > 0)

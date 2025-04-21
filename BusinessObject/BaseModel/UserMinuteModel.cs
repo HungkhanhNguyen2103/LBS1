@@ -19,6 +19,7 @@ namespace BusinessObject.BaseModel
         //Friday = 5,
         //Saturday = 6
         public DayOfWeek DayOfWeek { get; set; }
+        public string DayOfWeekStr { get; set; }
         public DateTime Day { get; set; }
         public bool IsToday { get; set; }
     }

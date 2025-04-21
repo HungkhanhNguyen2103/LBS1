@@ -1225,29 +1225,39 @@ namespace Repositories.Repository
         {
             var result = new ReponderModel<UserMinuteModel>();
 
-            var now = DateTime.UtcNow;
+            var now = DateTime.UtcNow.AddDays(-10);
             var dayOfweek = now.DayOfWeek;
             var dateNow = now.Date;
             var startOfWeek = dateNow.AddDays(-(int)dayOfweek + 1);
             var endOfWeek = startOfWeek.AddDays(7);
 
-            var asQuery = _lBSDbContext.UserBookViews.Where(c => c.CreateBy == userName && c.CreateDate.CompareTo(c.EndDate) < 0 && c.CreateDate.Date >= startOfWeek.Date && c.EndDate <= endOfWeek.Date).AsQueryable();
+            var asQuery = _lBSDbContext.UserBookViews.Where(c => c.CreateBy == userName && c.EndDate != DateTime.MinValue && c.CreateDate >= startOfWeek && c.CreateDate < endOfWeek).AsQueryable();
             var readMinute = await asQuery.Where(c => c.BookTypeStatus == BookTypeStatus.Read).ToListAsync();
             var voiceMinute = await asQuery.Where(c => c.BookTypeStatus == BookTypeStatus.Voice).ToListAsync();
 
             var i = startOfWeek;
-            while (i <= endOfWeek)
+            while (i < endOfWeek)
             {
+                var readMinuteInt = readMinute.Where(c => c.CreateDate.Date.CompareTo(i.Date) == 0 && c.EndDate.Date.CompareTo(i.Date) == 0).Sum(c => (int)c.EndDate.Subtract(c.CreateDate).TotalMinutes)
+                    + readMinute.Where(c => c.CreateDate.Date.CompareTo(i.Date) == 0 && c.EndDate.Date.CompareTo(i.Date) > 0).Sum(c => (int)c.EndDate.Date.Subtract(c.CreateDate).TotalMinutes)
+                    + readMinute.Where(c => c.CreateDate.Date.CompareTo(i.Date) == -1 && c.EndDate.Date.CompareTo(i.Date) == 0).Sum(c => (int)c.EndDate.Subtract(c.EndDate.Date).TotalMinutes);
+
+                var listenMinuteInt = voiceMinute.Where(c => c.CreateDate.Date.CompareTo(i.Date) == 0 && c.EndDate.CompareTo(i.Date) == 0).Sum(c => (int)c.EndDate.Subtract(c.CreateDate).TotalMinutes)
+                    + voiceMinute.Where(c => c.CreateDate.Date.CompareTo(i.Date) == 0 && c.EndDate.Date.CompareTo(i.Date) > 0).Sum(c => (int)c.EndDate.Date.Subtract(c.CreateDate).TotalMinutes)
+                    + voiceMinute.Where(c => c.CreateDate.Date.CompareTo(i.Date) == -1 && c.EndDate.Date.CompareTo(i.Date) == 0).Sum(c => (int)c.EndDate.Subtract(c.EndDate.Date).TotalMinutes);
+
                 var item = new UserMinuteModel
                 {
                     Day = i,
                     IsToday = dateNow.CompareTo(i) == 0 ? true : false,
                     DayOfWeek = i.DayOfWeek,
+                    DayOfWeekStr = GetDayOfWeekStr(i.DayOfWeek),
                     UserName = userName,
-                    ReadMinute = readMinute.Where(c => c.CreateDate.Date.CompareTo(i.Date) == 0).Sum(c => (int)c.EndDate.Subtract(c.CreateDate).TotalSeconds),
-                    ListenMinute = voiceMinute.Where(c => c.CreateDate.Date.CompareTo(i.Date) == 0).Sum(c => (int)c.EndDate.Subtract(c.CreateDate).TotalSeconds),
+                    ReadMinute = readMinuteInt,
+                    ListenMinute = listenMinuteInt,
                 };
                 result.DataList.Add(item);
+                i = i.AddDays(1);
             }
             return result;
         }
@@ -1707,6 +1717,29 @@ namespace Repositories.Repository
                            Đây là nội dung đoạn văn: {input}";
             var resultData = await _aIGeneration.TextGenerate(prompt);
             return resultData;
+        }
+
+        private string GetDayOfWeekStr(DayOfWeek dayOfWeek)
+        {
+            switch (dayOfWeek)
+            {
+                case DayOfWeek.Sunday:
+                    return "CN";
+                case DayOfWeek.Monday:
+                    return "Th2";
+                case DayOfWeek.Tuesday:
+                    return "Th3";
+                case DayOfWeek.Wednesday:
+                    return "Th4";
+                case DayOfWeek.Thursday:
+                    return "Th5";
+                case DayOfWeek.Friday:
+                    return "Th6";
+                case DayOfWeek.Saturday:
+                    return "Th7";
+                default:
+                    return string.Empty;
+            }
         }
     }
 }

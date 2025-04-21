@@ -11,7 +11,7 @@ namespace BusinessObject.BaseModel
         public string? UserName { get; set; }
         public string? FullName { get; set; }
         public string? Avatar { get; set; }
-        public bool IsComfirm { get; set; }
+        public bool IsConfirm { get; set; }
         public string? PaymentName { get; set; }
         public DateTime CreateDate { get; set; }
         public DateTime ExpireDate { get; set; }
