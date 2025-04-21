@@ -1388,9 +1388,16 @@ namespace Repositories.Repository
             var client = new MeilisearchClient("https://ireading.store/search/", key);
             var index = client.Index("books");
 
+            //await index.UpdateSearchableAttributesAsync(new[]
+            //    {
+            //       "Name",
+            //       "Author",
+            //       "Categories"
+            //    });
+
             var result1 = await index.SearchAsync<BookIndexModel>(input, new SearchQuery
             {
-                Limit = 20
+                //Limit = 20
             });
             var response = result1.Hits;
             result.IsSussess = true;
