@@ -82,9 +82,9 @@ namespace LBSWeb.Controllers
         }
 
         [Authorize(Roles = $"{Role.Admin},{Role.Author}")]
-        [Route("UpdateConspectus")]
+        [Route("CreateConspectus")]
         [HttpPost]
-        public async Task<IActionResult> UpdateConspectus(Conspectus model)
+        public async Task<IActionResult> CreateConspectus(Conspectus model)
         {
             model.CreateBy = User.FindFirst(ClaimTypes.NameIdentifier).Value;
             model.UserId = User.FindFirst(ClaimTypes.PrimarySid).Value;
@@ -114,6 +114,26 @@ namespace LBSWeb.Controllers
         {
             var res = await _informationService.ConspectusDetail(id);
             return View(res.Data);
+        }
+
+        [Authorize(Roles = $"{Role.Admin},{Role.Author}")]
+        [Route("ConspectusDetail/{id}")]
+        [HttpPost]
+        public async Task<IActionResult> ConspectusDetail(Conspectus model)
+        {
+            model.CreateBy = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            model.UserId = User.FindFirst(ClaimTypes.PrimarySid).Value;
+            var result = await _informationService.UpdateConspectus(model);
+            if (result.IsSussess)
+            {
+                _notyf.Success(result.Message);
+                return RedirectToAction("ListConspectus");
+            }
+            else
+            {
+                _notyf.Error(result.Message);
+                return View(model);
+            }
         }
 
         [Authorize(Roles = $"{Role.Admin},{Role.Author},{Role.Manager}")]

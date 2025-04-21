@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Net;
 using System.Reflection.Metadata;
 using MongoDB.Driver;
+using HtmlAgilityPack;
 
 namespace Repositories.Repository
 {
@@ -243,7 +244,7 @@ namespace Repositories.Repository
                 return result;
             }
 
-            if (string.IsNullOrEmpty(model.Content)) 
+            if (string.IsNullOrEmpty(model.Content) || !HasContent(model.Content)) 
             {
                 result.Message = "Nội dung không được để trống";
                 return result;
@@ -544,6 +545,14 @@ namespace Repositories.Repository
             result.Data = item;
             result.IsSussess = true;
             return result;
+        }
+
+        private bool HasContent(string html)
+        {
+            var doc = new HtmlDocument();
+            doc.LoadHtml(html);
+            var text = doc.DocumentNode.InnerText;
+            return !string.IsNullOrWhiteSpace(text);
         }
     }
 }

@@ -34,7 +34,7 @@
                         <thead>
                             <tr>
                                 <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Đại cương</th>
-                                <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Nội dung</th>
+                                <th class="d-none text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Nội dung</th>
                                 <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Cập nhật</th>
                                 <th class="text-secondary opacity-7"></th>
                             </tr>
@@ -46,8 +46,8 @@
                                     <td>
                                         <p class="mx-3 text-xs font-weight-bold mb-0">@item.Name</p>
                                     </td>
-                                    <td>
-                                        <p class="mx-3 text-xs font-weight-bold mb-0">@(item.Content.Length > 50 ? item.Content.Substring(0, 50) + "..." : item.Content)</p>
+                                    <td class="d-none">
+                                        <p class="mx-3 text-xs font-weight-bold mb-0">@Html.Raw(item.Content)</p>
                                     </td>
                                     <td>
                                         <p class="mx-3 text-xs font-weight-bold mb-0">@item.ModifyDate.ToString("HH:mm dd/MM/yyyy")</p>

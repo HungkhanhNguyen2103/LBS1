@@ -40,14 +40,16 @@ namespace Repositories.Repository
                          }).ToListAsync();
             try
             {
+                //books.RemoveAt(0);
                 //http://ireading.store:7700/
+                //https://ireading.store/search/
                 var client = new MeilisearchClient("https://ireading.store/search/", key);
                 var index = client.Index("books");
 
                 await index.DeleteAllDocumentsAsync();
                 await index.AddDocumentsAsync(books);
 
-
+                await index.UpdateSearchableAttributesAsync(new[] { "name", "author", "categories" });
                 var log = new MeilisearchLog
                 {
                     CreateDate = DateTime.UtcNow,

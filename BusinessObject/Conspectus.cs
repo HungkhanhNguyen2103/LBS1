@@ -11,9 +11,9 @@ namespace BusinessObject
     {
         public int Id { get; set; }
         [Column(TypeName = "nvarchar(MAX)")]
-        public string Name { get; set; }
+        public string? Name { get; set; }
         [Column(TypeName = "nvarchar(MAX)")]
-        public string Content { get; set; }
+        public string? Content { get; set; }
         public DateTime ModifyDate { get; set; }
         //public int BookId { get; set; }
         //public Book? Book { get; set; }

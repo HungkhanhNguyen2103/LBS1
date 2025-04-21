@@ -397,6 +397,11 @@ namespace LBSWeb.Service.Information
                 res.Message = "Thông tin không hợp lệ!";
                 return res;
             }
+            if (string.IsNullOrEmpty(model.Name))
+            {
+                res.Message = "Tên đại cương không để trống";
+                return res;
+            }
             try
             {
                 string url = PathUrl.INFO_UPDATE_CONSPECTUS;

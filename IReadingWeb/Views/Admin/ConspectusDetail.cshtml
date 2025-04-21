@@ -24,7 +24,7 @@
     }
 </style>
 <div class="row">
-    <form method="post" asp-action="UpdateConspectus">
+    <form method="post" asp-action="ConspectusDetail">
         <div class="col-12">
             <div class="card my-4">
                 <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
@@ -41,7 +41,8 @@
                         </div>
                         <div style="display:block" class="input-group input-group-outline mt-4">
                             <label for="Summary">Nội dung đại cương</label>
-                            <textarea style="width:100%" asp-for="Content" type="text" class="form-control" rows="8"></textarea>
+                            <div style="height:19rem;overflow: auto;width:100%" id="ContentDiv" class="form-control"></div>
+                            <textarea style="display:none" asp-for="Content" type="text" class="form-control" rows="8"></textarea>
                         </div>
                         <button type="submit" class="btn btn-success mt-4">Lưu thông tin</button>
                         <button type="button" onclick="window.location.href='/Admin/ListConspectus'" class="btn btn-secondary mt-4 ml-2">Quay lại</button>
@@ -51,8 +52,55 @@
         </div>
     </form>
 </div>
-
+<script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js" asp-append-version="true"></script>
 <script type="text/javascript">
+    const quill = new Quill('#ContentDiv', {
+        theme: 'snow',
+        modules: {
+            toolbar: {
+                container: [
+                    [{ 'header': [1, 2, 3, false] }],
+                    ['bold', 'italic', 'strike'],
+                    ['image'],
+                    [{ 'background': [] }],
+                    [{ 'script': 'sub' }, { 'script': 'super' }],
+                    [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                    [{ 'indent': '-1' }, { 'indent': '+1' }],
+                    [{ 'align': [] }],
+                    ['clean']
+                ],
+                // handlers: {
+                //     image: imageHandler
+                // }
+            }
 
+        }
+    });
+
+    const htmlContent = '@Html.Raw(Model.Content)';
+    quill.clipboard.dangerouslyPasteHTML(htmlContent);
+
+    getWordNo();
+
+    const input1 = document.getElementById("ContentDiv");
+    const events = [
+        "click", "focus", "blur", "change", "input",
+        "keydown", "keyup", "keypress",
+        "paste", "cut", "copy", "mousedown", "mouseup",
+        "mouseenter", "mouseleave", "mouseover", "mouseout",
+        "drag", "drop", "contextmenu"
+    ];
+
+    events.forEach(event => {
+        input1.addEventListener(event, (e) => {
+            getWordNo();
+        });
+    });
+
+    function getWordNo() {
+        var textContent = quill.root.innerHTML;
+        $('#Content').val(textContent);
+
+    }
 
 </script>
