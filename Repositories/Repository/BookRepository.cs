@@ -1304,7 +1304,7 @@ namespace Repositories.Repository
         {
             var result = new ReponderModel<UserMinuteModel>();
 
-            var now = DateTime.UtcNow.AddDays(-10);
+            var now = DateTime.UtcNow;
             var dayOfweek = now.DayOfWeek;
             var dateNow = now.Date;
             var startOfWeek = dateNow.AddDays(-(int)dayOfweek + 1);
