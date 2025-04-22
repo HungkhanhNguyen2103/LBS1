@@ -11,7 +11,6 @@ using MongoDB.Bson;
 using MongoDB.Bson.IO;
 using MongoDB.Bson.Serialization.Serializers;
 using MongoDB.Driver;
-using OpenAI.Chat;
 using Repositories.IRepository;
 using System;
 using System.Collections.Generic;
@@ -1381,8 +1380,9 @@ namespace Repositories.Repository
             return reponse;
         }
 
-        private async Task<bool> InsertOrUpdateChapterVoice(string chapterId, string contentWithTime)
+        public async Task<ReponderModel<string>> InsertOrUpdateChapterVoice(string chapterId, string contentWithTime,string fileName, int price = 1000)
         {
+            var result = new ReponderModel<string>();
             var filter = Builders<BookChapterVoice>.Filter.Eq(c => c.ChapterId, chapterId);
             var bookChapterVoice = await _mongoContext.BookChapterVoices.Find(filter).FirstOrDefaultAsync();
             if(bookChapterVoice == null)
@@ -1391,20 +1391,25 @@ namespace Repositories.Repository
                 {
                     ChapterId = chapterId,
                     ContentWithTime = contentWithTime,
-                    FileName = chapterId,
+                    FileName = fileName,
                     ModifyDate = DateTime.UtcNow,
+                    Price = price,
                 };
                 await _mongoContext.BookChapterVoices.InsertOneAsync(bookChapterVoice);
-                return true;
             }
-            
-            var update = Builders<BookChapterVoice>.Update
-                .Set(c => c.ContentWithTime, contentWithTime)
-                .Set(c => c.FileName, chapterId)
-                .Set(c => c.ModifyDate, DateTime.UtcNow);
+            else
+            {
+                var update = Builders<BookChapterVoice>.Update
+                            .Set(c => c.ContentWithTime, contentWithTime)
+                            .Set(c => c.FileName, chapterId)
+                            .Set(c => c.Price, price)
+                            .Set(c => c.ModifyDate, DateTime.UtcNow);
 
-            await _mongoContext.BookChapterVoices.UpdateOneAsync(filter, update);
-            return true;
+                await _mongoContext.BookChapterVoices.UpdateOneAsync(filter, update);
+            }
+            result.IsSussess = true;
+            result.Message = "Thành công";
+            return result;
         }
 
         private async Task<ReponderModel<string>> CreateContentWithTimeStamp(string input)
@@ -1945,6 +1950,17 @@ namespace Repositories.Repository
             }
 
             book.Status = BookStatus.Pause;
+
+            var filter = Builders<BookChapter>.Filter.Where(p => p.BookId == book.Id);
+
+
+            var update = Builders<BookChapter>.Update
+                .Set(c => c.BookType, BookType.Decline);
+
+            await _mongoContext.BookChapters.UpdateManyAsync(filter, update);
+
+            //var listChapterBook = _mongoContext.BookChapters.Find(c => c.BookId == bookId).tl
+
             await _lBSDbContext.SaveChangesAsync();
             result.IsSussess = true;
             result.Message = "Thành công";
@@ -1968,9 +1984,9 @@ namespace Repositories.Repository
             return result;
         }
 
-        public async Task<ReponderModel<BookChapterVoice>> GetChapterAudio(string chapterId)
+        public async Task<ReponderModel<BookChapterVoiceModel>> GetChapterAudio(string chapterId)
         {
-            var result = new ReponderModel<BookChapterVoice>();
+            var result = new ReponderModel<BookChapterVoiceModel>();
             var filter = Builders<BookChapter>.Filter.Eq(c => c.Id, chapterId);
             var bookChapter = await _mongoContext.BookChapters.Find(filter).FirstOrDefaultAsync();
             if (bookChapter == null)
@@ -1988,18 +2004,35 @@ namespace Repositories.Repository
                 var bookChapterVoice = await _mongoContext.BookChapterVoices.Find(c => c.ChapterId == chapterId).FirstOrDefaultAsync();
                 if(bookChapterVoice == null)
                 {
-                    var audioResult = await GenerateTextToAudio(bookChapter.Summary, chapterId);
-                    //var audioFileName = audioResult.Data;
+                    var audioFileName = $"${chapterId}.mp3";
+                    var audioResult = await GenerateTextToAudio(bookChapter.Summary, audioFileName);
 
-                    var audioWithTime = await CreateContentWithTimeStamp(bookChapter.Summary);
-                    var audioWithTimeData = audioWithTime.Data.Replace("```json", "").Replace("```", "").Trim();
 
-                    var resultChapterVoice = await InsertOrUpdateChapterVoice(chapterId, audioWithTimeData);
-                    if (!resultChapterVoice)
+                    //var audioWithTime = await CreateContentWithTimeStamp(bookChapter.Summary);
+                    var audioWithTimeData = await AudioTranscription(audioFileName);
+                    if(!audioWithTimeData.IsSussess)
+                    {
+                        result.Message = audioWithTimeData.Message;
+                        return result;
+                    }
+
+                    var audioWithTimeDataJson = Newtonsoft.Json.JsonConvert.SerializeObject(audioWithTimeData.DataList);
+                    
+                    // default Price = 500
+                    var resultChapterVoice = await InsertOrUpdateChapterVoice(chapterId, audioWithTimeDataJson,audioFileName);
+                    if (!resultChapterVoice.IsSussess)
                     {
                         result.Message = "Lỗi tạo file âm thanh";
                         return result;
                     }
+                    result.Data = new BookChapterVoiceModel
+                    {
+                        ChapterId = chapterId,
+                        ContentWithTimes = audioWithTimeData.DataList,
+                        FileUrl = audioFileName,
+                        Price = 1000,
+
+                    };
                 }
 
             }
@@ -2008,13 +2041,20 @@ namespace Repositories.Repository
                 result.Message = ex.Message;
                 return result;
             }
-
+            result.Message = "Thành công";
             result.IsSussess = true;
             return result;
         }
 
-        public Task<ReponderModel<string>> GenerateTextToAudio(string input)
+        public async Task<ReponderModel<string>> GenerateTextToAudio(string input)
         {
+            var result = await _aIGeneration.TextGenerateToSpeech(input,"test.mp3");
+            return result;
+        }
+
+        public async Task<ReponderModel<SegmentModel>> AudioTranscription(string input)
+        {
+            await _aIGeneration.AudioTranscription(input);
             throw new NotImplementedException();
         }
     }

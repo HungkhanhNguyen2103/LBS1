@@ -12,6 +12,7 @@ namespace Repositories.IRepository
     public interface IBookRepository
     {
         Task GetBookImages();
+        Task<ReponderModel<string>> InsertOrUpdateChapterVoice(string chapterId, string contentWithTime, string fileName, int price);
         Task<ReponderModel<Category>> GetCategories();
         Task<ReponderModel<string>> UpdateCategory(Category model);
         Task<ReponderModel<string>> DeleteCategory(int id);
@@ -37,7 +38,9 @@ namespace Repositories.IRepository
         Task<ReponderModel<string>> GenerateSummary(string input);
         Task<ReponderModel<string>> GeneratePoster(string input,string summary);
         Task<ReponderModel<string>> GenerateTextToAudio(string input);
-        Task<ReponderModel<BookChapterVoice>> GetChapterAudio(string chapterId);
+        Task<ReponderModel<string>> GenerateTextToAudio(string input,string filename);
+        Task<ReponderModel<SegmentModel>> AudioTranscription(string input);
+        Task<ReponderModel<BookChapterVoiceModel>> GetChapterAudio(string chapterId);
         Task<ReponderModel<string>> GenerateTextToImage(string input);
         Task<ReponderModel<DraftModel>> GetDrafts(string userName);
         Task<ReponderModel<BookChapterApproveModel>> ApproveBook(int bookId);

@@ -87,7 +87,7 @@
                                             <img src="@item.Poster" class="avatar avatar-sm me-3" style="border-radius:5px;width:50px!important;height:50px!important" alt="">
                                             <div>
                                                 <p id="name-@item.Id" class="text-l font-weight-bold mb-0">@(item.Name.Length > 35 ? item.Name.Substring(0, 35) + "..." : item.Name)</p>
-                                                <span class="text-secondary text-xs">@item.BookStatus <span style="margin-right:5px" class="@(item.BookTypePrice == BookTypePrice.PayByBook ? "status-payment" : "status-free")">@(item.BookTypePrice == BookTypePrice.PayByBook ? "Thanh toán theo sách" : "Thanh toán theo chương")</span><span class="@(item.Status == BookStatus.Done && item.Price > 0 ? "status-payment" : "d-none")">Thanh toán theo sách</span></span>
+                                                <span class="text-secondary text-xs">@item.BookStatus <span style="margin-right:5px" class="@(item.BookTypePrice == BookTypePrice.PayByBook ? "status-payment" : "status-free")">@(item.BookTypePrice == BookTypePrice.PayByBook ? "Thanh toán theo sách" : "Thanh toán theo chương")</span><span class="@(item.Status == BookStatus.Done && item.BookTypePrice != BookTypePrice.PayByBook && item.Price > 0 ? "status-payment" : "d-none")">Thanh toán theo sách</span></span>
                                             </div>
                                         </div>                                  
                                     </td>
@@ -108,12 +108,9 @@
                                         <button class="@(User.IsInRole("Manager") || User.IsInRole("Admin") ? "" : "d-none") btn1 btn btn-secondary" onclick="window.location.href='/Admin/UpdateBook/@item.Id'" title="Thông tin sách">
                                             <i class="fa-solid fa-info"></i>
                                         </button>
-                                        @if (ViewBag.BookType == 5 || ViewBag.BookType == 4 || ViewBag.BookType == 1 || ViewBag.BookType == 2)
-                                        {
-                                            <button class="@((User.IsInRole("Manager") || User.IsInRole("Admin")) ? "" : "d-none") btn1 btn btn-secondary" onclick="window.location.href='/Admin/ApproveBook/@item.Id'" title="Duyệt sách">
-                                                <i class="fa-solid fa-check-square-o"></i>
-                                            </button>
-                                        }
+                                        <button class="@((User.IsInRole("Manager") || User.IsInRole("Admin")) ? "" : "d-none") btn1 btn btn-secondary" onclick="window.location.href='/Admin/ApproveBook/@item.Id'" title="Duyệt sách">
+                                            <i class="fa-solid fa-check-square-o"></i>
+                                        </button>
                                         <button class="@(User.IsInRole("Author") ? "" : "d-none") @(item.Status == BookStatus.Done || (item.BookTypePrice == BookTypePrice.PayByBook && item.Status == BookStatus.PendingApproval) ? "disabled" : "") btn1 btn btn-secondary" onclick="window.location.href='/Admin/@item.Id/CreateChapterBook?ReturnUrl=Books'" title="Thêm chương">
                                             <i class="fa-solid fa-plus"></i>
                                         </button>

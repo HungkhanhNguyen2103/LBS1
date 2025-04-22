@@ -85,20 +85,7 @@
                             <li>- Nội dung chương: abc</li>
                         </ul>
                     </div>
-@*                     <div class="m-4 mt-4 mt-0 p-0 row">
-                        <div class="form-group input-group input-group-outline mt-4 col-6 p-0">
-                            <input asp-for="Id" hidden value="@ViewBag.ChapterId" />
-                            <label for="Name">STT: <span id="StartChapterIdText">@ViewBag.StartChapterId</span></label>
-                            <input style="width:100%" type="number" asp-for="ChaperId" class="form-control">
-                        </div>
-                    </div> *@
-
                     <div class="table-responsive p-0 m-4 mt-0">
-@*                         <select style="width:100%" asp-for="Type" class="form-control d-none">
-                            <option value="1">Đăng thường</option>
-                            <option value="2">Chèn chương</option>
-                            <option value="3">Lưu bản thảo</option>
-                        </select> *@
                         <input style="width:100%" type="number" asp-for="BookId" value="@ViewBag.BookId" class="form-control" hidden>
                         <div style="display:block" class="form-group input-group input-group-outline mt-0">
                             <label for="Name">Tên chương:</label>
@@ -107,23 +94,13 @@
                         <div class="row input-group input-group-outline mt-4">
                             <div style="display:block">
                                 <label for="Content">Nội dung chương:</label>
-                                @if (User.IsInRole("Author"))
-                                {
-                                    <input type="file" style="width:30%;margin-bottom:10px" onchange="changeFile(this)" accept=".docx,.txt,.pdf" class="form-control">
-                                }
-
                                 <div class="row" style="display:flex">
-                                    <div class="col-9">
+                                    <div class="col-12">
                                         @* contenteditable="true" *@
                                         <div style="height:19rem;overflow: auto;" id="ContentDiv" class="form-control"></div>
                                         <textarea oninput="getWordNo()" asp-for="Content" type="text" class="d-none form-control" rows="18"></textarea>
-                                        <label>Số từ: <span id="wordNoCount">0</span></label>
-                                        <input type="number" hidden asp-for="WordNo" />
-                                    </div>
-                                    <div class="col-3 ai-feedback" style="position:relative">
-                                        <ul id="requestContent" style="height:18rem;max-height:18rem;overflow: auto;padding-left:16px">
-                                        </ul>
-                                        <div id="loadingDivFeedBack" class="dot-elastic loadingDiv"></div>
+                                        @* <label>Số từ: <span id="wordNoCount">0</span></label> *@
+                                        @* <input type="number" hidden asp-for="WordNo" /> *@
                                     </div>
                                 </div>
                             </div>
@@ -146,7 +123,16 @@
                         {
                             <button type="submit" class="btn btn-success mt-4">Lưu thông tin</button>
                         }
-                        <button type="button" onclick="window.location.href='/Admin/Drafts'" class="btn btn-secondary mt-4 ml-2">Quay lại</button>
+                        <button type="button" onclick="approveChapter(@ViewBag.BookId,'@Model.Id')" class="@(Model.BookType != BookType.PendingApproval ? "disabled" : "") btn btn-success mt-4 ml-2">Duyệt chương</button>
+                        <button type="button" onclick="declineChapter(@ViewBag.BookId,'@Model.Id')" class="@(Model.BookType != BookType.PendingApproval ? "disabled" : "") btn btn-danger mt-4 ml-2">Hủy duyệt</button>
+                        @if (ViewBag.ReturnUrl == "ApproveBook")
+                        {
+                            <button type="button" onclick="window.location.href='/Admin/ApproveBook/@ViewBag.BookId'" class="btn btn-secondary mt-4 ml-2">Quay lại</button>
+                        }
+                        else if (ViewBag.ReturnUrl == "ChapterBooks")
+                        {
+                            <button type="button" onclick="window.location.href='/Admin/@ViewBag.BookId/ChapterBooks'" class="btn btn-secondary mt-4 ml-2">Quay lại</button>
+                        }
 
                     </div>
                 </div>
@@ -162,10 +148,76 @@
 @* <script src="~/js/chapter.js" asp-append-version="true"></script> *@
 <script type="text/javascript">
     document.getElementById('loadingSumary').classList.add('d-none');
-    document.getElementById('loadingDivFeedBack').classList.add('d-none');
+    // document.getElementById('loadingDivFeedBack').classList.add('d-none');
     // document.getElementById('CreatBookId').classList.add('active');
 
-        const quill = new Quill('#ContentDiv', {
+    function approveChapter(id,chapterId) {
+        if (confirm("Bạn có muốn duyệt chương ?") == false) return;
+        $('#tbodyFeedback').html('');
+        $('#loadingDivFeedBack').show();
+        //var formData = new FormData();
+        //formData.append("chapterId", chapterId);
+        $.ajax(
+            {
+                url: `/Admin/UpdateApproveChapterBook/${id}?chapterId=${chapterId}`,
+                type: "GET",
+                headers:
+                {
+                    "RequestVerificationToken": '@GetAntiXsrfRequestToken()'
+                },
+                //data: formData,
+                //dataType: "json",
+                async: true,
+                processData: false,
+                contentType: false,
+                success: function (data) {
+                    if (data.IsSussess == false) {
+                        notyf.error(data.message);
+                        return;
+                    }
+                    notyf.success(data.message);
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 800);
+                }
+            }
+        );
+
+    }
+
+    function declineChapter(id, chapterId) {
+        if (confirm("Bạn có muốn hủy duyệt ?") == false) return;
+        //var formData = new FormData();
+        $.ajax(
+            {
+                url: `/Admin/DeclineChapterBook/${id}?chapterId=${chapterId}`,
+                type: "GET",
+                headers:
+                {
+                    "RequestVerificationToken": '@GetAntiXsrfRequestToken()'
+                },
+                //data: formData,
+                //dataType: "json",
+                async: true,
+                processData: false,
+                contentType: false,
+                success: function (data) {
+                    if (data.IsSussess == false) {
+                        notyf.error(data.message);
+                        return;
+                    }
+                    notyf.success(data.message);
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 800);
+                }
+            }
+        );
+
+    }
+
+
+    const quill = new Quill('#ContentDiv', {
         theme: 'snow',
         modules: {
             toolbar: [
@@ -190,16 +242,16 @@
         "drag", "drop", "contextmenu"
     ];
 
-    events.forEach(event => {
-        input1.addEventListener(event, (e) => {
-            getWordNo();
-        });
-    });
+    // events.forEach(event => {
+    //     input1.addEventListener(event, (e) => {
+    //         getWordNo();
+    //     });
+    // });
 
     const htmlContent = '@Html.Raw(Model.Content)';
     quill.clipboard.dangerouslyPasteHTML(htmlContent);
 
-    getWordNo();
+    //getWordNo();
 
 
 </script>

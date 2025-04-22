@@ -1,7 +1,6 @@
 ﻿using BusinessObject;
 using BusinessObject.BaseModel;
 using Microsoft.AspNetCore.Mvc;
-using OpenAI.Chat;
 using Repositories;
 using Repositories.IRepository;
 using System;
@@ -24,8 +23,15 @@ namespace LBSAPI.Controllers
         [HttpGet]
         public async Task<bool> GetAllBookImages()
         {
-            await _bookRepository.GetBookImages();
+            //await _bookRepository.GetBookImages();
+            await _bookRepository.AudioTranscription("4f215c61-15c7-463d-b235-377715584567.mp3");
             return true;
+        }
+
+        public async Task<ReponderModel<BookChapterVoiceModel>> GetChapterAudio(string chapterId)
+        {
+            var result = await _bookRepository.GetChapterAudio(chapterId);
+            return result;
         }
 
         [Route("GetCommentByBook")]

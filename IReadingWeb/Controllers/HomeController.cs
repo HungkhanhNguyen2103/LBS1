@@ -8,7 +8,9 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using MimeKit.Encodings;
 using Newtonsoft.Json;
 using OpenAI;
+using OpenAI.Interfaces;
 using OpenAI.Managers;
+//using OpenAI.Audio;
 using OpenAI.ObjectModels.RequestModels;
 
 
@@ -16,6 +18,7 @@ using OpenAI.ObjectModels.RequestModels;
 //using OpenAI.Audio;
 using Repositories;
 using System.Diagnostics;
+using System.IO;
 using System.Net.NetworkInformation;
 using System.Security.Claims;
 using System.Text;
@@ -43,39 +46,30 @@ namespace LBSWeb.Controllers
 
         public async Task<IActionResult> Index()
 		{
-
-            var openAiService = new OpenAIService(new OpenAiOptions()
-            {
-                ApiKey = "YOUR_API_KEY"
-            });
-
-            //using var fileStream = File.OpenRead("audio.mp3");
-
-            //var result = await openAiService.Audio.CreateTranscription(new AudioCreateTranscriptionRequest
-            //{
-            //    FileName = "audio.mp3",
-            //    File = "test",
-            //    Model = "whisper-1",
-            //    ResponseFormat = "verbose_json"
-            //});
-
-            //if (result.Successful)
-            //{
-            //    var json = JsonDocument.Parse(result.ToString());
-            //    var segments = json.RootElement.GetProperty("segments");
-
-            //    foreach (var segment in segments.EnumerateArray())
+            //    var _openAiService = new OpenAIService(new OpenAiOptions()
             //    {
-            //        var start = segment.GetProperty("start").GetDouble();
-            //        var end = segment.GetProperty("end").GetDouble();
-            //        var text = segment.GetProperty("text").GetString();
-            //        Console.WriteLine($"{start}s - {end}s: {text}");
-            //    }
+            //        ApiKey = ""
+            //    });
+            //    var httpClient = new HttpClient();
+            //    var audioStream = await httpClient.GetStreamAsync("https://ireading.store/api/Book/Audio/4f215c61-15c7-463d-b235-377715584567.mp3");
+            //    using var memoryStream = new MemoryStream();
+            //    await audioStream.CopyToAsync(memoryStream);
+            //    byte[] audioBytes = memoryStream.ToArray();
+
+            //    var result = await _openAiService.Audio.CreateTranscription(new AudioCreateTranscriptionRequest
+            //    {
+            //        FileName = "test.mp3",
+            //        File = audioBytes,
+            //        Model = "whisper-1",
+            //        ResponseFormat = "verbose_json"
+            //    });
             //}
-            //else
+            //catch (Exception)
             //{
-            //    Console.WriteLine($"Error: {result.Error}");
+
+            //    throw;
             //}
+
             //var requestData1 = new
             //{
             //    model = "tts-1",

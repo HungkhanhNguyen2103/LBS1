@@ -122,6 +122,7 @@ namespace Repositories.Repository
         public async Task<ReponderModel<string>> PaymentItem(UserTranscationBook userTranscationBook)
         {
             var result = new ReponderModel<string>();
+            var price = 0;
             if(userTranscationBook == null)
             {
                 result.Message = "Dữ liệu không hợp lệ";
@@ -135,13 +136,7 @@ namespace Repositories.Repository
                 return result;
             }
 
-            var filter = Builders<BookChapter>.Filter.Eq(c => c.Id, userTranscationBook.ChapterId);
-            var chapter = await _mongoContext.BookChapters.Find(filter).FirstOrDefaultAsync();
-            if(chapter == null)
-            {
-                result.Message = "Không tồn tại chương";
-                return result;
-            }
+
 
             var asQuery = _lBSDbContext.UserTranscationBooks.Where(c => c.UserName == userTranscationBook.UserName).AsQueryable();
             if (!string.IsNullOrEmpty(userTranscationBook.ChapterId))
@@ -152,6 +147,17 @@ namespace Repositories.Repository
                     result.Message = "Chương đã được thanh toán";
                     return result;
                 }
+
+                var filter = Builders<BookChapter>.Filter.Eq(c => c.Id, userTranscationBook.ChapterId);
+                var chapter = await _mongoContext.BookChapters.Find(filter).FirstOrDefaultAsync();
+                if (chapter == null)
+                {
+                    result.Message = "Không tồn tại chương";
+                    return result;
+                }
+
+                price = chapter.Price;
+
             }
             else if (userTranscationBook.BookId != -1)
             {
@@ -161,8 +167,16 @@ namespace Repositories.Repository
                     result.Message = "Sách đã được thanh toán";
                     return result;
                 }
+
+                var book = await _lBSDbContext.Books.FirstOrDefaultAsync(x => x.Id == userTranscationBook.BookId);  
+                if(book == null)
+                {
+                    result.Message = "Không tồn tại sách";
+                    return result;
+                }
+                price = book.Price;
             }
-            userTranscationBook.Amount = chapter.Price;
+            userTranscationBook.Amount = price;
             userTranscationBook.CreateDate = DateTime.UtcNow;
             _lBSDbContext.UserTranscationBooks.Add(userTranscationBook);
 

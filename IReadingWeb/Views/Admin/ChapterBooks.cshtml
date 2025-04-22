@@ -116,8 +116,14 @@
                                     @if (User.IsInRole("Manager") || User.IsInRole("Admin"))
                                     {
                                         <td class="text-center align-middle">
-                                            <button onclick="window.location.href='/Admin/@ViewBag.BookId/UpdateChapterBook/@item.Id'" title="Chi tiết" class="btn1 btn btn-secondary">
+                                            <button onclick="contractAuthor(@ViewBag.BookId,'@item.Id')" title="Chi tiết" class="btn1 btn btn-secondary">
                                                 <i class="fa-solid fa-info"></i>
+                                            </button>
+                                            <button onclick="approveChapter(@ViewBag.BookId,'@item.Id')" type="button" title="Duyệt chương" class="@(item.BookType != BookType.PendingApproval ? "disabled" : "") btn1 btn btn-secondary">
+                                                <i class="fa-solid fa-check"></i>
+                                            </button>
+                                            <button onclick="declineChapter(@ViewBag.BookId,'@item.Id')" type="button" title="Không duyệt chương" class="@(item.BookType != BookType.PendingApproval ? "disabled" : "") btn1 btn btn-secondary">
+                                                <i class="fa-solid fa-times"></i>
                                             </button>
                                             <button class="btn1 btn btn-secondary" onclick="window.location.href='/Admin/@ViewBag.BookId/ChapterBookAudio/@item.Id'" title="Audio">
                                                 <i class="fa-solid fa-headphones"></i>
@@ -170,6 +176,75 @@
     let table = new DataTable('#table', {
         responsive: true
     });
+
+    function contractAuthor(id,chapterId){
+        window.location.href = `/Admin/ContractAuthor/${id}/${chapterId}?returnUrl=ChapterBooks`;
+    }
+
+    function approveChapter(id,chapterId) {
+        if (confirm("Bạn có muốn duyệt chương ?") == false) return;
+        $('#tbodyFeedback').html('');
+        $('#loadingDivFeedBack').show();
+        //var formData = new FormData();
+        //formData.append("chapterId", chapterId);
+        $.ajax(
+            {
+                url: `/Admin/UpdateApproveChapterBook/${id}?chapterId=${chapterId}`,
+                type: "GET",
+                headers:
+                {
+                    "RequestVerificationToken": '@GetAntiXsrfRequestToken()'
+                },
+                //data: formData,
+                //dataType: "json",
+                async: true,
+                processData: false,
+                contentType: false,
+                success: function (data) {
+                    if (data.IsSussess == false) {
+                        notyf.error(data.message);
+                        return;
+                    }
+                    notyf.success(data.message);
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 800);
+                }
+            }
+        );
+
+    }
+
+    function declineChapter(id, chapterId) {
+        if (confirm("Bạn có muốn hủy duyệt ?") == false) return;
+        //var formData = new FormData();
+        $.ajax(
+            {
+                url: `/Admin/DeclineChapterBook/${id}?chapterId=${chapterId}`,
+                type: "GET",
+                headers:
+                {
+                    "RequestVerificationToken": '@GetAntiXsrfRequestToken()'
+                },
+                //data: formData,
+                //dataType: "json",
+                async: true,
+                processData: false,
+                contentType: false,
+                success: function (data) {
+                    if (data.IsSussess == false) {
+                        notyf.error(data.message);
+                        return;
+                    }
+                    notyf.success(data.message);
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 800);
+                }
+            }
+        );
+
+    }
 
     function showPopup(id){
         $.ajax(

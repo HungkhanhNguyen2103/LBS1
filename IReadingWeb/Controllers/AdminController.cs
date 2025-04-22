@@ -614,13 +614,16 @@ namespace LBSWeb.Controllers
 
         [Authorize(Roles = $"{Role.Author},{Role.Manager}")]
         [Route("ContractAuthor/{bookId}/{chapterId}")]
-        public async Task<IActionResult> ContractAuthor(int bookId,string chapterId)
+        public async Task<IActionResult> ContractAuthor(int bookId,string chapterId,string returnUrl = "")
         {
             ViewBag.BookId = bookId;
             var result = await _bookService.GetBook(bookId);
             var resultChapterBook = await _bookService.GetBookChapter(chapterId);
             ViewBag.BookName = result.Data.Name;
             ViewBag.ChapterId = chapterId;
+
+            //Admin/ApproveBook/1070
+            ViewBag.ReturnUrl = returnUrl;
             return View(resultChapterBook.Data);
         }
 

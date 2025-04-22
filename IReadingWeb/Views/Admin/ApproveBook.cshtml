@@ -229,11 +229,12 @@
                 contentType: false,
                 success: function (listAifeedback) {
                     let html = '';
+                    //console.log(listAifeedback);
                     $('#loadingDivFeedBack').hide();
                     listAifeedbackBackup = listAifeedback.dataList;
                     var resultInfo = listAifeedback.data;
                     //console.log(listAifeedback);
-                    $('#infoApprove').html(`${resultInfo.chapterApprove} chương đang xét duyệt / tổng ${resultInfo.totalChapterApprove} chương chờ xét duyệt`);
+                    if(resultInfo != null) $('#infoApprove').html(`${resultInfo.chapterApprove} chương đang xét duyệt / tổng ${resultInfo.totalChapterApprove} chương chờ xét duyệt`);
                     //console.log(listAifeedback);
                     listAifeedback.dataList.forEach(item => {
                         //console.log(item.aiFeedback)
@@ -256,7 +257,7 @@
                                               <button onclick="declineChapter(${@ViewBag.BookId},'${item.chapterId}')" type="button" title="Không duyệt chương" class="btn1 btn btn-secondary">
                                             <i class="fa-solid fa-times"></i>
                                       </button>
-                                          <button onclick="contractAuthor(${@ViewBag.BookId},'${item.chapterId}')" type="button" title="Liên hệ với tác giả" class="btn1 btn btn-secondary">
+                                          <button onclick="contractAuthor(${@ViewBag.BookId},'${item.chapterId}')" type="button" title="Nội dung chi tiết" class="btn1 btn btn-secondary">
                                                  <i class="fa-solid fa-comments-o"></i>
                                       </button>
                                  </td>`;
@@ -273,7 +274,7 @@
     }
 
     function contractAuthor(id,chapterId){
-        window.location.href = `/Admin/ContractAuthor/${id}/${chapterId}`;
+        window.location.href = `/Admin/ContractAuthor/${id}/${chapterId}?returnUrl=ApproveBook`;
     }
 
     function approveChapter(id,chapterId) {
