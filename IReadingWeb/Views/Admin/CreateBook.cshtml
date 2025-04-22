@@ -45,6 +45,13 @@
                     </ul>
                 </div>
                 <div class="table-responsive p-0 m-4 mt-0">
+                     <div style="display:block" class="form-group input-group input-group-outline mt-4">
+                         <label>Loại thanh toán <span style="color:red">*</span>:</label>
+                         <select style="width:100%" asp-for="BookTypePrice" onchange="ChangePriceType(this)" class="form-control">
+                                <option value="0">Thanh toán theo chương</option>
+                                <option value="1">Thanh toán theo đầu sách</option>
+                         </select>
+                    </div>
                     <div style="display:block" class="form-group input-group input-group-outline mt-4">
                         <label for="Name">Tên sách <span style="color:red">*</span>:</label>
                         <input style="width:100%" type="text" asp-for="Name" class="form-control">
@@ -77,6 +84,10 @@
                         <img style="margin-top:2rem;height:16rem!important;width:16rem!important; border-radius:1rem!important" id="img-post-id" src="https://i.imgur.com/KHD58yX.png" class="avatar avatar-sm me-3 border-radius-lg">
                         <input type="text" id="image-post" asp-for="Poster" hidden />
                     </div>
+                    <div style="display:block" class="form-group input-group input-group-outline mt-4">
+                            <label for="Name">Thu phí:</label>
+                            <input style="width:100%" value="0" type="number" disabled asp-for="Price" class="form-control">          
+                    </div>
                     <button type="submit" class="btn btn-success mt-4">Lưu thông tin</button>
 
                 </div>
@@ -89,6 +100,16 @@
 <script type="text/javascript">
     // document.getElementById('CreatBookId').classList.add('active');
     document.getElementById('loading').classList.add('d-none');
+
+    function ChangePriceType(el){
+       var type = $(el).val();
+       if(type == 1) $('#Price').removeAttr("disabled");
+       else if(type == 0){
+           $('#Price').attr('disabled', 'disabled');
+           $('#Price').val('0');
+       }
+    }
+
     function changeImageFile(input) {
         if (input.files && input.files[0]) {
 

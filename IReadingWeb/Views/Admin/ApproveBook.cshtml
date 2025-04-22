@@ -70,7 +70,8 @@
         <div class="card my-4">
             <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
                 <div class="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3">
-                    <h6 class="text-white text-capitalize ps-3"></h6>
+                    <h6 class="text-white text-capitalize ps-3">Duyệt chương</h6>
+                    <span id="infoApprove" class="ps-3 text-white" style="font-size:12px"></span>
                 </div>
             </div>
             <div class="card-body px-0 pb-2">
@@ -212,6 +213,7 @@
 
     function GetListAifeedback(){
         $('#tbodyFeedback').html('');
+        $('#infoApprove').html('');
         $.ajax(
             {
                 url: `/Admin/GetListApproveBook/${@ViewBag.BookId}`,
@@ -228,13 +230,16 @@
                 success: function (listAifeedback) {
                     let html = '';
                     $('#loadingDivFeedBack').hide();
-                    listAifeedbackBackup = listAifeedback;
+                    listAifeedbackBackup = listAifeedback.dataList;
+                    var resultInfo = listAifeedback.data;
                     //console.log(listAifeedback);
-                    listAifeedback.forEach(item => {
+                    $('#infoApprove').html(`${resultInfo.chapterApprove} chương đang xét duyệt / tổng ${resultInfo.totalChapterApprove} chương chờ xét duyệt`);
+                    //console.log(listAifeedback);
+                    listAifeedback.dataList.forEach(item => {
                         //console.log(item.aiFeedback)
                         html += '<tr>';
                         html += `<td class="text-left">
-                                      <p id="name-${item.chapterId}" class="mx-3 text-xs font-weight-bold mb-0">${item.chapterName}</p>
+                                      <p id="${item.chapterId}" class="chapterIdCls mx-3 text-xs font-weight-bold mb-0">${item.chapterName}</p>
                                 </td>`;
                         html += `<td class="text-center">`;
                         if (item.aiFeedback.includes("không chứa từ ngữ"))
@@ -338,19 +343,25 @@
 
     function approveBook(id) {
         if (confirm("Bạn có muốn duyệt ?") == false) return;
+        var ids = $('.chapterIdCls').map(function() {
+                return this.id;
+            }).get();
+        // console.log(ids);
+        // return;
         $('#tbodyFeedback').html('');
         $('#loadingDivFeedBack').show();
-        //var formData = new FormData();
+        var formData = new FormData();
+        formData.append("chapterIds",ids);
         $.ajax(
             {
                 url: `/Admin/UpdateApproveBook/${id}`,
-                type: "GET",
+                type: "POST",
                 headers:
                 {
                     "RequestVerificationToken": '@GetAntiXsrfRequestToken()'
                 },
-                //data: formData,
-                //dataType: "json",
+                data: formData,
+                dataType: "json",
                 async: true,
                 processData: false,
                 contentType: false,
@@ -361,7 +372,7 @@
                     }
                     notyf.success(data.message);
                     setTimeout(() => {
-                        window.location.href = '/Admin/Books';
+                        window.location.reload();
                     }, 800);
                 }
             }

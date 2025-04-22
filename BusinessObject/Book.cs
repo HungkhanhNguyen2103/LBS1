@@ -15,6 +15,8 @@ namespace BusinessObject
         [Column(TypeName = "nvarchar(MAX)")]
         public string? Summary { get; set; }
         public int Price { get; set; }
+        public BookTypePrice BookTypePrice { get; set; }
+
         [Column(TypeName = "nvarchar(MAX)")]
         public string? Poster { get; set; }
         public BookType BookType { get; set; }
@@ -39,6 +41,13 @@ namespace BusinessObject
         //ChapterBook
         PendingApproval = 2,
         Decline = 3,
+        Hidden = 4
+    }
+
+    public enum BookTypePrice
+    {
+        PayByChapter = 0,
+        PayByBook = 1
     }
 
     public enum BookStatus

@@ -44,6 +44,13 @@
                         </ul>
                     </div>
                     <div class="table-responsive p-0 m-4 mt-0">
+                        <div style="display:block" class="form-group input-group input-group-outline mt-4">
+                         <label>Loại thanh toán:</label>
+                            <select style="width:100%" asp-for="BookTypePrice" disabled class="form-control">
+                                <option value="0">Thanh toán theo chương</option>
+                                <option value="1">Thanh toán theo đầu sách</option>
+                            </select>
+                        </div>
                         <input style="width:100%" type="number" asp-for="Id" class="form-control" hidden>
                         <div style="display:block" class="form-group input-group input-group-outline mt-4">
                             <label for="Name">Tên sách <span style="color:red">*</span>:</label>
@@ -75,8 +82,18 @@
                             <label for="Name" class="@(User.IsInRole("Manager") || User.IsInRole("Admin") ? "d-none" : "")">Cập nhật ảnh bìa</label>
                             <input type="file" style="width:100%" onchange="changeImageFile(this)" accept="image/*" class="form-control @(User.IsInRole("Manager") || User.IsInRole("Admin") ? "d-none" : "")">
                             <img style="margin-top:2rem;height:16rem!important;width:16rem!important; border-radius:1rem!important" id="img-post-id" src="@Model.Poster" class="avatar avatar-sm me-3 border-radius-lg">
-                            <input type="text" id="image-post" asp-for="Poster" hidden />
-                           
+                            <input type="text" id="image-post" asp-for="Poster" hidden />          
+                        </div>
+                        <div style="display:block" class="form-group input-group input-group-outline mt-4">
+                            <label for="Name">Thu phí:</label>
+                            @if(Model.BookTypePrice == BookTypePrice.PayByBook)
+                            {
+                                <input style="width:100%"  type="number" asp-for="Price" class="form-control">    
+                            }
+                            else
+                            {
+                                <input style="width:100%"  type="number" disabled asp-for="Price" class="form-control">    
+                            }      
                         </div>
                         <button type="submit" class="@(User.IsInRole("Manager") || User.IsInRole("Admin") ? "d-none" : "") btn btn-success mt-4">Lưu thông tin</button>
                         <button type="button" onclick="window.location.href='/Admin/Books'" class="btn btn-secondary mt-4 ml-2">Quay lại</button>

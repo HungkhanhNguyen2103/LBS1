@@ -15,6 +15,7 @@ namespace BusinessObject.BaseModel
         public string? Summary { get; set; }
         public int Price { get; set; }
         public string? Poster { get; set; }
+        public BookTypePrice BookTypePrice { get; set; }
         public BookType BookType { get; set; }
         public BookStatus Status { get; set; }
         public int AgeLimitType { get; set; }

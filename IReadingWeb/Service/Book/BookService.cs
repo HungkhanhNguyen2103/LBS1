@@ -353,7 +353,7 @@ namespace LBSWeb.Service.Book
             return res;
         }
 
-        public async Task<ReponderModel<string>> UpdateApproveBook(int bookId)
+        public async Task<ReponderModel<string>> UpdateApproveBook(int bookId, string chapterIds)
         {
             var res = new ReponderModel<string>();
             try
@@ -361,6 +361,7 @@ namespace LBSWeb.Service.Book
                 string url = PathUrl.BOOK_UPDATE_APPROVE;
                 var param = new Dictionary<string, string>();
                 param.Add("id", bookId.ToString());
+                param.Add("chapterIds", chapterIds);
                 res = await _api.Get<ReponderModel<string>>(url, param);
 
             }
@@ -495,6 +496,97 @@ namespace LBSWeb.Service.Book
                 param.Add("bookId", bookId.ToString());
                 param.Add("username", username);
                 res = await _api.Get<ReponderModel<bool>>(url, param);
+
+            }
+            catch (Exception ex)
+            {
+                res.Message = "Lỗi gọi api!";
+            }
+            return res;
+        }
+
+        public async Task<ReponderModel<string>> CheckFinishBook(int bookId)
+        {
+            var res = new ReponderModel<string>();
+            try
+            {
+                string url = PathUrl.BOOK_CHECK_FINISH;
+                var param = new Dictionary<string, string>();
+                param.Add("bookId", bookId.ToString());
+                res = await _api.Get<ReponderModel<string>>(url, param);
+
+            }
+            catch (Exception ex)
+            {
+                res.Message = "Lỗi gọi api!";
+            }
+            return res;
+        }
+
+        public async Task<ReponderModel<string>> UpdateFinishBook(int bookId, int price)
+        {
+            var res = new ReponderModel<string>();
+            try
+            {
+                string url = PathUrl.BOOK_UPDATE_FINISH;
+                var param = new Dictionary<string, string>();
+                param.Add("bookId", bookId.ToString());
+                param.Add("price", price.ToString());
+                res = await _api.Get<ReponderModel<string>>(url, param);
+
+            }
+            catch (Exception ex)
+            {
+                res.Message = "Lỗi gọi api!";
+            }
+            return res;
+        }
+
+        public async Task<ReponderModel<string>> HiddenChapterBook(string id)
+        {
+            var res = new ReponderModel<string>();
+            try
+            {
+                string url = PathUrl.BOOK_HIDDEN_CHAPTER;
+                var param = new Dictionary<string, string>();
+                param.Add("id", id);
+                res = await _api.Get<ReponderModel<string>>(url, param);
+
+            }
+            catch (Exception ex)
+            {
+                res.Message = "Lỗi gọi api!";
+            }
+            return res;
+        }
+
+        public async Task<ReponderModel<string>> BanBook(int bookId)
+        {
+            var res = new ReponderModel<string>();
+            try
+            {
+                string url = PathUrl.BOOK_BAN;
+                var param = new Dictionary<string, string>();
+                param.Add("id", bookId.ToString());
+                res = await _api.Get<ReponderModel<string>>(url, param);
+
+            }
+            catch (Exception ex)
+            {
+                res.Message = "Lỗi gọi api!";
+            }
+            return res;
+        }
+
+        public async Task<ReponderModel<string>> UnBanBook(int bookId)
+        {
+            var res = new ReponderModel<string>();
+            try
+            {
+                string url = PathUrl.BOOK_UN_BAN;
+                var param = new Dictionary<string, string>();
+                param.Add("id", bookId.ToString());
+                res = await _api.Get<ReponderModel<string>>(url, param);
 
             }
             catch (Exception ex)

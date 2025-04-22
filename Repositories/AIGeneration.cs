@@ -48,7 +48,7 @@ namespace Repositories
             return result;
         }
 
-        public async Task<ReponderModel<string>> TextGenerateToSpeech(string input)
+        public async Task<ReponderModel<string>> TextGenerateToSpeech(string input,string filename)
         {
             var result = new ReponderModel<string>();
             AudioClient client = new AudioClient(
@@ -69,7 +69,7 @@ namespace Repositories
                     Directory.CreateDirectory(outputPath);
                 }
 
-                var filename = $"{Guid.NewGuid().ToString()}.mp3";
+                //var filename = $"{Guid.NewGuid().ToString()}.mp3";
 
                 outputPath = Path.Combine(outputPath,filename);
                 using (FileStream stream = new FileStream(outputPath, FileMode.Create, FileAccess.Write))
@@ -121,6 +121,7 @@ namespace Repositories
             }
             return result;
         }
+    
     }
 
     public class AIConfiguration

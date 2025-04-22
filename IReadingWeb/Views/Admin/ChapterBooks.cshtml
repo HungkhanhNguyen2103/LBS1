@@ -51,8 +51,11 @@
 </style>
 @if (User.IsInRole("Author"))
 {
-    <button type="button" onclick="window.location.href ='/Admin/@ViewBag.BookId/CreateChapterBook'" class="btn btn-success">
+    <button type="button" onclick="window.location.href ='/Admin/@ViewBag.BookId/CreateChapterBook'" class="btn btn-success @ViewBag.ButtonAddChapter">
         Thêm chương
+    </button>
+    <button type="button" onclick="finishBook(@ViewBag.BookId)" data-toggle="modal" data-target="#exampleModalFinishBook" class="btn btn-info @ViewBag.ButtonFinish">
+        Hoàn thành tác phẩm
     </button>
 }
 <button type="button" onclick="window.location.href='/Admin/Books'" class="btn btn-secondary ml-2">Quay lại</button>
@@ -85,7 +88,7 @@
                                         <span class="text-secondary text-xs font-weight-bold">@item.ChaperId</span>
                                     </td>
                                     <td class="text-left align-middle" style="padding-left:1.5rem">
-                                        <span class="text-secondary text-xs font-weight-bold">@item.ChapterName <span class="@(item.BookType == BookType.Payment ? "status-payment" : item.BookType == BookType.Free ? "status-free" : item.BookType == BookType.PendingApproval ? "status-pending" : "status-decline")">@(item.BookType == BookType.Payment ? "Trả phí" : item.BookType == BookType.Free ? "Miễn phí" : item.BookType == BookType.PendingApproval ? "Chờ duyệt" : "Hủy duyệt")</span></span>
+                                        <span class="text-secondary text-xs font-weight-bold">@(item.ChapterName.Length > 35 ? item.ChapterName.Substring(0, 35) + "..." : item.ChapterName)<span style="margin-left:5px" class="@(item.BookType == BookType.Payment ? "status-payment" : item.BookType == BookType.Free ? "status-free" : item.BookType == BookType.PendingApproval || item.BookType == BookType.Hidden ? "status-pending" : "status-decline")">@(item.BookType == BookType.Payment ? "Trả phí" : item.BookType == BookType.Free ? "Miễn phí" : item.BookType == BookType.PendingApproval ? "Chờ duyệt" : item.BookType == BookType.Hidden ? "Ẩn chương" : "Hủy duyệt")</span></span>
                                     </td>
                                     <td class="text-center align-middle">
                                         <span class="text-secondary text-xs font-weight-bold">@item.ModifyDate.AddHours(7).ToString("HH:mm dd/MM/yyyy")</span>
@@ -102,16 +105,22 @@
                                             <button onclick="window.location.href='/Admin/@ViewBag.BookId/UpdateChapterBook/@item.Id'" title="Sửa" class="btn1 btn btn-secondary">
                                                 <i class="fa-solid fa-pen-to-square"></i>
                                             </button>
-                                            <button onclick="deleteItem('@item.Id')" title="Xóa" class="btn1 btn btn-secondary">
+                                            <button onclick="deleteItem('@item.Id')" title="Xóa" class="@(item.BookType == BookType.PendingApproval || item.BookType == BookType.Decline || item.BookType == BookType.Hidden ? "" : "disabled") btn1 btn btn-secondary">
                                                 <i class="fa-solid fa-trash"></i>
+                                            </button>
+                                            <button onclick="hiddenItem('@item.Id','@item.BookType')" title="@(item.BookType == BookType.Hidden ? "Mở lại" : "Ẩn")" class="@(item.BookType == BookType.PendingApproval || item.BookType == BookType.Decline || item.BookType == BookType.Hidden ? "" : "disabled") btn1 btn btn-secondary">
+                                                <i class="fa-solid @(item.BookType == BookType.Hidden ? "fa-eye" : "fa-eye-slash")"></i>
                                             </button>
                                         </td>
                                     }
-                                    @if (User.IsInRole("Manager"))
+                                    @if (User.IsInRole("Manager") || User.IsInRole("Admin"))
                                     {
                                         <td class="text-center align-middle">
                                             <button onclick="window.location.href='/Admin/@ViewBag.BookId/UpdateChapterBook/@item.Id'" title="Chi tiết" class="btn1 btn btn-secondary">
                                                 <i class="fa-solid fa-info"></i>
+                                            </button>
+                                            <button class="btn1 btn btn-secondary" onclick="window.location.href='/Admin/@ViewBag.BookId/ChapterBookAudio/@item.Id'" title="Audio">
+                                                <i class="fa-solid fa-headphones"></i>
                                             </button>
                                         </td>
                                     }
@@ -123,6 +132,36 @@
                 </div>
             </div>
         </div>
+    </div>
+</div>
+<!-- Modal Finish Book -->
+<div class="modal fade" id="exampleModalFinishBook" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <form id="formModal" class="modal-content" method="post" asp-action="UpdateFinishBook">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Hoàn thành tác phẩm</h5>
+                <button type="button" class="btn close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+@*                 <div class="note">
+                    <ul>
+                        <li>- Danh mục con: abc</li>
+                    </ul>
+                </div> *@
+                <div style="display:block" class="form-group input-group input-group-outline">
+                    <span id="responseText"></span>
+                </div>
+                <div style="display:block" class="book-price-div form-group input-group input-group-outline mt-4">
+                    <label for="Price">Thu phí:</label>
+                    <input style="width:100%" id="book-price-val" type="number" class="form-control">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="btn-finish" onclick="updateFinishBook()" class="btn btn-primary">Hoàn thành</button>
+            </div>
+        </form>
     </div>
 </div>
 
@@ -161,8 +200,105 @@
         );
     }
 
+    function finishBook(id){
+        $('#responseText').html('');
+        $('#book-price-val').val('0');
+        $.ajax(
+            {
+                url: `/Admin/CheckFinishBook?bookId=${id}`,
+                type: "GET",
+                headers:
+                {
+                    "RequestVerificationToken": '@GetAntiXsrfRequestToken()'
+                },
+                //data: formData,
+                //dataType: "json",
+                async: true,
+                processData: false,
+                contentType: false,
+                success: function (data) {
+                    //console.log(data);
+                    $('#responseText').html(data.message);
+                    $('#book-price-val').val(data.data);
+                    if(data.isSussess == false){
+                        $("#responseText").addClass("status-decline");
+                        $('#book-price-val').attr('disabled','disabled');
+                        $('#btn-finish').attr('disabled','disabled');
+                    }
+                    else{
+                        $("#responseText").addClass("status-free");
+                        $('#book-price-val').removeAttr("disabled");
+                        $('#btn-finish').removeAttr("disabled");
+                    }
+                }
+            }
+        );
 
+    }
 
+    function updateFinishBook() {
+        if (confirm("Bạn muốn hoàn thành đầu sách ?") == false) return;
+        var bookId = '@ViewBag.BookId';
+        var price = $('#book-price-val').val();
+        //console.log(price);
+        //var formData = new FormData();
+        $.ajax(
+            {
+                url: `/Admin/UpdateFinishBook?bookId=${bookId}&price=${price}`,
+                type: "GET",
+                headers:
+                {
+                    "RequestVerificationToken": '@GetAntiXsrfRequestToken()'
+                },
+                async: true,
+                processData: false,
+                contentType: false,
+                success: function (data) {
+                    if (data.isSussess == false){
+                        notyf.error(data.message);
+                        return;
+                    }
+                    notyf.success(data.message);
+                    setTimeout(() =>{
+                        window.location.href = '/Admin/Books';
+                    },800);
+
+                }
+            }
+        );
+
+    }
+
+    function hiddenItem(id,type) {
+        var message = type != 'Hidden' ? "ẩn" : "hiển thị"
+        if (confirm(`Bạn có muốn ${message} chương?`) == false) return;
+        //var formData = new FormData();
+        $.ajax(
+            {
+                url: `/Admin/HiddenChapterBook?id=${id}`,
+                type: "GET",
+                headers:
+                {
+                    "RequestVerificationToken": '@GetAntiXsrfRequestToken()'
+                },
+                async: true,
+                processData: false,
+                contentType: false,
+                success: function (data) {
+                    if (data.isSussess == false){
+                        notyf.error(data.message);
+                        return;
+                    }
+                    notyf.success(data.message);
+                    setTimeout(() =>{
+                        window.location.reload();
+                    },800);
+
+                }
+            }
+        );
+
+    }
 
     function deleteItem(id) {
         if (confirm("Bạn có muốn xóa ?") == false) return;
@@ -179,7 +315,7 @@
                 processData: false,
                 contentType: false,
                 success: function (data) {
-                    if (data.IsSussess == false){
+                    if (data.isSussess == false){
                         notyf.error(data.message);
                         return;
                     }

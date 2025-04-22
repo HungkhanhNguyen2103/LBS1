@@ -67,6 +67,34 @@ namespace LBSWeb.Controllers
         }
 
         [Authorize(Roles = $"{Role.Admin},{Role.Author}")]
+        [Route("HiddenChapterBook")]
+        [HttpGet]
+        public async Task<IActionResult> HiddenChapterBook(string id)
+        {
+            var res = await _bookService.HiddenChapterBook(id);
+            return Json(res);
+        }
+
+        [Authorize(Roles = $"{Role.Admin},{Role.Manager}")]
+        [Route("BanBook")]
+        [HttpGet]
+        public async Task<IActionResult> BanBook(int id)
+        {
+            var res = await _bookService.BanBook(id);
+            return Json(res);
+        }
+
+        [Authorize(Roles = $"{Role.Admin},{Role.Manager}")]
+        [Route("UnBanBook")]
+        [HttpGet]
+        public async Task<IActionResult> UnBanBook(int id)
+        {
+            var res = await _bookService.UnBanBook(id);
+            return Json(res);
+        }
+
+
+        [Authorize(Roles = $"{Role.Admin},{Role.Author}")]
         [Route("BasicKnowledge")]
         public IActionResult BasicKnowledge()
         {
@@ -253,6 +281,24 @@ namespace LBSWeb.Controllers
             return Json(result.Data);
         }
 
+        [Authorize(Roles = $"{Role.Author}")]
+        [Route("CheckFinishBook")]
+        [HttpGet]
+        public async Task<IActionResult> CheckFinishBook(int bookId)
+        {
+            var result = await _bookService.CheckFinishBook(bookId);
+            return Json(result);
+        }
+
+        [Authorize(Roles = $"{Role.Author}")]
+        [Route("UpdateFinishBook")]
+        [HttpGet]
+        public async Task<IActionResult> UpdateFinishBook(int bookId,int price)
+        {
+            var result = await _bookService.UpdateFinishBook(bookId, price);
+            return Json(result);
+        }
+
         [Authorize(Roles = $"{Role.Admin},{Role.Author},{Role.Manager}")]
         [Route("UserReportDetail/{id}")]
         public async Task<IActionResult> UserReportDetail(int id)
@@ -398,16 +444,27 @@ namespace LBSWeb.Controllers
             var result = await _bookService.ApproveBook(id);
             //ViewBag.AppoveSupport = result.DataList;
             //ViewBag.BookId = id;
-            return Json(result.DataList);
+            return Json(result);
         }
 
         [Authorize(Roles = $"{Role.Manager}")]
         [Route("UpdateApproveBook/{id}")]
-        public async Task<IActionResult> UpdateApproveBook(int id)
+        [HttpPost]
+        public async Task<IActionResult> UpdateApproveBook(int id, string chapterIds)
         {
-            var result = await _bookService.UpdateApproveBook(id);
+            var result = await _bookService.UpdateApproveBook(id, chapterIds);
             return Json(result);
         }
+
+        [Authorize(Roles = $"{Role.Manager},{Role.Admin}")]
+        [Route("{bookId}/ChapterBookAudio/{chapterId}")]
+        public async Task<IActionResult> ChapterBookAudio(int bookId, string chapterId)
+        {
+            //var result = await _bookService.UpdateApproveBook(id, chapterIds);
+            return View();
+        }
+
+        
 
         [Authorize(Roles = $"{Role.Author}")]
         [Route("CreateBook")]
@@ -600,6 +657,10 @@ namespace LBSWeb.Controllers
         public async Task<IActionResult> ChapterBooks(int bookId)
         {
             ViewBag.BookId = bookId;
+            var book = await _bookService.GetBook(bookId);
+            var item = book.Data;
+            ViewBag.ButtonAddChapter = item.Status == BookStatus.Done || (item.BookTypePrice == BookTypePrice.PayByBook && item.Status == BookStatus.PendingApproval) ? "disabled" : "";
+            ViewBag.ButtonFinish = item.Status == BookStatus.Done || (item.BookTypePrice == BookTypePrice.PayByBook && item.Status == BookStatus.PendingApproval) ? "disabled" : "";
             var result = await _bookService.GetListBookChapter(bookId);
             ViewBag.ChapterBooks = result.DataList;
             return View();

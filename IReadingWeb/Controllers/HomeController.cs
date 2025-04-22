@@ -7,12 +7,19 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using MimeKit.Encodings;
 using Newtonsoft.Json;
-using OpenAI.Audio;
+using OpenAI;
+using OpenAI.Managers;
+using OpenAI.ObjectModels.RequestModels;
+
+
+
+//using OpenAI.Audio;
 using Repositories;
 using System.Diagnostics;
 using System.Net.NetworkInformation;
 using System.Security.Claims;
 using System.Text;
+using System.Text.Json;
 //using OpenAI.GPT3;
 //using OpenAI.GPT3.Managers;
 //using OpenAI.GPT3.ObjectModels.RequestModels;
@@ -37,7 +44,38 @@ namespace LBSWeb.Controllers
         public async Task<IActionResult> Index()
 		{
 
+            var openAiService = new OpenAIService(new OpenAiOptions()
+            {
+                ApiKey = "YOUR_API_KEY"
+            });
 
+            //using var fileStream = File.OpenRead("audio.mp3");
+
+            //var result = await openAiService.Audio.CreateTranscription(new AudioCreateTranscriptionRequest
+            //{
+            //    FileName = "audio.mp3",
+            //    File = "test",
+            //    Model = "whisper-1",
+            //    ResponseFormat = "verbose_json"
+            //});
+
+            //if (result.Successful)
+            //{
+            //    var json = JsonDocument.Parse(result.ToString());
+            //    var segments = json.RootElement.GetProperty("segments");
+
+            //    foreach (var segment in segments.EnumerateArray())
+            //    {
+            //        var start = segment.GetProperty("start").GetDouble();
+            //        var end = segment.GetProperty("end").GetDouble();
+            //        var text = segment.GetProperty("text").GetString();
+            //        Console.WriteLine($"{start}s - {end}s: {text}");
+            //    }
+            //}
+            //else
+            //{
+            //    Console.WriteLine($"Error: {result.Error}");
+            //}
             //var requestData1 = new
             //{
             //    model = "tts-1",

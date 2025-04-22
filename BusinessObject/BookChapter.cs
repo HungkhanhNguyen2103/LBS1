@@ -23,6 +23,8 @@ namespace BusinessObject
         public int WordNo { get; set; }
         [BsonIgnore]
         public int ViewNo { get; set; }
+        [BsonIgnore]
+        public int RatingNo { get; set; }
         public int Price { get; set; }
         public string? CreateBy { get; set; }
         public string? UserId { get; set; }

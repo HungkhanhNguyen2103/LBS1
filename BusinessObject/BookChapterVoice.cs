@@ -16,6 +16,7 @@ namespace BusinessObject
         public string? FileName { get; set; }
         public string? ChapterId { get; set; }
         public string? ContentWithTime { get; set; }
+        public int Price { get; set; }
         public DateTime ModifyDate { get; set; }
     }
 }

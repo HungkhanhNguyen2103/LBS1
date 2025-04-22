@@ -21,6 +21,7 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 
+
 namespace Repositories.Repository
 {
     public class BookRepository : IBookRepository
@@ -259,6 +260,7 @@ namespace Repositories.Repository
                 Status = BookStatus.PendingPublication,
                 UserId = bookModel.UserId,
                 SubCategory = bookModel.SubCategory,
+                BookTypePrice = bookModel.BookTypePrice,
                 //BookCategories = bookModel.CategoryIds.Select(c => new BookCategory
                 //{
                 //    CategoryId = c
@@ -356,6 +358,7 @@ namespace Repositories.Repository
                 bookChapter.Poster = item.Poster;
                 bookChapter.Author = item.CreateBy;
                 bookChapter.Status = item.Status;
+                //bookChapter.
                 result.DataList.Add(bookChapter);
             }
             result.DataList = result.DataList.OrderByDescending(c => c.NewPulishedDateTimeFormat).ToList();
@@ -403,16 +406,25 @@ namespace Repositories.Repository
             bookChapter.BookType = BookType.PendingApproval;
             bookChapter.ModifyDate = DateTime.Now;
 
-            var listBookChapter = await GetListBookChapter(bookChapter.BookId);
-            if (listBookChapter.IsSussess && listBookChapter.DataList.Count == 2)
+            var book = await _lBSDbContext.Books.FirstOrDefaultAsync(c => c.Id == bookChapter.BookId);
+            if(book == null)
             {
-                var book = await _lBSDbContext.Books.FirstOrDefaultAsync(c => c.Id == bookChapter.BookId);
-                if (book != null && book.Status == BookStatus.PendingPublication)
+                result.Message = "Không có thông tin sách";
+                return result;
+            }
+            if (book.BookTypePrice == BookTypePrice.PayByChapter)
+            {
+                var listBookChapter = await GetListBookChapter(bookChapter.BookId);
+                if (listBookChapter.IsSussess && listBookChapter.DataList.Count == 2)
                 {
-                    book.Status = BookStatus.PendingApproval;
-                    await _lBSDbContext.SaveChangesAsync();
+                    if (book != null && book.Status == BookStatus.PendingPublication)
+                    {
+                        book.Status = BookStatus.PendingApproval;
+                        await _lBSDbContext.SaveChangesAsync();
+                    }
                 }
             }
+
 
             // chen chuong
             if (bookChapter.Type == 2)
@@ -510,6 +522,7 @@ namespace Repositories.Repository
                 SubCategory = book.SubCategory,
                 Summary = book.Summary,
                 UserId = book.UserId,
+                BookTypePrice = book.BookTypePrice,
                 //ViewNo = await _lBSDbContext.UserBookViews.Where(c => c.Status == ChapterStatus.Open && c.).CountAsync(),
                 ListCategories = book.BookCategories != null ? book.BookCategories.Select(c => c.Category).ToList() : new List<Category>(),
                 CategoryIds = book.BookCategories != null ? book.BookCategories.Select(c => c.CategoryId.Value).ToList() : new List<int>(),
@@ -586,6 +599,8 @@ namespace Repositories.Repository
                 var bookViewModel = new BookViewModel
                 {
                     //Author = lastedBookChapter != null ? lastedBookChapter.CreateBy : string.Empty,
+                    Price = book.Price,
+                    BookTypePrice = book.BookTypePrice,
                     BookStatus = BookStatusName.ListBookStatus[(int)book.Status],
                     ChapterId = lastedBookChapter != null && !string.IsNullOrEmpty(lastedBookChapter.Id)  ? lastedBookChapter.Id : string.Empty,    
                     NewPulished = lastedBookChapter != null && !string.IsNullOrEmpty(lastedBookChapter.ChapterName) ? lastedBookChapter.ChapterName : string.Empty,
@@ -614,9 +629,9 @@ namespace Repositories.Repository
             return result;
         }
 
-        public async Task<ReponderModel<string>> GenerateTextToAudio(string input)
+        public async Task<ReponderModel<string>> GenerateTextToAudio(string input,string filename)
         {
-            var result = await _aIGeneration.TextGenerateToSpeech(input);
+            var result = await _aIGeneration.TextGenerateToSpeech(input, filename);
             return result;
         }
 
@@ -746,6 +761,8 @@ namespace Repositories.Repository
         {
             var result = new ReponderModel<BookChapterApproveModel>();
 
+            var resultData = new BookChapterApproveModel();
+
             var book = await _lBSDbContext.Books.FirstOrDefaultAsync(c => c.Id == bookId);
             if (book == null || (book.Status != BookStatus.PendingApproval && book.Status != BookStatus.Continue && book.Status != BookStatus.Pause && book.Status != BookStatus.Published))
             {
@@ -768,6 +785,12 @@ namespace Repositories.Repository
             //    result.Message = "Dữ liệu chương sách không chính xác";
             //    return result;
             //}
+            resultData.TotalChapterApprove = listBookChapter.Count;
+            if(listBookChapter.Count > 3)
+            {
+                listBookChapter = listBookChapter.Take(3).ToList();
+            }
+            resultData.ChapterApprove = listBookChapter.Count;
 
             foreach (var bookChapter in listBookChapter)
             {
@@ -793,15 +816,30 @@ namespace Repositories.Repository
                 chapterApprove.AiFeedback = resultChapter.Data;
                 result.DataList.Add(chapterApprove);
             }
-
+            result.Data = resultData;
             result.IsSussess = true;
             result.Message = "Kết thúc quá trình duyệt";
             return result;
         }
 
-        public async Task<ReponderModel<string>> UpdateApproveBook(int bookId)
+        public async Task<ReponderModel<string>> UpdateApproveBook(int bookId, string chapterIds)
         {
             var result = new ReponderModel<string>();
+
+            if (string.IsNullOrEmpty(chapterIds))
+            {
+                result.Message = "Không có dữ liệu duyệt";
+                return result;
+            }
+            
+            var listChapterIds = chapterIds.Split(",").ToList();
+
+            var book = await _lBSDbContext.Books.FirstOrDefaultAsync(c => c.Id == bookId);
+            if (book == null)
+            {
+                result.Message = "Không có dữ liệu sách";
+                return result;
+            }
 
             var data = await _lBSDbContext.Books.FirstOrDefaultAsync(c => c.Id == bookId);
             if (data == null)
@@ -809,10 +847,12 @@ namespace Repositories.Repository
                 result.Message = "Data không hợp lệ";
                 return result;
             }
-            if (data.Status == BookStatus.PendingApproval) data.Status = BookStatus.Published;
+
+            if (data.Status == BookStatus.PendingApproval && book.BookTypePrice == BookTypePrice.PayByChapter) data.Status = BookStatus.Published;
 
             var filter = Builders<BookChapter>.Filter.And(
                 Builders<BookChapter>.Filter.Where(p => p.BookId == bookId),
+                Builders<BookChapter>.Filter.In(p => p.Id,listChapterIds),
                 Builders<BookChapter>.Filter.Where(p => p.Type != 3),
                 Builders<BookChapter>.Filter.Where(p => p.BookType == BookType.PendingApproval)
             );
@@ -822,6 +862,7 @@ namespace Repositories.Repository
             var filterFree = Builders<BookChapter>.Filter.And(
                                 Builders<BookChapter>.Filter.Where(p => p.BookId == bookId),
                                 Builders<BookChapter>.Filter.Where(p => p.Type != 3),
+                                Builders<BookChapter>.Filter.In(p => p.Id, listChapterIds),
                                 Builders<BookChapter>.Filter.Where(p => p.BookType == BookType.PendingApproval),
                                 Builders<BookChapter>.Filter.Eq(p => p.Price,0)
                             );
@@ -832,6 +873,7 @@ namespace Repositories.Repository
             var filterPaid = Builders<BookChapter>.Filter.And(
                     Builders<BookChapter>.Filter.Where(p => p.BookId == bookId),
                     Builders<BookChapter>.Filter.Where(p => p.Type != 3),
+                    Builders<BookChapter>.Filter.In(p => p.Id, listChapterIds),
                     Builders<BookChapter>.Filter.Where(p => p.BookType == BookType.PendingApproval),
                     Builders<BookChapter>.Filter.Ne(p => p.Price, 0)
                 );
@@ -839,20 +881,33 @@ namespace Repositories.Repository
                 .Set(c => c.BookType, BookType.Payment);
             await _mongoContext.BookChapters.UpdateManyAsync(filterPaid, updatePaid);
 
-            foreach (var item in listBookChapter)
+            //foreach (var item in listBookChapter)
+            //{
+            //    if(item == null)
+            //    {
+            //        result.Message = "Dữ liệu chương sách không tồn tại";
+            //        return result;
+            //    }
+            //    var result1 = await UpdateApproveChapterBook(bookId,item.Id);
+            //    if(!result1.IsSussess)
+            //    {
+            //        result.Message = "Duyệt không thành công";
+            //        return result;
+            //    }
+            //}
+
+            if (book.BookTypePrice == BookTypePrice.PayByBook)
             {
-                if(item == null)
-                {
-                    result.Message = "Dữ liệu chương sách không tồn tại";
-                    return result;
-                }
-                var result1 = await UpdateApproveChapterBook(bookId,item.Id);
-                if(!result1.IsSussess)
-                {
-                    result.Message = "Duyệt không thành công";
-                    return result;
-                }
+                var filterChapter = Builders<BookChapter>.Filter.And(
+                                    Builders<BookChapter>.Filter.Where(p => p.BookId == bookId),
+                                    Builders<BookChapter>.Filter.Where(p => p.Type != 3),
+                                    Builders<BookChapter>.Filter.Where(p => p.BookType == BookType.PendingApproval || p.BookType == BookType.Hidden || p.BookType == BookType.Decline)
+                                );
+
+                var listBookChapterCount = await _mongoContext.BookChapters.Find(filterChapter).ToListAsync();
+                if (listBookChapterCount.Count == 0) book.Status = BookStatus.Done;
             }
+            await _lBSDbContext.SaveChangesAsync();
 
             await _lBSDbContext.SaveChangesAsync();
             result.Message = "Duyệt thành công";
@@ -881,11 +936,18 @@ namespace Repositories.Repository
             var item = new StatisticsChapterBook
             {
                 Title = "Lượt xem",
-                Label = listChapterBook.Select(c => "Chương " + c.ChaperId).ToList(),
+                Label = listChapterBook.Select(c => c.ChapterName).ToList(),
                 Data = listChapterBook.Select(c => c.ViewNo.ToString()).ToList()
             };
 
-            result.Data = item;
+            var itemRating = new StatisticsChapterBook
+            {
+                Title = "Đánh giá",
+                //Label = listChapterBook.Select(c => c.ChapterName).ToList(),
+                Data = listChapterBook.Select(c => c.ViewNo.ToString()).ToList()
+            };
+
+            result.DataList.Add(item);
             result.IsSussess = true;
             return result;
         }
@@ -980,6 +1042,12 @@ namespace Repositories.Repository
         public async Task<ReponderModel<string>> UpdateApproveChapterBook(int bookId, string chapterId)
         {
             var result = new ReponderModel<string>();
+            var book = await _lBSDbContext.Books.FirstOrDefaultAsync(c => c.Id == bookId);
+            if(book == null)
+            {
+                result.Message = "Không có dữ liệu sách";
+                return result;
+            }
             string audioWithTimeData = string.Empty;
             string audioFileName = string.Empty;
             var data = await _lBSDbContext.Books.FirstOrDefaultAsync(c => c.Id == bookId);
@@ -988,8 +1056,8 @@ namespace Repositories.Repository
                 result.Message = "Data không hợp lệ";
                 return result;
             }
-            if (data.Status == BookStatus.PendingApproval) data.Status = BookStatus.Published;
-            await _lBSDbContext.SaveChangesAsync();
+            if (data.Status == BookStatus.PendingApproval && book.BookTypePrice == BookTypePrice.PayByChapter) data.Status = BookStatus.Published;
+            //await _lBSDbContext.SaveChangesAsync();
 
             var filter = Builders<BookChapter>.Filter.And(
                             Builders<BookChapter>.Filter.Where(p => p.BookId == bookId),
@@ -1005,43 +1073,55 @@ namespace Repositories.Repository
                 return result;
             }
 
-            if (string.IsNullOrEmpty(bookChapter.Summary))
-            {
-                var summaryResult = await GenerateSummary(bookChapter.Content);
-                if (summaryResult.IsSussess)
-                {
-                    var update2 = Builders<BookChapter>.Update
-                            .Set(c => c.Summary, summaryResult.Data);
-                    await _mongoContext.BookChapters.UpdateOneAsync(filter, update2);
-                    bookChapter.Summary = summaryResult.Data;
-                }
-            }
-            try
-            {
-                var audioResult = await GenerateTextToAudio(bookChapter.Summary);
-                audioFileName = audioResult.Data;
+            //if (string.IsNullOrEmpty(bookChapter.Summary))
+            //{
+            //    var summaryResult = await GenerateSummary(bookChapter.Content);
+            //    if (summaryResult.IsSussess)
+            //    {
+            //        var update2 = Builders<BookChapter>.Update
+            //                .Set(c => c.Summary, summaryResult.Data);
+            //        await _mongoContext.BookChapters.UpdateOneAsync(filter, update2);
+            //        bookChapter.Summary = summaryResult.Data;
+            //    }
+            //}
+            //try
+            //{
+            //    var audioResult = await GenerateTextToAudio(bookChapter.Summary);
+            //    audioFileName = audioResult.Data;
 
-                var audioWithTime = await CreateContentWithTimeStamp(bookChapter.Summary);
-                audioWithTimeData = audioWithTime.Data.Replace("```json","").Replace("```","").Trim();
+            //    var audioWithTime = await CreateContentWithTimeStamp(bookChapter.Summary);
+            //    audioWithTimeData = audioWithTime.Data.Replace("```json","").Replace("```","").Trim();
 
-                var resultChapterVoice = await InsertOrUpdateChapterVoice(chapterId, audioWithTimeData, audioFileName);
-                if (!resultChapterVoice)
-                {
-                    result.Message = "Lỗi tạo file âm thanh";
-                    return result;
-                }
-            }
-            catch (Exception ex)
-            {
-                result.Message = ex.Message;
-                return result;
-            }
-
+            //    var resultChapterVoice = await InsertOrUpdateChapterVoice(chapterId, audioWithTimeData, audioFileName);
+            //    if (!resultChapterVoice)
+            //    {
+            //        result.Message = "Lỗi tạo file âm thanh";
+            //        return result;
+            //    }
+            //}
+            //catch (Exception ex)
+            //{
+            //    result.Message = ex.Message;
+            //    return result;
+            //}
 
             var update = Builders<BookChapter>.Update
                 .Set(c => c.BookType, bookChapter.Price != 0 ? BookType.Payment : BookType.Free);
 
             await _mongoContext.BookChapters.UpdateOneAsync(filter, update);
+
+            if(book.BookTypePrice == BookTypePrice.PayByBook)
+            {
+                var filterChapter = Builders<BookChapter>.Filter.And(
+                                    Builders<BookChapter>.Filter.Where(p => p.BookId == bookId),
+                                    Builders<BookChapter>.Filter.Where(p => p.Type != 3),
+                                    Builders<BookChapter>.Filter.Where(p => p.BookType == BookType.PendingApproval || p.BookType == BookType.Hidden || p.BookType == BookType.Decline)
+                                );
+
+                var listBookChapterCount = await _mongoContext.BookChapters.Find(filterChapter).ToListAsync();
+                if (listBookChapterCount.Count == 0) book.Status = BookStatus.Done;
+            }
+            await _lBSDbContext.SaveChangesAsync();
 
             result.Message = "Duyệt thành công";
             result.IsSussess = true;
@@ -1301,7 +1381,7 @@ namespace Repositories.Repository
             return reponse;
         }
 
-        private async Task<bool> InsertOrUpdateChapterVoice(string chapterId, string contentWithTime, string fileName)
+        private async Task<bool> InsertOrUpdateChapterVoice(string chapterId, string contentWithTime)
         {
             var filter = Builders<BookChapterVoice>.Filter.Eq(c => c.ChapterId, chapterId);
             var bookChapterVoice = await _mongoContext.BookChapterVoices.Find(filter).FirstOrDefaultAsync();
@@ -1311,7 +1391,7 @@ namespace Repositories.Repository
                 {
                     ChapterId = chapterId,
                     ContentWithTime = contentWithTime,
-                    FileName = fileName,
+                    FileName = chapterId,
                     ModifyDate = DateTime.UtcNow,
                 };
                 await _mongoContext.BookChapterVoices.InsertOneAsync(bookChapterVoice);
@@ -1320,7 +1400,7 @@ namespace Repositories.Repository
             
             var update = Builders<BookChapterVoice>.Update
                 .Set(c => c.ContentWithTime, contentWithTime)
-                .Set(c => c.FileName, fileName)
+                .Set(c => c.FileName, chapterId)
                 .Set(c => c.ModifyDate, DateTime.UtcNow);
 
             await _mongoContext.BookChapterVoices.UpdateOneAsync(filter, update);
@@ -1588,6 +1668,14 @@ namespace Repositories.Repository
         public async Task<ReponderModel<bool>> CheckPaidWithBookChapter(string username,int bookId)
         {
             var result = new ReponderModel<bool>();
+
+            var book = await _lBSDbContext.Books.FirstOrDefaultAsync(c => c.Id == bookId);
+            if(book == null)
+            {
+                result.Message = "Không có dữ liệu sách";
+                return result;
+            }
+
             var filter = Builders<BookChapter>.Filter.And(
                 Builders<BookChapter>.Filter.Where(p => p.BookId == bookId),
                 Builders<BookChapter>.Filter.Where(p => p.CreateBy == username),
@@ -1596,8 +1684,9 @@ namespace Repositories.Repository
             );
 
             var listBookChapter = await _mongoContext.BookChapters.Find(filter).ToListAsync();
-            // toi thieu 10 chương
-            result.Data = listBookChapter.Count >= 10 ? true : false;
+            // toi thieu 10 chương va thuoc type PayChapter
+            result.Data = listBookChapter.Count >= 10 && book .BookTypePrice == BookTypePrice.PayByChapter? true : false;
+
             result.IsSussess = true;
             return result;
         }
@@ -1740,6 +1829,193 @@ namespace Repositories.Repository
                 default:
                     return string.Empty;
             }
+        }
+
+        public async Task<ReponderModel<string>> CheckFinishBook(int bookId)
+        {
+            var result = new ReponderModel<string>();
+            var book = await GetBook(bookId);
+            if(book == null || book.Data == null)
+            {
+                result.Message = "Không có thông tin sách";
+                return result;
+            }
+            var listBookChapter = await GetListBookChapter(bookId);
+            if(!listBookChapter.IsSussess || listBookChapter.DataList.Count == 0)
+            {
+                result.Message = "Không tồn tại chương sách";
+                return result;
+            }
+
+            // hoàn thành sách thanh toán theo chương
+            if(book.Data.BookTypePrice == BookTypePrice.PayByChapter)
+            {
+                var bookChaptersPending = listBookChapter.DataList.Where(c => c.BookType != BookType.Free && c.BookType != BookType.Payment).ToList();
+                if (bookChaptersPending.Count > 0)
+                {
+                    result.Message = "Tồn tại chương sách chưa xuất bản";
+                    return result;
+                }
+            }
+            else if(book.Data.BookTypePrice == BookTypePrice.PayByBook)
+            {
+                // hoàn thành sách thanh toán theo sách
+                var bookChapterNotPending = listBookChapter.DataList.Where(c => c.BookType != BookType.PendingApproval).ToList();
+                if (bookChapterNotPending.Count > 0)
+                {
+                    result.Message = "Tồn tại chương sách đã xuất bản hoặc hủy duyệt";
+                    return result;
+                }
+            }
+
+            result.Data = book.Data.Price.ToString();
+            result.Message = "Đủ điều kiện để chuyển trạng thái hoàn thành";
+            result.IsSussess = true;
+            return result;
+            //throw new NotImplementedException();
+        }
+
+        public async Task<ReponderModel<string>> UpdateFinishBook(int bookId, int price)
+        {
+            var result = new ReponderModel<string>();
+            var book = await _lBSDbContext.Books.FirstOrDefaultAsync(c => c.Id == bookId);
+            if (book == null)
+            {
+                result.Message = "Không có thông tin sách";
+                return result;
+            }
+            if (book.BookTypePrice == BookTypePrice.PayByChapter)
+            {
+                if(price <= 0)
+                {
+                    result.Message = "Giá tiền không hợp lệ";
+                    return result;
+                }
+                book.Price = price;
+                book.Status = BookStatus.Done;
+            }
+            else if(book.BookTypePrice == BookTypePrice.PayByBook)
+            {
+                book.Price = price;
+                book.Status = BookStatus.PendingApproval;
+            }
+            await _lBSDbContext.SaveChangesAsync();
+            result.Message = "Cập nhật thành công";
+            result.IsSussess = true;
+            return result;
+        }
+
+        public async Task<ReponderModel<string>> HiddenChapterBook(string id)
+        {
+            var filter = Builders<BookChapter>.Filter.Eq(c => c.Id, id);
+            var result = new ReponderModel<string>();
+
+            var bookChapter = await _mongoContext.BookChapters.Find(filter).FirstOrDefaultAsync();
+            if(bookChapter == null)
+            {
+                result.Message = "Không có dữ liệu chương";
+                return result;
+            }
+
+            UpdateDefinition<BookChapter> update;
+            if(bookChapter.BookType == BookType.Hidden)
+            {
+                update = Builders<BookChapter>.Update
+                    .Set(c => c.BookType, BookType.PendingApproval);
+            }
+            else
+            {
+                update = Builders<BookChapter>.Update
+                    .Set(c => c.BookType, BookType.Hidden);
+            }
+            await _mongoContext.BookChapters.UpdateOneAsync(filter, update);
+            result.IsSussess = true;
+            result.Message = "Cập nhật thành công";
+            return result;
+        }
+
+        public async Task<ReponderModel<string>> BanBook(int bookId)
+        {
+            var result = new ReponderModel<string>();
+            var book = await _lBSDbContext.Books.FirstOrDefaultAsync(c => c.Id == bookId);
+            if(book == null)
+            {
+                result.Message = "Không có dữ liệu sách";
+                return result;
+            }
+
+            book.Status = BookStatus.Pause;
+            await _lBSDbContext.SaveChangesAsync();
+            result.IsSussess = true;
+            result.Message = "Thành công";
+            return result;
+        }
+
+        public async Task<ReponderModel<string>> UnBanBook(int bookId)
+        {
+            var result = new ReponderModel<string>();
+            var book = await _lBSDbContext.Books.FirstOrDefaultAsync(c => c.Id == bookId);
+            if (book == null)
+            {
+                result.Message = "Không có dữ liệu sách";
+                return result;
+            }
+
+            book.Status = BookStatus.PendingApproval;
+            await _lBSDbContext.SaveChangesAsync();
+            result.IsSussess = true;
+            result.Message = "Thành công";
+            return result;
+        }
+
+        public async Task<ReponderModel<BookChapterVoice>> GetChapterAudio(string chapterId)
+        {
+            var result = new ReponderModel<BookChapterVoice>();
+            var filter = Builders<BookChapter>.Filter.Eq(c => c.Id, chapterId);
+            var bookChapter = await _mongoContext.BookChapters.Find(filter).FirstOrDefaultAsync();
+            if (bookChapter == null)
+            {
+                result.Message = "Dữ liệu không tồn tại";
+                return result;
+            }
+            if (string.IsNullOrEmpty(bookChapter.Summary))
+            {
+                result.Message = "Không có dữ liệu tóm tắt";
+                return result;
+            }
+            try
+            {
+                var bookChapterVoice = await _mongoContext.BookChapterVoices.Find(c => c.ChapterId == chapterId).FirstOrDefaultAsync();
+                if(bookChapterVoice == null)
+                {
+                    var audioResult = await GenerateTextToAudio(bookChapter.Summary, chapterId);
+                    //var audioFileName = audioResult.Data;
+
+                    var audioWithTime = await CreateContentWithTimeStamp(bookChapter.Summary);
+                    var audioWithTimeData = audioWithTime.Data.Replace("```json", "").Replace("```", "").Trim();
+
+                    var resultChapterVoice = await InsertOrUpdateChapterVoice(chapterId, audioWithTimeData);
+                    if (!resultChapterVoice)
+                    {
+                        result.Message = "Lỗi tạo file âm thanh";
+                        return result;
+                    }
+                }
+
+            }
+            catch (Exception ex)
+            {
+                result.Message = ex.Message;
+                return result;
+            }
+
+            result.IsSussess = true;
+            return result;
+        }
+
+        public Task<ReponderModel<string>> GenerateTextToAudio(string input)
+        {
+            throw new NotImplementedException();
         }
     }
 }

@@ -15,6 +15,9 @@ namespace LBSWeb.Service.Book
         Task<ReponderModel<string>> QuicklyApproveChapterContent(RequestModel model);
         Task<ReponderModel<BookModel>> GetBook(int id);
         Task<ReponderModel<BookViewModel>> GetAllBookByUser(string userName);
+        Task<ReponderModel<string>> HiddenChapterBook(string id);
+        Task<ReponderModel<string>> BanBook(int bookId);
+        Task<ReponderModel<string>> UnBanBook(int bookId);
         Task<ReponderModel<string>> CreateBookChapter(BookChapter bookChapter);
         Task<ReponderModel<BookChapter>> GetBookChapter(string id);
         Task<ReponderModel<string>> UpdateBookChapter(BookChapter bookChapter);
@@ -25,11 +28,13 @@ namespace LBSWeb.Service.Book
         Task<ReponderModel<string>> DeleteChapterBook(string id);
         Task<ReponderModel<DraftModel>> GetDrafts(string userName);
         Task<ReponderModel<BookChapterApproveModel>> ApproveBook(int bookId);
-        Task<ReponderModel<string>> UpdateApproveBook(int bookId);
+        Task<ReponderModel<string>> UpdateApproveBook(int bookId,string chapterIds);
         Task<ReponderModel<string>> UpdateApproveChapterBook(int bookId, string chapterId);
         Task<ReponderModel<string>> DeclineChapterBook(int id, string chapterId);
         Task<ReponderModel<StatisticsChapterBook>> StatisticsChapterBook(int bookId);
         Task<ReponderModel<StatisticsChapterBook>> StatisticsBook(string username);
         Task<ReponderModel<bool>> CheckPaidWithBookChapter(string username, int bookId);
+        Task<ReponderModel<string>> CheckFinishBook(int bookId);
+        Task<ReponderModel<string>> UpdateFinishBook(int bookId, int price);
     }
 }

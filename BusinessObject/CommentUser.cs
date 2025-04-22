@@ -14,6 +14,6 @@ namespace BusinessObject
         public DateTime ModifyDate { get; set; }
         public string? ChapterId { get; set; }
         public string? UserId { get; set; }
-        public Account? Account { get; set; }
+        public Account? User { get; set; }
     }
 }

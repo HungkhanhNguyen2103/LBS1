@@ -44,6 +44,22 @@ namespace LBSAPI.Controllers
             return result;
         }
 
+        [Route("BanBook")]
+        [HttpGet]
+        public async Task<ReponderModel<string>> BanBook(int id)
+        {
+            var result = await _bookRepository.BanBook(id);
+            return result;
+        }
+
+        [Route("UnBanBook")]
+        [HttpGet]
+        public async Task<ReponderModel<string>> UnBanBook(int id)
+        {
+            var result = await _bookRepository.UnBanBook(id);
+            return result;
+        }
+
         [Route("DeleteBook")]
         [HttpGet]
         public async Task<ReponderModel<string>> DeleteBook(int id)
@@ -119,9 +135,9 @@ namespace LBSAPI.Controllers
 
         [Route("UpdateApproveBook")]
         [HttpGet]
-        public async Task<ReponderModel<string>> UpdateApproveBook(int id)
+        public async Task<ReponderModel<string>> UpdateApproveBook(int id, string chapterIds)
         {
-            var result = await _bookRepository.UpdateApproveBook(id);
+            var result = await _bookRepository.UpdateApproveBook(id, chapterIds);
             return result;
         }
 
@@ -178,6 +194,30 @@ namespace LBSAPI.Controllers
         public async Task<ReponderModel<string>> GetAnalysis(string input)
         {
             var result = await _bookRepository.GetAnalysis(input);
+            return result;
+        }
+
+        [Route("CheckFinishBook")]
+        [HttpGet]
+        public async Task<ReponderModel<string>> CheckFinishBook(int bookId)
+        {
+            var result = await _bookRepository.CheckFinishBook(bookId);
+            return result;
+        }
+
+        [Route("UpdateFinishBook")]
+        [HttpGet]
+        public async Task<ReponderModel<string>> UpdateFinishBook(int bookId, int price)
+        {
+            var result = await _bookRepository.UpdateFinishBook(bookId,price);
+            return result;
+        }
+
+        [Route("HiddenChapterBook")]
+        [HttpGet]
+        public async Task<ReponderModel<string>> HiddenChapterBook(string id)
+        {
+            var result = await _bookRepository.HiddenChapterBook(id);
             return result;
         }
 

@@ -33,6 +33,11 @@
         public static string BOOK_GET_BY_USER = "api/Book/GetAllBookByUser";
         public static string BOOK_CREATE_CHAPTER = "api/Book/CreateBookChapter";
         public static string BOOK_PAID_CHAPTER = "api/Book/CheckPaidWithBookChapter";
+        public static string BOOK_CHECK_FINISH = "api/Book/CheckFinishBook";
+        public static string BOOK_UPDATE_FINISH = "api/Book/UpdateFinishBook";
+        public static string BOOK_HIDDEN_CHAPTER = "api/Book/HiddenChapterBook";
+        public static string BOOK_BAN = "api/Book/BanBook";
+        public static string BOOK_UN_BAN = "api/Book/UnBanBook";
         public static string BOOK_GET_CHAPTER = "api/Book/GetListBookChapter";
         public static string BOOK_GET_BOOK_CHAPTER = "api/Book/GetBookChapter";
         public static string BOOK_GENERATE_SUMMARY_CHAPTER = "api/Book/GenerateSummary";

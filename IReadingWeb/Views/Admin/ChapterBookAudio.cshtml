@@ -1,0 +1,128 @@
+﻿@{
+    Layout = "~/Views/Admin/_AdminLayout.cshtml";
+}
+@model BookModel
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Xsrf
+@functions {
+    public string GetAntiXsrfRequestToken()
+    {
+        return Xsrf.GetAndStoreTokens(Context).RequestToken;
+    }
+}
+<style>
+    .form-control{
+        margin-left: 0px !important;
+    }
+
+    button {
+        margin-left: 5px;
+    }
+
+
+   #loading {
+        position: absolute;
+        top: 57%;
+        right: 50%;
+    }
+</style>
+<div class="row">
+    <form method="post" asp-action="CreateBook">
+    <div class="col-12">
+        <div class="card my-4">
+            <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
+                <div class="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3">
+                    <h6 class="text-white text-capitalize ps-3">Chương nói</h6>
+                </div>
+            </div>
+            <div class="card-body px-0 pb-2">
+                <div class="note">
+                    <ul>
+                            <li>- Danh mục con: abc</li>
+                    </ul>
+                </div>
+                <div class="table-responsive p-0 m-4 mt-0">
+                    <div style="display:block" class="form-group input-group input-group-outline mt-4">
+                         <label>Tóm tắt:</label>
+                            <textarea style="width:100%" id="textContent" class="form-control mb-4" disabled>
+                            </textarea>
+                    </div>
+                    <div style="display:block" class="form-group input-group input-group-outline mt-4">
+                        <label for="Name">Dữ liệu phân tích audio <span style="color:red">*</span>:</label>
+                            <table class="table table-bordered table-hover align-middle text-center" id="syncTable">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Nội dung</th>
+                                        <th>Bắt đầu (s)</th>
+                                        <th>Kêt thúc (s)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><input type="text" class="form-control" value="Nếu trong tim không có chốn dừng chân"></td>
+                                        <td><input type="number" class="form-control" value="0"></td>
+                                        <td><input type="number" class="form-control" value="30"></td>
+                                    </tr>
+                                    <tr>
+                                        <td><input type="text" class="form-control" value="đi đâu cũng chỉ là lang thang."></td>
+                                        <td><input type="number" class="form-control" value="31"></td>
+                                        <td><input type="number" class="form-control" value="60"></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                    </div>
+                    <div style="display:block" class="input-group input-group-outline mt-4">
+                            <label for="Summary">Nghe audio <span style="color:red">*</span>:</label>
+                            <audio id="audioPlayer" controls class="w-100">
+                                <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
+                                Trình duyệt của bạn không hỗ trợ audio.
+                            </audio>
+                    </div>
+                    <div style="display:block" class="form-group input-group input-group-outline mt-4">
+                            <label for="Name">Thu phí:</label>
+                            <input style="width:100%" value="0" type="number" asp-for="Price" class="form-control">          
+                    </div>
+                    <button type="submit" class="btn btn-success mt-4">Lưu thông tin</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    </form>
+</div>
+<script type="text/javascript">
+
+    function GeneratePoster() {
+        $('#loading').removeClass('d-none');
+        //var summary;
+        var input = $('#Name').val();
+        var summary = $('#Summary').val();
+        var formData = new FormData();
+        formData.append('input', input);
+        formData.append('summary', summary);
+        $.ajax(
+            {
+                url: `/Admin/GeneratePoster`,
+                type: "POST",
+                headers:
+                {
+                    "RequestVerificationToken": '@GetAntiXsrfRequestToken()'
+                },
+                data: formData,
+                //dataType: "json",
+                async: true,
+                processData: false,
+                contentType: false,
+                success: function (data) {
+                    $('#loading').addClass('d-none');
+                    console.log(data);
+                    if (data.isSussess == false) {
+                        notyf.error(data.message);
+                        return;
+                    }
+                    $('#img-post-id').attr('src', data.data);
+                    $('#image-post').val(data.data);
+                }
+            }
+        );
+    }
+
+</script>
