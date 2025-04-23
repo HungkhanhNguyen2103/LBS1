@@ -32,12 +32,13 @@ namespace Repositories.Repository
             _mongoContext = mongoDBContext;
         }
 
-        public async Task<ReponderModel<string>> CheckEnoughCoins(string username, int amount)
+        public async Task<ReponderModel<int>> CheckEnoughCoins(string username, int amount)
         {
-            var result = new ReponderModel<string>();
+            var result = new ReponderModel<int>();
             var paidPackage = await _lBSDbContext.UserTranscations.Include(c => c.PaymentItem).Where(c => c.UserName == username).ToListAsync();
             var userTranscations = await _lBSDbContext.UserTranscationBooks.Where(c => c.UserName == username).ToListAsync();
             var totalPaidRemaining = paidPackage.Sum(c => c.Amount) - userTranscations.Sum(c => c.Amount);
+            result.Data = totalPaidRemaining;
             if (totalPaidRemaining < amount)
             {
                 result.Message = "Số dư không đủ";

@@ -33,7 +33,7 @@ namespace IReadingAPI.Controllers
 
         [Route("CheckEnoughCoins")]
         [HttpGet]
-        public async Task<ReponderModel<string>> CheckEnoughCoins(string username, int amount)
+        public async Task<ReponderModel<int>> CheckEnoughCoins(string username, int amount)
         {
             var result = await _paymentRepository.CheckEnoughCoins(username, amount);
             return result;
