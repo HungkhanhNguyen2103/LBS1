@@ -35,6 +35,12 @@ builder.Services.AddDataProtection()
     .PersistKeysToFileSystem(new DirectoryInfo(@"./keys"))
     .SetApplicationName("IReading");
 
+builder.Services.Configure<CookiePolicyOptions>(options =>
+{
+    options.MinimumSameSitePolicy = SameSiteMode.None;
+    options.Secure = CookieSecurePolicy.Always;
+});
+
 builder.Services.AddHttpContextAccessor();
 
 // Declare DI
@@ -100,11 +106,7 @@ app.UseRouting();
 
 app.UseNotyf();
 
-app.UseCookiePolicy(new CookiePolicyOptions
-{
-    MinimumSameSitePolicy = SameSiteMode.None,
-    Secure = CookieSecurePolicy.Always
-});
+app.UseCookiePolicy();
 
 
 app.UseAuthentication();
