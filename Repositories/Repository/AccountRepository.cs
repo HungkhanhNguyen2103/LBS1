@@ -242,32 +242,32 @@ namespace Repositories.Repository
                     await _userManager.AddToRolesAsync(user, new List<string> { Role.User});
                     roles = $"{Role.User}";
                 }
-				
+                if (string.IsNullOrEmpty(account.DeviceToken)) account.DeviceToken = "";
                 responder.Data = await EncodeSha256(user, roles, true,user.ResetPassword,account.DeviceToken);
-                var tokenEmail = await EncodeSha256(user, roles, true,user.ResetPassword,account.DeviceToken,isSenderEmail:true);
+                //var tokenEmail = await EncodeSha256(user, roles, true,user.ResetPassword,account.DeviceToken,isSenderEmail:true);
 
 
                 //Send Email 
-                var template = await LBSDbContext.TemplateEmails.FirstOrDefaultAsync(c => c.Name == "EmailConfirm");
-                if(template == null)
-                {
-                    responder.Message = "Không có dữ liệu giao diện";
-                    return responder;
-                }
-                var webPageUrl = Environment.GetEnvironmentVariable("WEBPAGE_URL");
-                template.Body = !string.IsNullOrEmpty(template.Body) ? template.Body.Replace("$${EmailConfirmLink}", webPageUrl + "/Account/ConfirmSuccess?token=" + tokenEmail) : string.Empty;
-                var emailModel = new EmailModel
-                {
-                    Body = template.Body,
-                    Subject = template.Subject,
-                    To = new List<string>() { account.Email }
-                };
-                var rs = await _emailSender.SendEmailAsync(emailModel);
-                if (!rs)
-                {
-                    responder.Message = "Lỗi gửi mail";
-                    return responder;
-                }
+                //var template = await LBSDbContext.TemplateEmails.FirstOrDefaultAsync(c => c.Name == "EmailConfirm");
+                //if(template == null)
+                //{
+                //    responder.Message = "Không có dữ liệu giao diện";
+                //    return responder;
+                //}
+                //var webPageUrl = Environment.GetEnvironmentVariable("WEBPAGE_URL");
+                //template.Body = !string.IsNullOrEmpty(template.Body) ? template.Body.Replace("$${EmailConfirmLink}", webPageUrl + "/Account/ConfirmSuccess?token=" + tokenEmail) : string.Empty;
+                //var emailModel = new EmailModel
+                //{
+                //    Body = template.Body,
+                //    Subject = template.Subject,
+                //    To = new List<string>() { account.Email }
+                //};
+                //var rs = await _emailSender.SendEmailAsync(emailModel);
+                //if (!rs)
+                //{
+                //    responder.Message = "Lỗi gửi mail";
+                //    return responder;
+                //}
                 responder.Message = "Tạo tài khoản thành công";
                 responder.IsSussess = true;
                 return responder;

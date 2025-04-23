@@ -18,7 +18,9 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 
 namespace Repositories.Repository
@@ -1486,6 +1488,12 @@ namespace Repositories.Repository
             //       "Author",
             //       "Categories"
             //    });
+            var pattern = @"[@#*?""'\\/()\[\]{}]";
+            if(Regex.IsMatch(input, pattern))
+            {
+                result.IsSussess = true;
+                return result;
+            }
 
             var result1 = await index.SearchAsync<BookIndexModel>(input, new SearchQuery
             {
