@@ -31,6 +31,23 @@ namespace Repositories.Repository
             _userManager = userManager;
             _mongoContext = mongoDBContext;
         }
+
+        public async Task<ReponderModel<string>> CheckEnoughCoins(string username, int amount)
+        {
+            var result = new ReponderModel<string>();
+            var paidPackage = await _lBSDbContext.UserTranscations.Include(c => c.PaymentItem).Where(c => c.UserName == username).ToListAsync();
+            var userTranscations = await _lBSDbContext.UserTranscationBooks.Where(c => c.UserName == username).ToListAsync();
+            var totalPaidRemaining = paidPackage.Sum(c => c.Amount) - userTranscations.Sum(c => c.Amount);
+            if (totalPaidRemaining < amount)
+            {
+                result.Message = "Số dư không đủ";
+                return result;
+            }
+            result.IsSussess = true;
+            result.Message = "Số dư đủ";
+            return result;
+        }
+
         public async Task<ReponderModel<string>> CreatePaymentLink(PaymentRequestModel model)
         {
             var result = new ReponderModel<string>();
@@ -260,5 +277,6 @@ namespace Repositories.Repository
             result.IsSussess = true;
             return result;
         }
+    
     }
 }

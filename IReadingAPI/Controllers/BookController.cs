@@ -28,6 +28,8 @@ namespace LBSAPI.Controllers
             return true;
         }
 
+        [Route("GetChapterAudio")]
+        [HttpGet]
         public async Task<ReponderModel<BookChapterVoiceModel>> GetChapterAudio(string chapterId)
         {
             var result = await _bookRepository.GetChapterAudio(chapterId);
