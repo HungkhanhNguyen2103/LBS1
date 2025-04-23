@@ -2001,7 +2001,7 @@ namespace Repositories.Repository
                 var domain = "https://ireading.store";
 
                 //local
-                domain = "https://localhost:7157";
+                //domain = "https://localhost:7157";
                 var bookChapterVoice = await _mongoContext.BookChapterVoices.Find(c => c.ChapterId == chapterId).FirstOrDefaultAsync();
                 var audioFileName = $"{chapterId}.mp3";
                 var audioFilePath = $"{domain}/api/Book/Audio/";
