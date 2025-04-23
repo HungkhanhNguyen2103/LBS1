@@ -71,6 +71,7 @@ namespace Repositories.IRepository
         Task<ReponderModel<string>> UpdateCommentUser(CommentUser comment);
         Task<ReponderModel<string>> GetListCommentByChapter(string chapterId);
         Task<ReponderModel<string>> GetAnalysis(string input);
+        Task<ReponderModel<string>> CheckReadingEnough(string username,int bookId);
         //Task<ReponderModel<string>> Get(string input);
 
     }

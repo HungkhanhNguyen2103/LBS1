@@ -2132,5 +2132,14 @@ namespace Repositories.Repository
 
             return result;
         }
+
+        public async Task<ReponderModel<string>> CheckReadingEnough(string username, int bookId)
+        {
+            var result = new ReponderModel<string>();
+            var listChapter = await _lBSDbContext.UserBookViews.Where(c => c.CreateBy == username && c.BookId == bookId).Select(c => c.ChapterId).Distinct().ToListAsync();
+            if(listChapter.Count >= 3) result.IsSussess = true;
+            else result.IsSussess = false;
+            return result;
+        }
     }
 }

@@ -100,6 +100,14 @@ namespace LBSAPI.Controllers
             return result;
         }
 
+        [Route("CheckReadingEnough")]
+        [HttpGet]
+        public async Task<ReponderModel<string>> CheckReadingEnough(string username, int bookId)
+        {
+            var result = await _bookRepository.CheckReadingEnough(username, bookId);
+            return result;
+        }
+
         [Route("Audio/{fileName}")]
         [HttpGet, HttpHead]
         public IActionResult GetAudio(string fileName)
