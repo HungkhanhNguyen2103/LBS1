@@ -8,9 +8,11 @@ namespace BusinessObject.BaseModel
 {
     public class BookChapterVoiceModel
     {
-        public string ChapterId { get; set; }
-        public string FileUrl { get; set; }
-        public List<SegmentModel> ContentWithTimes { get; set; }
+        public string? ChapterId { get; set; }
+        public string? FileUrl { get; set; }
+        public List<SegmentModel> ContentWithTimes { get; set; } = new List<SegmentModel>();
+        public string? Summary { get; set; }
+        public string? ChapterName { get; set; }
         public int Price { get; set; }
 
     }

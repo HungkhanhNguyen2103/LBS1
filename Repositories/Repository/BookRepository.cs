@@ -1396,17 +1396,14 @@ namespace Repositories.Repository
                     Price = price,
                 };
                 await _mongoContext.BookChapterVoices.InsertOneAsync(bookChapterVoice);
-            }
-            else
-            {
-                var update = Builders<BookChapterVoice>.Update
-                            .Set(c => c.ContentWithTime, contentWithTime)
-                            .Set(c => c.FileName, chapterId)
-                            .Set(c => c.Price, price)
-                            .Set(c => c.ModifyDate, DateTime.UtcNow);
 
-                await _mongoContext.BookChapterVoices.UpdateOneAsync(filter, update);
+                var filterChapter = Builders<BookChapter>.Filter.Eq(c => c.Id, chapterId);
+                var update = Builders<BookChapter>.Update
+                            .Set(c => c.AudioUrl, "Audio");
+                await _mongoContext.BookChapters.UpdateOneAsync(filterChapter, update);
+
             }
+
             result.IsSussess = true;
             result.Message = "Thành công";
             return result;
@@ -2001,12 +1998,22 @@ namespace Repositories.Repository
             }
             try
             {
-                var bookChapterVoice = await _mongoContext.BookChapterVoices.Find(c => c.ChapterId == chapterId).FirstOrDefaultAsync();
-                if(bookChapterVoice == null)
-                {
-                    var audioFileName = $"${chapterId}.mp3";
-                    var audioResult = await GenerateTextToAudio(bookChapter.Summary, audioFileName);
+                var domain = "https://ireading.store";
 
+                //local
+                domain = "https://localhost:7157";
+                var bookChapterVoice = await _mongoContext.BookChapterVoices.Find(c => c.ChapterId == chapterId).FirstOrDefaultAsync();
+                var audioFileName = $"{chapterId}.mp3";
+                var audioFilePath = $"{domain}/api/Book/Audio/";
+                if (bookChapterVoice == null)
+                {
+              
+                    var audioResult = await GenerateTextToAudio(bookChapter.Summary, audioFileName);
+                    if (!audioResult.IsSussess)
+                    {
+                        result.Message = "Lỗi tạo file âm thanh";
+                        return result;
+                    }
 
                     //var audioWithTime = await CreateContentWithTimeStamp(bookChapter.Summary);
                     var audioWithTimeData = await AudioTranscription(audioFileName);
@@ -2018,7 +2025,7 @@ namespace Repositories.Repository
 
                     var audioWithTimeDataJson = Newtonsoft.Json.JsonConvert.SerializeObject(audioWithTimeData.DataList);
                     
-                    // default Price = 500
+                    // default Price = 1000
                     var resultChapterVoice = await InsertOrUpdateChapterVoice(chapterId, audioWithTimeDataJson,audioFileName);
                     if (!resultChapterVoice.IsSussess)
                     {
@@ -2029,9 +2036,23 @@ namespace Repositories.Repository
                     {
                         ChapterId = chapterId,
                         ContentWithTimes = audioWithTimeData.DataList,
-                        FileUrl = audioFileName,
+                        FileUrl = audioFilePath + audioFileName,
+                        ChapterName = bookChapter.ChapterName,
+                        Summary = bookChapter.Summary,
                         Price = 1000,
+                    };
 
+                }
+                else
+                {
+                    result.Data = new BookChapterVoiceModel
+                    {
+                        ChapterId = bookChapterVoice.ChapterId,
+                        ContentWithTimes = Newtonsoft.Json.JsonConvert.DeserializeObject<List<SegmentModel>>(bookChapterVoice.ContentWithTime),
+                        FileUrl = audioFilePath + bookChapterVoice.FileName,
+                        ChapterName = bookChapter.ChapterName,
+                        Summary = bookChapter.Summary,
+                        Price = bookChapterVoice.Price
                     };
                 }
 
@@ -2054,8 +2075,32 @@ namespace Repositories.Repository
 
         public async Task<ReponderModel<SegmentModel>> AudioTranscription(string input)
         {
-            await _aIGeneration.AudioTranscription(input);
-            throw new NotImplementedException();
+            var result = await _aIGeneration.AudioTranscription(input);
+            return result;
+        }
+
+        public async Task<ReponderModel<string>> UpdatePriceChapterVoice(BookChapterVoiceModel model)
+        {
+            var result = new ReponderModel<string>();
+            var bookChapterVoice = await _mongoContext.BookChapterVoices.Find(c => c.ChapterId == model.ChapterId).FirstOrDefaultAsync();
+            if(bookChapterVoice == null)
+            {
+                result.Message = "Không có dữ liệu âm thanh";
+                return result;
+            }
+            if(model.Price < 0)
+            {
+                result.Message = "Giá không hợp lệ";
+                return result;
+            }
+            var filter = Builders<BookChapterVoice>.Filter.Eq(c => c.ChapterId, model.ChapterId);
+            var update = Builders<BookChapterVoice>.Update
+                        .Set(c => c.Price, model.Price);
+
+            await _mongoContext.BookChapterVoices.UpdateOneAsync(filter, update);
+            result.Message = "Cập nhật thành công";
+            result.IsSussess = true;
+            return result;
         }
     }
 }

@@ -39,6 +39,8 @@
         public static string BOOK_BAN = "api/Book/BanBook";
         public static string BOOK_UN_BAN = "api/Book/UnBanBook";
         public static string BOOK_GET_CHAPTER = "api/Book/GetListBookChapter";
+        public static string BOOK_GET_CHAPTER_AUDIO = "api/Book/GetChapterAudio";
+        public static string BOOK_UPDATE_PRICE_CHAPTER_AUDIO = "api/Book/UpdatePriceChapterVoice";
         public static string BOOK_GET_BOOK_CHAPTER = "api/Book/GetBookChapter";
         public static string BOOK_GENERATE_SUMMARY_CHAPTER = "api/Book/GenerateSummary";
         public static string BOOK_GENERATE_POSTER_CHAPTER = "api/Book/GeneratePoster";

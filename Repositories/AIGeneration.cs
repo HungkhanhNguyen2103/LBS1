@@ -138,7 +138,11 @@ namespace Repositories
 
             try
             {
-                var audioFilePath = $"https://ireading.store/api/Book/Audio/{filename}";
+                var domain = "https://ireading.store";
+
+                //local
+                //domain = "https://localhost:7157";
+                var audioFilePath = $"{domain}/api/Book/Audio/{filename}";
                 var httpClient = new HttpClient();
                 var audioStream = await httpClient.GetStreamAsync(audioFilePath);
                 AudioTranscription transcription = await client.TranscribeAudioAsync(audioStream, filename, options);
@@ -147,8 +151,8 @@ namespace Repositories
                 {
                     result.DataList = transcription.Segments.Select(c => new SegmentModel
                     {
-                        StartTime = c.StartTime.TotalMilliseconds,
-                        EndTime = c.EndTime.TotalMilliseconds,
+                        StartTime = Math.Ceiling(c.StartTime.TotalSeconds),
+                        EndTime = Math.Ceiling(c.EndTime.TotalSeconds),
                         Text = c.Text
                     }).ToList();
                     result.IsSussess = true;

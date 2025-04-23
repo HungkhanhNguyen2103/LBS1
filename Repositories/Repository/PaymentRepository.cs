@@ -110,7 +110,8 @@ namespace Repositories.Repository
                 else if (!string.IsNullOrEmpty(item.ChapterId))
                 {
                     var chapter = chapters.FirstOrDefault(c => c.Id == item.ChapterId);
-                    paymentName = $"Thanh toán chương {chapter.ChapterName}";
+                    var book = await _lBSDbContext.Books.FirstOrDefaultAsync(x => x.Id == chapter.BookId);
+                    paymentName = $"Mở khóa chương {chapter.ChapterName} - sách {book.Name}";
                 }
 
                 result.DataList.Add(new UserTranscationBookModel

@@ -88,7 +88,14 @@
                                         <span class="text-secondary text-xs font-weight-bold">@item.ChaperId</span>
                                     </td>
                                     <td class="text-left align-middle" style="padding-left:1.5rem">
-                                        <span class="text-secondary text-xs font-weight-bold">@(item.ChapterName.Length > 35 ? item.ChapterName.Substring(0, 35) + "..." : item.ChapterName)<span style="margin-left:5px" class="@(item.BookType == BookType.Payment ? "status-payment" : item.BookType == BookType.Free ? "status-free" : item.BookType == BookType.PendingApproval || item.BookType == BookType.Hidden ? "status-pending" : "status-decline")">@(item.BookType == BookType.Payment ? "Trả phí" : item.BookType == BookType.Free ? "Miễn phí" : item.BookType == BookType.PendingApproval ? "Chờ duyệt" : item.BookType == BookType.Hidden ? "Ẩn chương" : "Hủy duyệt")</span></span>
+                                        <span class="text-secondary text-xs font-weight-bold">@(item.ChapterName.Length > 35 ? item.ChapterName.Substring(0, 35) + "..." : item.ChapterName)
+                                        <span style="margin-left:5px" class="@(item.BookType == BookType.Payment ? "status-payment" : item.BookType == BookType.Free ? "status-free" : item.BookType == BookType.PendingApproval || item.BookType == BookType.Hidden ? "status-pending" : "status-decline")">
+                                            @(item.BookType == BookType.Payment ? "Trả phí" : item.BookType == BookType.Free ? "Miễn phí" : item.BookType == BookType.PendingApproval ? "Chờ duyệt" : item.BookType == BookType.Hidden ? "Ẩn chương" : "Hủy duyệt")
+                                        </span>
+                                        <span style="margin-left:5px" class="@(item.AudioUrl == "Audio" ? "status-free" : "d-none")">
+                                            @item.AudioUrl
+                                        </span>
+                                        </span>
                                     </td>
                                     <td class="text-center align-middle">
                                         <span class="text-secondary text-xs font-weight-bold">@item.ModifyDate.AddHours(7).ToString("HH:mm dd/MM/yyyy")</span>

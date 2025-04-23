@@ -1,7 +1,7 @@
 ﻿@{
     Layout = "~/Views/Admin/_AdminLayout.cshtml";
 }
-@model BookModel
+@model BookChapterVoiceModel
 @inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Xsrf
 @functions {
     public string GetAntiXsrfRequestToken()
@@ -10,6 +10,10 @@
     }
 }
 <style>
+    .highlight {
+        background-color: #80808040 !important
+    }
+
     .form-control{
         margin-left: 0px !important;
     }
@@ -24,14 +28,22 @@
         top: 57%;
         right: 50%;
     }
+
+    .loadingDiv {
+        position: absolute;
+        top: 3%;
+        right: 50%;
+        z-index:999;
+    }
 </style>
 <div class="row">
-    <form method="post" asp-action="CreateBook">
+    <form method="post" asp-action="ChapterBookAudio" asp-route-bookId="@ViewBag.BookId" asp-route-chapterId="@Model.ChapterId">
     <div class="col-12">
         <div class="card my-4">
             <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
                 <div class="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3">
                     <h6 class="text-white text-capitalize ps-3">Chương nói</h6>
+                    <span class="ps-3 text-white" style="font-size:12px" id="chapterNameText">@Model.ChapterName</span>
                 </div>
             </div>
             <div class="card-body px-0 pb-2">
@@ -40,89 +52,127 @@
                             <li>- Danh mục con: abc</li>
                     </ul>
                 </div>
-                <div class="table-responsive p-0 m-4 mt-0">
+                <div class="table-responsive p-0 m-4 mt-0" style="position:relative">
+                    <div id="loadingDivAudio" class="dot-elastic loadingDiv"></div>
+                    <input class="ps-3 " type="text" asp-for="ChapterName" hidden/>
                     <div style="display:block" class="form-group input-group input-group-outline mt-4">
                          <label>Tóm tắt:</label>
-                            <textarea style="width:100%" id="textContent" class="form-control mb-4" disabled>
-                            </textarea>
+                            <textarea style="width:100%" rows="10" class="form-control mb-4" asp-for="Summary" disabled></textarea>
                     </div>
                     <div style="display:block" class="form-group input-group input-group-outline mt-4">
                         <label for="Name">Dữ liệu phân tích audio <span style="color:red">*</span>:</label>
                             <table class="table table-bordered table-hover align-middle text-center" id="syncTable">
                                 <thead class="table-light">
                                     <tr>
-                                        <th>Nội dung</th>
+                                        <th style="width:90%">Nội dung</th>
                                         <th>Bắt đầu (s)</th>
                                         <th>Kêt thúc (s)</th>
                                     </tr>
                                 </thead>
-                                <tbody>
-                                    <tr>
-                                        <td><input type="text" class="form-control" value="Nếu trong tim không có chốn dừng chân"></td>
-                                        <td><input type="number" class="form-control" value="0"></td>
-                                        <td><input type="number" class="form-control" value="30"></td>
-                                    </tr>
-                                    <tr>
-                                        <td><input type="text" class="form-control" value="đi đâu cũng chỉ là lang thang."></td>
-                                        <td><input type="number" class="form-control" value="31"></td>
-                                        <td><input type="number" class="form-control" value="60"></td>
-                                    </tr>
+                                <tbody id="tbodyAudioContent">
+                                    @foreach (var item in Model.ContentWithTimes)
+                                    {
+                                        <tr>
+                                            <td style="width:90%" class="descriptionCell"><input type="text" class="form-control" value="@item.Text"></td>
+                                            <td><input type="number" class="form-control" value="@item.StartTime"></td>
+                                            <td><input type="number" class="form-control" value="@item.EndTime"></td>
+                                        </tr>
+                                    }
                                 </tbody>
                             </table>
                     </div>
                     <div style="display:block" class="input-group input-group-outline mt-4">
                             <label for="Summary">Nghe audio <span style="color:red">*</span>:</label>
                             <audio id="audioPlayer" controls class="w-100">
-                                <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
+                                <source id="audioPlayerSource" src="" type="audio/mpeg">
                                 Trình duyệt của bạn không hỗ trợ audio.
                             </audio>
                     </div>
                     <div style="display:block" class="form-group input-group input-group-outline mt-4">
                             <label for="Name">Thu phí:</label>
-                            <input style="width:100%" value="0" type="number" asp-for="Price" class="form-control">          
+                            <input style="width:100%" type="number" asp-for="Price" class="form-control">          
                     </div>
                     <button type="submit" class="btn btn-success mt-4">Lưu thông tin</button>
+                        <button type="button" onclick="window.location.href='/Admin/@ViewBag.BookId/ChapterBooks'" class="btn btn-secondary mt-4 ml-2">Quay lại</button>
                 </div>
             </div>
         </div>
     </div>
     </form>
 </div>
+<script src="~/lib/jquery/dist/jquery.js" asp-append-version="true"></script>
 <script type="text/javascript">
+    $(document).ready(function() {
+            GenerateAudio();
 
-    function GeneratePoster() {
-        $('#loading').removeClass('d-none');
-        //var summary;
-        var input = $('#Name').val();
-        var summary = $('#Summary').val();
-        var formData = new FormData();
-        formData.append('input', input);
-        formData.append('summary', summary);
-        $.ajax(
-            {
-                url: `/Admin/GeneratePoster`,
-                type: "POST",
+    });
+
+    function GenerateAudio() {
+        var chapterId = '@ViewBag.ChapterId';
+        $('#tbodyAudioContent').html('');
+        $.ajax({
+                url: `/Admin/GetChapterBookAudio?chapterId=${chapterId}`,
+                type: "GET",
                 headers:
                 {
                     "RequestVerificationToken": '@GetAntiXsrfRequestToken()'
                 },
-                data: formData,
+                // data: formData,
                 //dataType: "json",
                 async: true,
                 processData: false,
                 contentType: false,
                 success: function (data) {
-                    $('#loading').addClass('d-none');
-                    console.log(data);
-                    if (data.isSussess == false) {
-                        notyf.error(data.message);
-                        return;
-                    }
-                    $('#img-post-id').attr('src', data.data);
-                    $('#image-post').val(data.data);
+                    //console.log(data);
+                    $('#loadingDivAudio').addClass('d-none');
+                    $('#chapterNameText').html(data.chapterName);
+                    $('#ChapterName').val(data.chapterName);
+                    $('#Summary').val(data.summary);
+                    let html = '';
+                    data.contentWithTimes.forEach(item => {
+                        html += `
+                                 <tr>
+                                        <td style="width:90%" class="descriptionCell"><input type="text" class="form-control" value="${item.text}"></td>
+                                        <td><input type="number" class="form-control" value="${item.startTime}"></td>
+                                        <td><input type="number" class="form-control" value="${item.endTime}"></td>
+                                 </tr>`;
+                    });
+                    $('#tbodyAudioContent').html(html);
+                    $('#Price').val(data.price);
+                    $('#audioPlayerSource').attr('src',data.fileUrl);
+                    $('#audioPlayer')[0].load();
+
+                    const audio = $('#audioPlayer')[0];
+
+                    $('#audioPlayer').on('play', function() {
+                        let interval = setInterval(function() {
+                            let currentTime = Math.ceil(audio.currentTime);
+
+                            $('#syncTable tbody tr').each(function() {
+                                let startTime = parseInt($(this).find('td:nth-child(2) input').val());
+                                let endTime = parseInt($(this).find('td:nth-child(3) input').val());
+                                let descriptionCell = $(this).find('td:nth-child(1)');
+                                //console.log($(this));
+                                //console.log(endTime);
+                                //console.log(descriptionCell);
+                                if (currentTime >= startTime && currentTime <= endTime) {
+                                    descriptionCell.addClass('highlight');
+                                } else {
+                                    descriptionCell.removeClass('highlight');
+                                }
+                            });
+                        }, 1000);
+
+                        audio.onended = function() {
+                            clearInterval(interval);
+                            // $('#syncTable tbody tr').each(function() {
+                            //     $(this).find('td:nth-child(1)').removeClass('highlight');
+                            // }
+
+                        };
+                    });
                 }
-            }
-        );
+            });
     }
 
 </script>

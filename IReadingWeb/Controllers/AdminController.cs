@@ -458,13 +458,45 @@ namespace LBSWeb.Controllers
 
         [Authorize(Roles = $"{Role.Manager},{Role.Admin}")]
         [Route("{bookId}/ChapterBookAudio/{chapterId}")]
-        public async Task<IActionResult> ChapterBookAudio(int bookId, string chapterId)
+        //[HttpGet]
+        public IActionResult ChapterBookAudio(int bookId, string chapterId)
         {
-            //var result = await _bookService.UpdateApproveBook(id, chapterIds);
-            return View();
+            ViewBag.BookId = bookId;
+            ViewBag.ChapterId = chapterId;
+            return View(new BookChapterVoiceModel { });
         }
 
-        
+        [Authorize(Roles = $"{Role.Manager},{Role.Admin}")]
+        [Route("GetChapterBookAudio")]
+        //[HttpGet]
+        public async Task<IActionResult> GetChapterBookAudio(string chapterId)
+        {
+            //ViewBag.BookId = bookId;
+            var result = await _bookService.GetChapterAudio(chapterId);
+            return Json(result.Data);
+        }
+
+        [Authorize(Roles = $"{Role.Manager},{Role.Admin}")]
+        [HttpPost]
+        [Route("{bookId}/ChapterBookAudio/{chapterId}")]
+        public async Task<IActionResult> ChapterBookAudio(int bookId, string chapterId,BookChapterVoiceModel model)
+        {
+            model.ChapterId = chapterId;
+            var result = await _bookService.UpdatePriceChapterVoice(model);
+            if (result.IsSussess)
+            {
+                _notyf.Success(result.Message);
+                return Redirect($"/Admin/{bookId}/ChapterBooks");
+            }
+            else
+            {
+                _notyf.Error(result.Message);
+                var resultData = await _bookService.GetChapterAudio(chapterId);
+                resultData.Data.Price = model.Price;
+                return View(resultData.Data);
+            }
+
+        }
 
         [Authorize(Roles = $"{Role.Author}")]
         [Route("CreateBook")]

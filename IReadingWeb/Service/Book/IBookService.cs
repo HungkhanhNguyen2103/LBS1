@@ -36,5 +36,7 @@ namespace LBSWeb.Service.Book
         Task<ReponderModel<bool>> CheckPaidWithBookChapter(string username, int bookId);
         Task<ReponderModel<string>> CheckFinishBook(int bookId);
         Task<ReponderModel<string>> UpdateFinishBook(int bookId, int price);
+        Task<ReponderModel<BookChapterVoiceModel>> GetChapterAudio(string chapterId);
+        Task<ReponderModel<string>> UpdatePriceChapterVoice(BookChapterVoiceModel model);
     }
 }

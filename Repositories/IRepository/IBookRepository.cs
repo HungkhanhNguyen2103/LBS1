@@ -13,6 +13,7 @@ namespace Repositories.IRepository
     {
         Task GetBookImages();
         Task<ReponderModel<string>> InsertOrUpdateChapterVoice(string chapterId, string contentWithTime, string fileName, int price);
+        Task<ReponderModel<string>> UpdatePriceChapterVoice(BookChapterVoiceModel model);
         Task<ReponderModel<Category>> GetCategories();
         Task<ReponderModel<string>> UpdateCategory(Category model);
         Task<ReponderModel<string>> DeleteCategory(int id);

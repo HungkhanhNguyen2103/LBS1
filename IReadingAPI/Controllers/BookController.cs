@@ -36,6 +36,14 @@ namespace LBSAPI.Controllers
             return result;
         }
 
+        [Route("UpdatePriceChapterVoice")]
+        [HttpPost]
+        public async Task<ReponderModel<string>> UpdatePriceChapterVoice(BookChapterVoiceModel model)
+        {
+            var result = await _bookRepository.UpdatePriceChapterVoice(model);
+            return result;
+        }
+
         [Route("GetCommentByBook")]
         [HttpGet]
         public async Task<ReponderModel<CommentModel>> GetCommentByBook(int bookId)
@@ -97,6 +105,7 @@ namespace LBSAPI.Controllers
         public IActionResult GetAudio(string fileName)
         {
             var filePath = Path.Combine(Directory.GetCurrentDirectory(), "Resource", fileName);
+            //filePath = Path.Combine(Directory.GetCurrentDirectory(), "bin", "Debug", "net8.0", "Resource", fileName);
 
             if (!System.IO.File.Exists(filePath))
             {

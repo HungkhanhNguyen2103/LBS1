@@ -595,5 +595,39 @@ namespace LBSWeb.Service.Book
             }
             return res;
         }
+
+        public async Task<ReponderModel<BookChapterVoiceModel>> GetChapterAudio(string chapterId)
+        {
+            var res = new ReponderModel<BookChapterVoiceModel>();
+            try
+            {
+                string url = PathUrl.BOOK_GET_CHAPTER_AUDIO;
+                var param = new Dictionary<string, string>();
+                param.Add("chapterId", chapterId);
+                res = await _api.Get<ReponderModel<BookChapterVoiceModel>>(url, param);
+
+            }
+            catch (Exception ex)
+            {
+                res.Message = "Lỗi gọi api!";
+            }
+            return res;
+        }
+
+        public async Task<ReponderModel<string>> UpdatePriceChapterVoice(BookChapterVoiceModel model)
+        {
+            var res = new ReponderModel<string>();
+            try
+            {
+                string url = PathUrl.BOOK_UPDATE_PRICE_CHAPTER_AUDIO;
+                res = await _api.Post<ReponderModel<string>>(url, model);
+
+            }
+            catch (Exception ex)
+            {
+                res.Message = "Lỗi gọi api!";
+            }
+            return res;
+        }
     }
 }
