@@ -9,6 +9,7 @@ using LBSWeb.Service.Information;
 using LBSWeb.Services.Account;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc;
 
@@ -29,6 +30,10 @@ builder.Services.AddAuthentication(options =>
     options.ClientSecret = builder.Configuration["GoogleKey:ClientSecret"].ToString();
     options.CallbackPath = "/signin-google";
 });
+
+builder.Services.AddDataProtection()
+    .PersistKeysToFileSystem(new DirectoryInfo(@"./keys"))
+    .SetApplicationName("IReading");
 
 builder.Services.AddHttpContextAccessor();
 
