@@ -10,6 +10,10 @@
     }
 }
 <style>
+    tr td{
+        transition: background-color 0.3s ease;
+    }
+
     .highlight {
         background-color: #80808040 !important
     }
@@ -37,7 +41,7 @@
     }
 </style>
 <div class="row">
-    <form method="post" asp-action="ChapterBookAudio" asp-route-bookId="@ViewBag.BookId" asp-route-chapterId="@Model.ChapterId">
+    <form method="post" asp-action="ChapterBookAudio" asp-route-bookId="@ViewBag.BookId" asp-route-chapterId="@ViewBag.ChapterId">
     <div class="col-12">
         <div class="card my-4">
             <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
@@ -61,25 +65,28 @@
                     </div>
                     <div style="display:block" class="form-group input-group input-group-outline mt-4">
                         <label for="Name">Dữ liệu phân tích audio <span style="color:red">*</span>:</label>
-                            <table class="table table-bordered table-hover align-middle text-center" id="syncTable">
-                                <thead class="table-light">
-                                    <tr>
-                                        <th style="width:90%">Nội dung</th>
-                                        <th>Bắt đầu (s)</th>
-                                        <th>Kêt thúc (s)</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="tbodyAudioContent">
-                                    @foreach (var item in Model.ContentWithTimes)
-                                    {
+                            <div id="syncTableDiv" style="height:30rem;overflow:auto">
+                                <table class="table table-bordered table-hover align-middle text-center" id="syncTable">
+                                    <thead class="table-light">
                                         <tr>
-                                            <td style="width:90%" class="descriptionCell"><input type="text" class="form-control" value="@item.Text"></td>
-                                            <td><input type="number" class="form-control" value="@item.StartTime"></td>
-                                            <td><input type="number" class="form-control" value="@item.EndTime"></td>
+                                            <th style="width:90%">Nội dung</th>
+                                            <th>Bắt đầu (s)</th>
+                                            <th>Kêt thúc (s)</th>
                                         </tr>
-                                    }
-                                </tbody>
-                            </table>
+                                    </thead>
+                                    <tbody id="tbodyAudioContent">
+                                        @foreach (var item in Model.ContentWithTimes)
+                                        {
+                                            <tr>
+                                                <td style="width:90%" class="descriptionCell"><input type="text" class="form-control" value="@item.Text"></td>
+                                                <td><input type="number" class="form-control" value="@item.StartTime"></td>
+                                                <td><input type="number" class="form-control" value="@item.EndTime"></td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                        </div>
+
                     </div>
                     <div style="display:block" class="input-group input-group-outline mt-4">
                             <label for="Summary">Nghe audio <span style="color:red">*</span>:</label>
@@ -152,11 +159,9 @@
                                 let startTime = parseInt($(this).find('td:nth-child(2) input').val());
                                 let endTime = parseInt($(this).find('td:nth-child(3) input').val());
                                 let descriptionCell = $(this).find('td:nth-child(1)');
-                                //console.log($(this));
-                                //console.log(endTime);
-                                //console.log(descriptionCell);
                                 if (currentTime >= startTime && currentTime <= endTime) {
                                     descriptionCell.addClass('highlight');
+                                    //descriptionCell.scrollTop();
                                 } else {
                                     descriptionCell.removeClass('highlight');
                                 }
