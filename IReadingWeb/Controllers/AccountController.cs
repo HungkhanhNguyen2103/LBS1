@@ -73,8 +73,24 @@ namespace LBSWeb.Controllers
                 _notyf.Error(result.Message);
                 return Redirect("/");
             }
-            HttpContext.Response.Cookies.Append("token", result.Data, new CookieOptions { MaxAge = TimeSpan.FromMinutes(45) });
-            return RedirectToAction("VerifyToken");
+            var claims = TokenUtil.ValidateToken(result.Data, _configuration["Tokens:Key"], _configuration["Tokens:Issuer"]);
+            if (claims != null)
+            {
+                var isConfirmEmail = claims.FindFirst(ClaimTypes.Email).Value;
+                if (isConfirmEmail == "False")
+                {
+                    return Redirect("/Account/EmailReConfirm");
+                }
+                HttpContext.Response.Cookies.Append("token", result.Data, new CookieOptions { MaxAge = TimeSpan.FromDays(365 * 2) });
+                var claimsIdentity = new ClaimsIdentity(
+                    claims.Claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                await HttpContext.SignInAsync(
+                    CookieAuthenticationDefaults.AuthenticationScheme,
+                    new ClaimsPrincipal(claimsIdentity));
+                return Redirect("/Admin/Index");
+
+            }
+            return Redirect("/Account/AccessDenied");
         }
 
         [Authorize]
@@ -112,16 +128,16 @@ namespace LBSWeb.Controllers
                 _notyf.Error(result.Message);
                 return Redirect("/");
             }
-            //var claims = TokenUtil.ValidateToken(token, _configuration["Tokens:Key"], _configuration["Tokens:Issuer"]);
-            //if (claims != null)
-            //{
-            //    HttpContext.Response.Cookies.Append("token", token, new CookieOptions { MaxAge = TimeSpan.FromMinutes(45) });
-            //    var claimsIdentity = new ClaimsIdentity(
-            //        claims.Claims, CookieAuthenticationDefaults.AuthenticationScheme);
-            //    await HttpContext.SignInAsync(
-            //        CookieAuthenticationDefaults.AuthenticationScheme,
-            //        new ClaimsPrincipal(claimsIdentity));
-            //}
+            var claims = TokenUtil.ValidateToken(token, _configuration["Tokens:Key"], _configuration["Tokens:Issuer"]);
+            if (claims != null)
+            {
+                HttpContext.Response.Cookies.Append("token", token, new CookieOptions { MaxAge = TimeSpan.FromDays(365 * 2) });
+                var claimsIdentity = new ClaimsIdentity(
+                    claims.Claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                await HttpContext.SignInAsync(
+                    CookieAuthenticationDefaults.AuthenticationScheme,
+                    new ClaimsPrincipal(claimsIdentity));
+            }
             return View();
         }
 
@@ -131,8 +147,14 @@ namespace LBSWeb.Controllers
             return View();
         }
 
-        [AllowAnonymous]
+        [Authorize]
         public IActionResult EmailConfirm()
+        {
+            return View();
+        }
+
+        [Authorize]
+        public IActionResult EmailConfirmSender()
         {
             return View();
         }
@@ -140,14 +162,16 @@ namespace LBSWeb.Controllers
         [Authorize]
         public async Task<IActionResult> EmailReConfirm()
         {
-            var userName = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            //var userClaims = User.Claims;
+            var userName = User.FindFirst(ClaimTypes.Email).Value;
+            //var userName = User.FindFirst(ClaimTypes.Name).Value;
             var result = await _accountService.ReConfirmEmail(userName);
             if (!result.IsSussess)
             {
                 _notyf.Error(result.Message);
             }
             //else _notyf.Error(result.Message);
-            return RedirectToAction("EmailConfirm");
+            return RedirectToAction("EmailConfirmSender");
         }
 
         public IActionResult Register()
@@ -202,6 +226,11 @@ namespace LBSWeb.Controllers
                 var claims = TokenUtil.ValidateToken(res.Data, _configuration["Tokens:Key"], _configuration["Tokens:Issuer"]);
                 if (claims != null)
                 {
+                    var isConfirmEmail = User.FindFirst(ClaimTypes.Email).Value;
+                    if (isConfirmEmail == "False")
+                    {
+                        return Redirect("/Account/ReConfirm");
+                    }
                     HttpContext.Response.Cookies.Append("token", res.Data, new CookieOptions { MaxAge = TimeSpan.FromDays(365*2) });
                     var claimsIdentity = new ClaimsIdentity(
                         claims.Claims, CookieAuthenticationDefaults.AuthenticationScheme);

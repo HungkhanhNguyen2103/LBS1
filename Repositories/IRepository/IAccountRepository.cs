@@ -17,7 +17,7 @@ namespace Repositories.Repository
         Task<ReponderModel<string>> ForgotPassword(string email);
         Task<ReponderModel<string>> ChangePassword(AccountModel accountModel);
         Task<ReponderModel<string>> ConfirmEmail(string? token);
-        Task<ReponderModel<string>> ReConfirmEmail(string? username);
+        Task<ReponderModel<string>> ReConfirmEmail(string? email);
 
         Task<ReponderModel<AccountModel>> GetInformation(string username);
         Task<ReponderModel<string>> UpdateInformation(AccountModel account);

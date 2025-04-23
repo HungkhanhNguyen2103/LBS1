@@ -14,19 +14,28 @@
     {
         if(claims != null)
         {
-            var isConfirmEmail = User.FindFirst(ClaimTypes.Email).Value;
-            if (string.IsNullOrEmpty(isConfirmEmail) || isConfirmEmail == "False")
+            try
             {
-                ViewContext.HttpContext.Response.Redirect("/Account/EmailReConfirm");
-                //return;
+                var isConfirmEmail = User.FindFirst(ClaimTypes.Email).Value;
+                if (string.IsNullOrEmpty(isConfirmEmail) || isConfirmEmail == "False")
+                {
+                    ViewContext.HttpContext.Response.Redirect("/Account/EmailConfirm");
+                }
+                else
+                {
+                    userName = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+                    isManager = User.IsInRole("Manager");
+                }
+
             }
+            catch (Exception ex)
+            {
+                ViewContext.HttpContext.Response.Redirect("/Account/Logout");
+            }
+
+
         }
         //ViewContext.HttpContext.Response.Redirect("/Account/EmailReConfirm");
-    }
-    if (!string.IsNullOrEmpty(jwtToken) && User.Identity.IsAuthenticated)
-    {
-        userName = User.FindFirst(ClaimTypes.NameIdentifier).Value;
-        isManager = User.IsInRole("Manager");
     }
 }
 @inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Xsrf

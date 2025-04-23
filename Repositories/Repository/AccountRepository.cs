@@ -67,10 +67,10 @@ namespace Repositories.Repository
             }
             user.EmailConfirmed = true;
 
-            var deviceToken = claims.FindFirst(ClaimTypes.Locality);
+            var deviceToken = claims.FindFirst(ClaimTypes.Locality).Value;
             if (deviceToken != null && !string.IsNullOrEmpty(deviceToken.ToString()))
             {
-                var tokenApp = deviceToken.Value;
+                var tokenApp = deviceToken;
                 var result = await _googleCredentialService.SendToDevice(tokenApp,token);
                 if (!result.IsSussess)
                 {
@@ -168,10 +168,13 @@ namespace Repositories.Repository
                 responder.Message = "Tài khoản đang bị khóa. Vui lòng báo với admin";
                 return responder;
             }
+
+            if (string.IsNullOrEmpty(account.DeviceToken)) account.DeviceToken = "";
+
             var roles = await _userManager.GetRolesAsync(userExists);
             responder.Message = "Đăng nhập thành công";
             responder.IsSussess = true;
-            responder.Data = await EncodeSha256(userExists, string.Join(", ", roles),userExists.EmailConfirmed,userExists.ResetPassword);
+            responder.Data = await EncodeSha256(userExists, string.Join(", ", roles),userExists.EmailConfirmed,userExists.ResetPassword, account.DeviceToken);
             return responder;
         }
 
@@ -241,6 +244,7 @@ namespace Repositories.Repository
                 }
 				
                 responder.Data = await EncodeSha256(user, roles, true,user.ResetPassword,account.DeviceToken);
+                var tokenEmail = await EncodeSha256(user, roles, true,user.ResetPassword,account.DeviceToken,isSenderEmail:true);
 
 
                 //Send Email 
@@ -251,7 +255,7 @@ namespace Repositories.Repository
                     return responder;
                 }
                 var webPageUrl = Environment.GetEnvironmentVariable("WEBPAGE_URL");
-                template.Body = !string.IsNullOrEmpty(template.Body) ? template.Body.Replace("$${EmailConfirmLink}", webPageUrl + "/Account/ConfirmSuccess?token=" + responder.Data) : string.Empty;
+                template.Body = !string.IsNullOrEmpty(template.Body) ? template.Body.Replace("$${EmailConfirmLink}", webPageUrl + "/Account/ConfirmSuccess?token=" + tokenEmail) : string.Empty;
                 var emailModel = new EmailModel
                 {
                     Body = template.Body,
@@ -319,7 +323,7 @@ namespace Repositories.Repository
             return responder;
         }
 
-        private async Task<string> EncodeSha256(Account user, string role,bool emailConfirm = true,int resetPassword = 0, string deviceToken = "")
+        private async Task<string> EncodeSha256(Account user, string role,bool emailConfirm = true,int resetPassword = 0, string deviceToken = "",bool isSenderEmail = false)
 		{
 			string token = string.Empty;
 			var key = _configuration["Tokens:Key"];
@@ -340,7 +344,7 @@ namespace Repositories.Repository
 			claims.Add(new Claim(ClaimTypes.PrimarySid, user.Id));
 			claims.Add(new Claim(ClaimTypes.NameIdentifier, user.UserName));
 			claims.Add(new Claim(ClaimTypes.Locality, deviceToken));
-			claims.Add(new Claim(ClaimTypes.Email, user.EmailConfirmed.ToString()));
+			claims.Add(new Claim(ClaimTypes.Email, isSenderEmail ? emailConfirm.ToString() : user.EmailConfirmed.ToString()));
 
             // add or get room
             if (role.Contains(Role.Author))
@@ -548,17 +552,18 @@ namespace Repositories.Repository
             return responder;
         }
 
-        public async Task<ReponderModel<string>> ReConfirmEmail(string username)
+        public async Task<ReponderModel<string>> ReConfirmEmail(string email)
         {
             var responder = new ReponderModel<string>();
-            var userExist = await _userManager.FindByNameAsync(username);
+            var userExist = await _userManager.FindByEmailAsync(email);
             if (userExist == null)
             {
                 responder.Message = "Tài khoản không tồn tại";
                 return responder;
             }
             var roles = await _userManager.GetRolesAsync(userExist);
-            var token = await EncodeSha256(userExist, string.Join(", ", roles), true, userExist.ResetPassword);
+            var token = await EncodeSha256(userExist, string.Join(", ", roles), true, userExist.ResetPassword,isSenderEmail:true);
+            //var tokenEmail = await EncodeSha256(userExist, string.Join(", ", roles), true, userExist.ResetPassword);
             //Send Email 
             var template = await LBSDbContext.TemplateEmails.FirstOrDefaultAsync(c => c.Name == "EmailConfirm");
             if (template == null)
@@ -636,12 +641,12 @@ namespace Repositories.Repository
                         Subject = template.Subject,
                         To = new List<string>() { email }
                     };
-                    var rs = await _emailSender.SendEmailAsync(emailModel);
-                    if (!rs)
-                    {
-                        responder.Message = "Lỗi gửi mail";
-                        return responder;
-                    }
+                    //var rs = await _emailSender.SendEmailAsync(emailModel);
+                    //if (!rs)
+                    //{
+                    //    responder.Message = "Lỗi gửi mail";
+                    //    return responder;
+                    //}
                     responder.Message = "Đăng nhập thành công";
                     responder.IsSussess = true;
                     return responder;

@@ -102,16 +102,17 @@ namespace Repositories.Repository
             foreach (var item in userTranscationBook)
             {
                 var paymentName = string.Empty;
-                if(item.BookId != -1)
-                {
-                    var book = await _lBSDbContext.Books.FirstOrDefaultAsync(x => x.Id == item.BookId);
-                    paymentName = $"Mở khóa sách {book.Name}";
-                }
-                else if (!string.IsNullOrEmpty(item.ChapterId))
+
+                if (!string.IsNullOrEmpty(item.ChapterId))
                 {
                     var chapter = chapters.FirstOrDefault(c => c.Id == item.ChapterId);
                     var book = await _lBSDbContext.Books.FirstOrDefaultAsync(x => x.Id == chapter.BookId);
                     paymentName = $"Mở khóa chương {chapter.ChapterName} - sách {book.Name}";
+                }
+                else if (item.BookId != -1)
+                {
+                    var book = await _lBSDbContext.Books.FirstOrDefaultAsync(x => x.Id == item.BookId);
+                    paymentName = $"Mở khóa sách {book.Name}";
                 }
 
                 result.DataList.Add(new UserTranscationBookModel

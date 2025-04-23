@@ -16,6 +16,8 @@ namespace BusinessObject.BaseModel
         public string? FileName { get; set; }
         public string? Content { get; set; }
         public List<SummaryTime> ContentWithTime { get; set; } = new List<SummaryTime>();
+        public List<SegmentModel> SegmentWithTimes { get; set; } = new List<SegmentModel>();
+        public string? AudioUrl { get; set; }
         public string ModifyDate { get; set; }
         public BookType BookType { get; set; }
         //public int WordNo { get; set; }

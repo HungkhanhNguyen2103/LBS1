@@ -2102,5 +2102,27 @@ namespace Repositories.Repository
             result.IsSussess = true;
             return result;
         }
+
+        public async Task<ReponderModel<BookChapterModel>> GetListBookChapterByUserName(int bookId, string username)
+        {
+            var result = new ReponderModel<BookChapterModel>();
+            var filter = Builders<BookChapter>.Filter.And(
+                Builders<BookChapter>.Filter.Where(p => p.BookId == bookId)
+            );
+
+            var listBookChapter = await _mongoContext.BookChapters.Find(filter).ToListAsync();
+
+            if (listBookChapter == null || listBookChapter.Count == 0)
+            {
+                result.Message = "Không có dữ liệu chương";
+                return result;
+            }
+
+            var listBookChapterIds = listBookChapter.Select(c => c.Id).ToList();
+
+            //var paidPackage = await _lBSDbContext.UserTranscationBooks.Where(c => c.UserName == username && (c.BookId == bookId || listBookChapterIds.)).ToListAsync();
+
+            return result;
+        }
     }
 }
