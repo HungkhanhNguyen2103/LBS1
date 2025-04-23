@@ -76,7 +76,7 @@ namespace LBSWeb.Controllers
         }
 
 
-        [Authorize]
+        //[Authorize]
         //[IgnoreAntiforgeryToken]
         public async Task<IActionResult> LoginWithGoogle()
         {

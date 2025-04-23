@@ -22,9 +22,11 @@ namespace BusinessObject.BaseModel
         public BookType BookType { get; set; }
         //public int WordNo { get; set; }
         public int Price { get; set; }
+        public int PriceVoice { get; set; }
         public string? CreateBy { get; set; }
-        public int BookId { get; set; }
-        
+        public int BookId { get; set; } 
+        public bool IsPaidChapter { get; set; }
+        public bool IsPaidVoice { get; set; }
     }
 
     public class SummaryTime

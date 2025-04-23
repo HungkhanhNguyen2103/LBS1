@@ -9,6 +9,7 @@ using LBSWeb.Service.Information;
 using LBSWeb.Services.Account;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
+using Microsoft.AspNetCore.Authentication.OAuth;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc;
@@ -29,6 +30,15 @@ builder.Services.AddAuthentication(options =>
     options.ClientId = builder.Configuration["GoogleKey:ClientId"].ToString();
     options.ClientSecret = builder.Configuration["GoogleKey:ClientSecret"].ToString();
     options.CallbackPath = "/signin-google";
+
+    //options.Events = new OAuthEvents
+    //{
+    //    OnTicketReceived = context =>
+    //    {
+    //        context.ReturnUri = "/LoginWithGoogle";
+    //        return Task.CompletedTask;
+    //    }
+    //};
 });
 
 builder.Services.AddDataProtection()

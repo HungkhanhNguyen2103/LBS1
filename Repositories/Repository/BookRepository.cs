@@ -2115,7 +2115,9 @@ namespace Repositories.Repository
         {
             var result = new ReponderModel<BookChapterModel>();
             var filter = Builders<BookChapter>.Filter.And(
-                Builders<BookChapter>.Filter.Where(p => p.BookId == bookId)
+                Builders<BookChapter>.Filter.Where(p => p.BookId == bookId),
+                Builders<BookChapter>.Filter.Where(p => p.BookType == BookType.Free || p.BookType == BookType.Payment)
+                
             );
 
             var listBookChapter = await _mongoContext.BookChapters.Find(filter).ToListAsync();
@@ -2125,11 +2127,79 @@ namespace Repositories.Repository
                 result.Message = "Không có dữ liệu chương";
                 return result;
             }
+            var isExpireMemberShip = await CheckExpireMemberShip(username);
+            var paidBook = await _lBSDbContext.UserTranscationBooks.FirstOrDefaultAsync(c => c.BookId == bookId && string.IsNullOrEmpty(c.ChapterId));
+            
+            //mua full sách
+            if(paidBook != null)
+            {
+                var paidChapters = await _lBSDbContext.UserTranscationBooks.Where(c => c.UserName == username && c.Type == TranscationBookType.Voice).ToListAsync();
+                foreach (var c in listBookChapter)
+                {
+                    var bookChapterVoice = await _mongoContext.BookChapterVoices.Find(c => c.ChapterId == c.Id).FirstOrDefaultAsync();
+                    var bookChapterModel = new BookChapterModel
+                    {
+                        AudioUrl = c.AudioUrl,
+                        Id = c.Id,
+                        BookId = c.BookId,
+                        ChapterName = c.ChapterName,
+                        Content = c.Content,
+                        BookType = c.BookType,
+                        ChaperId = c.ChaperId,
+                        CreateBy = c.CreateBy,
+                        Price = c.Price,
+                        Summary = c.Summary,
+                        IsPaidChapter = true
+                        //ModifyDate = c.ModifyDate
+                    };
 
-            var listBookChapterIds = listBookChapter.Select(c => c.Id).ToList();
+                    if(bookChapterVoice != null)
+                    {
+                        bookChapterModel.PriceVoice = bookChapterVoice.Price;
+                        bookChapterModel.SegmentWithTimes = Newtonsoft.Json.JsonConvert.DeserializeObject<List<SegmentModel>>(bookChapterVoice.ContentWithTime);
+                        bookChapterModel.FileName = bookChapterVoice.FileName;
 
-            //var paidPackage = await _lBSDbContext.UserTranscationBooks.Where(c => c.UserName == username && (c.BookId == bookId || listBookChapterIds.)).ToListAsync();
+                        //mua sach noi
+                        bookChapterModel.IsPaidVoice = paidChapters.FirstOrDefault(c => c.ChapterId == bookChapterVoice.ChapterId) != null || isExpireMemberShip ? true : false;
+                    }
+                    result.DataList.Add(bookChapterModel);
+                }
 
+            }
+            // mua tung chuong
+            else
+            {
+                var paidChapters = await _lBSDbContext.UserTranscationBooks.Where(c => c.UserName == username && c.BookId == bookId).ToListAsync();
+                foreach (var c in listBookChapter)
+                {
+                    var bookChapterVoice = await _mongoContext.BookChapterVoices.Find(c => c.ChapterId == c.Id).FirstOrDefaultAsync();
+                    var bookChapterModel = new BookChapterModel
+                    {
+                        AudioUrl = c.AudioUrl,
+                        Id = c.Id,
+                        BookId = c.BookId,
+                        ChapterName = c.ChapterName,
+                        Content = c.Content,
+                        BookType = c.BookType,
+                        ChaperId = c.ChaperId,
+                        CreateBy = c.CreateBy,
+                        Price = c.Price,
+                        Summary = c.Summary,
+                        IsPaidChapter = paidChapters.FirstOrDefault(x => x.ChapterId == c.Id && x.Type == TranscationBookType.Read) != null ? true : false,
+                    };
+                    if (bookChapterVoice != null)
+                    {
+                        bookChapterModel.PriceVoice = bookChapterVoice.Price;
+                        bookChapterModel.SegmentWithTimes = Newtonsoft.Json.JsonConvert.DeserializeObject<List<SegmentModel>>(bookChapterVoice.ContentWithTime);
+                        bookChapterModel.FileName = bookChapterVoice.FileName;
+                        //mua sach noi
+                        bookChapterModel.IsPaidVoice = paidChapters.FirstOrDefault(c => c.ChapterId == bookChapterVoice.ChapterId) != null || isExpireMemberShip ? true : false;
+                    }
+                    result.DataList.Add(bookChapterModel);
+                }
+            }
+
+            result.IsSussess = true;
             return result;
         }
 
@@ -2140,6 +2210,15 @@ namespace Repositories.Repository
             if(listChapter.Count >= 3) result.IsSussess = true;
             else result.IsSussess = false;
             return result;
+        }
+
+        private async Task<bool> CheckExpireMemberShip(string username)
+        {
+            var paid = await _lBSDbContext.UserTranscations.Where(c => c.UserName == username && c.Type == PaymentItemType.Membership && c.ExpireDate != null)
+                .OrderByDescending(c => c.ExpireDate)
+                .FirstOrDefaultAsync();
+            if(paid == null || paid.ExpireDate < DateTime.UtcNow) return false;
+            return true;
         }
     }
 }
