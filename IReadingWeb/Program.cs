@@ -32,7 +32,7 @@ builder.Services.AddAuthentication(options =>
 });
 
 builder.Services.AddDataProtection()
-    .PersistKeysToFileSystem(new DirectoryInfo(@"./keys"))
+    .PersistKeysToFileSystem(new DirectoryInfo("/app/keys"))
     .SetApplicationName("IReading");
 
 builder.Services.Configure<CookiePolicyOptions>(options =>
