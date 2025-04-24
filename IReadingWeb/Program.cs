@@ -31,14 +31,14 @@ builder.Services.AddAuthentication(options =>
     options.ClientSecret = builder.Configuration["GoogleKey:ClientSecret"].ToString();
     options.CallbackPath = "/signin-google";
 
-    //options.Events = new OAuthEvents
-    //{
-    //    OnTicketReceived = context =>
-    //    {
-    //        context.ReturnUri = "/LoginWithGoogle";
-    //        return Task.CompletedTask;
-    //    }
-    //};
+    options.Events = new OAuthEvents
+    {
+        OnTicketReceived = context =>
+        {
+            context.ReturnUri = "Account/LoginWithGoogle";
+            return Task.CompletedTask;
+        }
+    };
 });
 
 builder.Services.AddDataProtection()
