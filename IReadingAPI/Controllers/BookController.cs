@@ -110,7 +110,7 @@ namespace LBSAPI.Controllers
 
         [Route("GetListBookChapterByUserName")]
         [HttpGet]
-        public async Task<ReponderModel<BookChapterModel>> GetListBookChapterByUserName(int bookId, string username)
+        public async Task<ReponderModel<BookChapterModel>> GetListBookChapterByUserName(int bookId, string? username)
         {
             var result = await _bookRepository.GetListBookChapterByUserName(bookId, username);
             return result;

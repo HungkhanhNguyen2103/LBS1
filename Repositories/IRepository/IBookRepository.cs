@@ -31,7 +31,7 @@ namespace Repositories.IRepository
         Task<ReponderModel<BookChapter>> GetBookChapter(string id);
         Task<ReponderModel<BookChapterModel>> GetBookChapterWithVoice(string id);
         Task<ReponderModel<BookChapter>> GetListBookChapter(int bookId);
-        Task<ReponderModel<BookChapterModel>> GetListBookChapterByUserName(int bookId, string username);
+        Task<ReponderModel<BookChapterModel>> GetListBookChapterByUserName(int bookId, string? username);
         Task<ReponderModel<string>> DeleteChapterBook(string id);
         Task<ReponderModel<string>> HiddenChapterBook(string id);
         Task<ReponderModel<string>> BanBook(int bookId);

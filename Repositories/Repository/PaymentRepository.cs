@@ -161,7 +161,7 @@ namespace Repositories.Repository
             var asQuery = _lBSDbContext.UserTranscationBooks.Where(c => c.UserName == userTranscationBook.UserName).AsQueryable();
             if (!string.IsNullOrEmpty(userTranscationBook.ChapterId))
             {
-                var resultPayment = await asQuery.FirstOrDefaultAsync(x => x.ChapterId == userTranscationBook.ChapterId);
+                var resultPayment = await asQuery.FirstOrDefaultAsync(x => x.ChapterId == userTranscationBook.ChapterId && x.Type == userTranscationBook.Type);
                 if(resultPayment != null)
                 {
                     result.Message = "Chương đã được thanh toán";
@@ -181,7 +181,7 @@ namespace Repositories.Repository
             }
             else if (userTranscationBook.BookId != -1)
             {
-                var resultPayment = await asQuery.FirstOrDefaultAsync(x => x.BookId == userTranscationBook.BookId);
+                var resultPayment = await asQuery.FirstOrDefaultAsync(x => x.BookId == userTranscationBook.BookId && x.Type == userTranscationBook.Type);
                 if (resultPayment != null)
                 {
                     result.Message = "Sách đã được thanh toán";

@@ -2111,7 +2111,7 @@ namespace Repositories.Repository
             return result;
         }
 
-        public async Task<ReponderModel<BookChapterModel>> GetListBookChapterByUserName(int bookId, string username)
+        public async Task<ReponderModel<BookChapterModel>> GetListBookChapterByUserName(int bookId, string? username)
         {
             var result = new ReponderModel<BookChapterModel>();
             var filter = Builders<BookChapter>.Filter.And(
@@ -2127,6 +2127,42 @@ namespace Repositories.Repository
                 result.Message = "Không có dữ liệu chương";
                 return result;
             }
+
+            if (string.IsNullOrEmpty(username))
+            {
+                foreach (var c in listBookChapter)
+                {
+                    var bookChapterVoice = await _mongoContext.BookChapterVoices.Find(c => c.ChapterId == c.Id).FirstOrDefaultAsync();
+                    var bookChapterModel = new BookChapterModel
+                    {
+                        AudioUrl = c.AudioUrl,
+                        Id = c.Id,
+                        BookId = c.BookId,
+                        ChapterName = c.ChapterName,
+                        Content = c.Content,
+                        BookType = c.BookType,
+                        ChaperId = c.ChaperId,
+                        CreateBy = c.CreateBy,
+                        Price = c.Price,
+                        Summary = c.Summary,
+                        IsPaidChapter = false
+                        //ModifyDate = c.ModifyDate
+                    };
+
+                    if (bookChapterVoice != null)
+                    {
+                        bookChapterModel.PriceVoice = bookChapterVoice.Price;
+                        bookChapterModel.SegmentWithTimes = Newtonsoft.Json.JsonConvert.DeserializeObject<List<SegmentModel>>(bookChapterVoice.ContentWithTime);
+                        bookChapterModel.FileName = bookChapterVoice.FileName;
+
+                        bookChapterModel.IsPaidVoice = false;
+                    }
+                    result.DataList.Add(bookChapterModel);
+                }
+                result.IsSussess = true;
+                return result;
+            }
+
             var isExpireMemberShip = await CheckExpireMemberShip(username);
             var paidBook = await _lBSDbContext.UserTranscationBooks.FirstOrDefaultAsync(c => c.BookId == bookId && string.IsNullOrEmpty(c.ChapterId));
             
