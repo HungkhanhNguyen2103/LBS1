@@ -31,14 +31,14 @@ builder.Services.AddAuthentication(options =>
     options.ClientSecret = builder.Configuration["GoogleKey:ClientSecret"].ToString();
     options.CallbackPath = "/signin-google";
 
-    options.Events = new OAuthEvents
-    {
-        OnTicketReceived = context =>
-        {
-            context.ReturnUri = "Account/LoginWithGoogle";
-            return Task.CompletedTask;
-        }
-    };
+    //options.Events = new OAuthEvents
+    //{
+    //    OnTicketReceived = context =>
+    //    {
+    //        context.ReturnUri = "Account/LoginWithGoogle";
+    //        return Task.CompletedTask;
+    //    }
+    //};
 });
 
 builder.Services.AddDataProtection()
@@ -94,12 +94,12 @@ builder.Services.AddCors(options =>
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-//if (!app.Environment.IsDevelopment())
-//{
-//    app.UseExceptionHandler("/Home/Error");
-//    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-//    app.UseHsts();
-//}
+if (!app.Environment.IsDevelopment())
+{
+    app.UseExceptionHandler("/Account/EmailConfirmSender");
+    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+    app.UseHsts();
+}
 
 app.UseCors("AllowSpecificOrigin");
 
