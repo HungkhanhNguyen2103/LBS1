@@ -8,11 +8,12 @@ using System.Threading.Tasks;
 
 namespace BusinessObject
 {
-    public class BookChapter
+    public class BookChapterPending
     {
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
         public string? Id { get; set; }
+        public string? ChapterId { get; set; }
         public string? ChapterName { get; set; }
         public int ChapterNumber { get; set; }
         public string? Summary { get; set; }
@@ -21,10 +22,6 @@ namespace BusinessObject
         public DateTime ModifyDate { get; set; }
         public BookType BookType { get; set; }
         public int WordNo { get; set; }
-        [BsonIgnore]
-        public int ViewNo { get; set; }
-        [BsonIgnore]
-        public int RatingNo { get; set; }
         public int Price { get; set; }
         public string? CreateBy { get; set; }
         public string? UserId { get; set; }

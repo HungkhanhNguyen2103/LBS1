@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace BusinessObject
 {
-    public class UserTranscationBook
+    public class UserTransactionBook
     {
         public int Id { get; set; }
         public int Amount { get; set; }

@@ -139,7 +139,7 @@ namespace Repositories.Repository
             return result;
         }
 
-        public async Task<ReponderModel<string>> PaymentItem(UserTranscationBook userTranscationBook)
+        public async Task<ReponderModel<string>> PaymentItem(UserTransactionBook userTranscationBook)
         {
             var result = new ReponderModel<string>();
             var price = 0;
@@ -256,7 +256,7 @@ namespace Repositories.Repository
             }
             //end
 
-            var userTranscation = new UserTranscation
+            var userTranscation = new UserTransaction
             {
                 PaymentItemId = paymentKey,
                 Type = typeEnum,

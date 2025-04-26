@@ -1,7 +1,7 @@
 ﻿@{
     Layout = "~/Views/Admin/_AdminLayout.cshtml";
 }
-@model BasicKnowledge
+@model Notification
 @inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Xsrf
 @functions {
     public string GetAntiXsrfRequestToken()
@@ -34,22 +34,17 @@
             </div>
             <div class="card-body px-0 pb-2">
                 <div class="table-responsive p-0">
-                      <h3 class="title">@Model.Title</h3>
-                      <div class="title">
-                        <p class="title">
-                            @Html.Raw(@Model.Content)
+                    <h3 class="title mb-0">@Model.Name</h3>
+                    <small class="title">@Model.ModifyDate.AddHours(7).ToString("HH:mm dd/MM/yyyy")</small>
+                    <div class="title mt-1">
+                        <p>
+                            @Html.Raw(Model.Content)
                         </p>
-                      </div>
+                    </div>
 
-                      <div style="text-align:center">
-                        <button type="button" onclick="window.location.href='/Admin/BasicKnowledge'" class="btn btn-secondary mt-4">Quay lại</button>
-                      </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
-<script src="~/lib/jquery/dist/jquery.min.js"></script>
-<script type="text/javascript">
-    document.getElementById('BasicKnowledgeId').classList.add('active');
-</script>
+

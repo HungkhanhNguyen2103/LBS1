@@ -41,7 +41,12 @@ namespace BusinessObject
         //ChapterBook
         PendingApproval = 2,
         Decline = 3,
-        Hidden = 4
+        Hidden = 4,
+
+        //cap nhat lai chuong
+        AwaitApproval = 5,
+        //dang cap nhat
+        LoadingEdit = 6,
     }
 
     public enum BookTypePrice

@@ -58,7 +58,7 @@ namespace IReadingAPI.Controllers
 
         [Route("PaymentItem")]
         [HttpPost]
-        public async Task<ReponderModel<string>> PaymentItem(UserTranscationBook userTranscationBook)
+        public async Task<ReponderModel<string>> PaymentItem(UserTransactionBook userTranscationBook)
         {
             var result = await _paymentRepository.PaymentItem(userTranscationBook);
             return result;

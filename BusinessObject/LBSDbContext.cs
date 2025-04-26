@@ -19,8 +19,8 @@ namespace BusinessObject
             builder.Entity<Book>().ToTable("Book").HasKey(x => x.Id);
             builder.Entity<UserBook>().ToTable("UserBook").HasKey(x => x.Id);
             builder.Entity<BookCategory>().ToTable("BookCategory").HasKey(x => x.Id);
-            builder.Entity<UserTranscation>().ToTable("UserTranscation").HasKey(x => x.Id);
-            builder.Entity<UserTranscationBook>().ToTable("UserTranscationBook").HasKey(x => x.Id);
+            builder.Entity<UserTransaction>().ToTable("UserTransaction").HasKey(x => x.Id);
+            builder.Entity<UserTransactionBook>().ToTable("UserTransactionBook").HasKey(x => x.Id);
             builder.Entity<Category>().ToTable("Category").HasKey(x => x.Id);
             builder.Entity<Comment>().ToTable("Comment").HasKey(x => x.Id);
             builder.Entity<BasicKnowledge>().ToTable("BasicKnowledge").HasKey(x => x.Id);
@@ -37,8 +37,8 @@ namespace BusinessObject
         public virtual DbSet<Book> Books { get; set; }
         public virtual DbSet<BookCategory> BookCategories { get; set; }
         public virtual DbSet<UserBook> UserBooks { get; set; }
-        public virtual DbSet<UserTranscation> UserTranscations { get; set; }
-        public virtual DbSet<UserTranscationBook> UserTranscationBooks { get; set; }
+        public virtual DbSet<UserTransaction> UserTranscations { get; set; }
+        public virtual DbSet<UserTransactionBook> UserTranscationBooks { get; set; }
         public virtual DbSet<Category> Categories { get; set; }
         public virtual DbSet<Comment> Comments { get; set; }
         public virtual DbSet<BasicKnowledge> BasicKnowledges { get; set; }
@@ -53,5 +53,6 @@ namespace BusinessObject
         public virtual DbSet<NoteUser> NoteUsers { get; set; }
         public virtual DbSet<MeilisearchLog> MeilisearchLogs { get; set; }
         public virtual DbSet<CommentUser> CommentUsers { get; set; }
+        public virtual DbSet<NotificationManager> NotificationManagers { get; set; }
     }
 }

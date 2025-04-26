@@ -11,7 +11,7 @@ namespace BusinessObject.BaseModel
     {
         public string? Id { get; set; }
         public string? ChapterName { get; set; }
-        public int ChaperId { get; set; }
+        public int ChapterNumber { get; set; }
         public string? Summary { get; set; }
         public string? FileName { get; set; }
         public string? Content { get; set; }

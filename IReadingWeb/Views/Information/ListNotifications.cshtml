@@ -1,7 +1,8 @@
 ﻿@{
     Layout = "~/Views/Admin/_AdminLayout.cshtml";
+    // ViewData["Title"] = "Loại bài viết";
 }
-@model BasicKnowledge
+@model Notification
 @inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Xsrf
 @functions {
     public string GetAntiXsrfRequestToken()
@@ -18,34 +19,29 @@
         <div class="card my-4">
             <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
                 <div class="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3">
-                    <h6 class="text-white text-capitalize ps-3">Kiến thức cơ bản</h6>
+                    <h6 class="text-white text-capitalize ps-3">Thông báo</h6>
                 </div>
             </div>
-            <div style="width:12rem;margin-left:2rem" class="form-group input-group input-group-outline mt-4">
-                <select style="width:100%" class="form-select form-control" onchange="ChangeSelect(this)" id="CategoryKnowledgeType">
-                    <option value="0">Hướng Dẫn Cơ Bản</option>
-                    <option value="1">Trợ Lực Sáng Tác</option>
-                    <option value="2">Thu Nhập Và Thanh Toán</option>
-                    <option value="3">Sử dụng IReading</option>
-                </select>
-            </div>
-
             <div class="card-body px-0 pb-2">
                 <div class="table-responsive p-0">
                     <table class="table align-items-center mb-0">
                         <thead>
                             <tr>
-                                <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Tiêu đề</th>
+                                <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Tên</th>
+                                <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Thời gian</th>
                                 @* <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Mô tả</th> *@
                                 <th class="text-secondary opacity-7"></th>
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach (BasicKnowledge item in ViewBag.ListBasicKnowledge)
+                            @foreach (Notification item in ViewBag.Notifications)
                             {
                                 <tr>
                                     <td>
-                                        <p id="name-@item.Id" class="mx-3 text-xs font-weight-bold mb-0">@item.Title</p>
+                                        <p id="name-@item.Id" class="mx-3 text-xs font-weight-bold mb-0">@item.Name</p>
+                                    </td>
+                                    <td>
+                                        <p class="mx-3 text-xs font-weight-bold mb-0">@item.ModifyDate.AddHours(7).ToString("HH:mm dd/MM/yyyy")</p>
                                     </td>
                                     <td class="align-middle">
                                         <button type="button" onclick="showPopup(@item.Id)" title="Sửa" class="btn1 btn btn-secondary" data-toggle="modal" data-target="#exampleModal">
@@ -68,9 +64,9 @@
 <!-- Modal -->
 <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl">
-        <form id="formModal" class="modal-content" method="post" asp-action="UpdateBasicKnowledge">
+        <form id="formModal" class="modal-content" method="post" asp-action="UpdateNotification">
             <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Kiến thức cơ bản</h5>
+                <h5 class="modal-title" id="exampleModalLabel">Thông báo</h5>
                 <button type="button" class="btn close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -78,19 +74,10 @@
             <div class="modal-body">
                 <div style="display:block" class="form-group input-group input-group-outline">
                     <input type="number" asp-for="Id" hidden />
-                    <label for="Title">Tiêu đề</label>
-                    <input style="width:100%"  type="text" class="form-control" asp-for="Title" required placeholder="Tên">
+                    <label for="Name">Tên</label>
+                    <input style="width:100%"  type="text" class="form-control" asp-for="Name" required placeholder="Tên">
                 </div>
-                <div style="display:block" class="form-group input-group input-group-outline mt-4">
-                    <label>Thể loại</label>
-                    <select style="width:100%" asp-for="Category" class="form-control">
-                        <option value="0">Hướng Dẫn Cơ Bản</option>
-                        <option value="1">Trợ Lực Sáng Tác</option>
-                        <option value="2">Thu Nhập Và Thanh Toán</option>
-                        <option value="3">Sử dụng IReading</option>
-                    </select>
-                </div>
-                <div style="display:block" class="row input-group input-group-outline mt-4">
+                <div class="row input-group input-group-outline mt-4">
                     <div style="display:block">
                         <label for="Content">Nội dung:</label>
                         <div class="row" style="display:flex">
@@ -106,7 +93,6 @@
                     <label for="Content">Nội dung</label>
                     <textarea style="width:100%" type="text" asp-for="Content" class="form-control" placeholder="Nội dung"></textarea>
                 </div> *@
-
             </div>
             <div class="modal-footer">
                 <button type="submit" class="btn btn-primary">Lưu thông tin</button>
@@ -116,9 +102,8 @@
 </div>
 <script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js" asp-append-version="true"></script>
 <script type="text/javascript">
-    document.getElementById('BasicKnowledgeId').classList.add('active');
-    document.getElementById('CategoryKnowledgeType').value = @ViewBag.Category;
-    
+    document.getElementById('ListNotificationsId').classList.add('active');
+
     const quill = new Quill('#ContentDiv', {
         theme: 'snow',
         modules: {
@@ -156,18 +141,15 @@
         $('#Content').val(textContent);
     }
 
-    function ChangeSelect(el){
-        var category = $(el).val();
-        window.location.href = `/Admin/ListBasicKnowledge?category=${category}`;
-    }
 
     function showPopup(id){
+        //console.log(id);
         document.getElementById('Id').value = '';
-        document.getElementById('Title').value = '';
+        document.getElementById('Name').value = '';
         document.getElementById('Content').value = '';
         $.ajax(
             {
-                url: `/Admin/Knowledge/${id}`,
+                url: `/Information/Notificate/${id}`,
                 type: "GET",
                 headers:
                 {
@@ -179,13 +161,17 @@
                 success: function (data) {
                     //console.log(data);
                     document.getElementById('Id').value = data.id;
-                    document.getElementById('Title').value = data.title;
+                    document.getElementById('Name').value = data.name;
                     document.getElementById('Content').value = data.content;
-                    document.getElementById('Category').value = data.category;
                     quill.clipboard.dangerouslyPasteHTML(data.content);
                 }
             }
         );
+        // document.getElementById('Id').value = id;
+        // document.getElementById('Name').value = name;
+        // document.getElementById('Content').value = des;
+
+        // quill.clipboard.dangerouslyPasteHTML(des);
     }
 
     function ResetForm(){
@@ -198,7 +184,7 @@
         //var formData = new FormData();
         $.ajax(
             {
-                url: `/Admin/DeleteBasicKnowledge?id=${id}`,
+                url: `/Information/DeleteNotification?id=${id}`,
                 type: "GET",
                 headers:
                 {
@@ -210,14 +196,11 @@
                 processData: false,
                 contentType: false,
                 success: function (data) {
-                    if (data.IsSussess == false) {
-                        notyf.error(data.message);
-                        return;
-                    }
-                    notyf.success(data.message);
+                    notyf.success(data);
                     setTimeout(() => {
-                        window.location.href = '/Admin/ListBasicKnowledge';
+                        window.location.reload();
                     }, 800);
+
                 }
             }
         );

@@ -77,8 +77,8 @@ namespace Repositories.Repository
 
         public async Task GetBookImages()
         {
-            var bookImage = await _mongoContext.BookImages.Find(_ => true).ToListAsync();
-            var s = await _mongoContext.BookChapters.Find(_ => true).ToListAsync();
+            //var bookImage = await _mongoContext.BookImages.Find(_ => true).ToListAsync();
+            //var s = await _mongoContext.BookChapters.Find(_ => true).ToListAsync();
 
             throw new NotImplementedException();
         }
@@ -431,7 +431,7 @@ namespace Repositories.Repository
             if (bookChapter.Type == 2)
             {
                 var filter = Builders<BookChapter>.Filter.And(
-                    Builders<BookChapter>.Filter.Where(p => p.ChaperId == bookChapter.ChaperId),
+                    Builders<BookChapter>.Filter.Where(p => p.ChapterNumber == bookChapter.ChapterNumber),
                     Builders<BookChapter>.Filter.Where(p => p.BookId == bookChapter.BookId)
                     );
 
@@ -551,7 +551,7 @@ namespace Repositories.Repository
                             Builders<BookChapter>.Filter.Where(p => p.Type != 3)
                         );
 
-            var sort = Builders<BookChapter>.Sort.Descending(x => x.ChaperId);
+            var sort = Builders<BookChapter>.Sort.Descending(x => x.ChapterNumber);
 
             var listBookChapter = await _mongoContext.BookChapters.Find(filter).Sort(sort).ToListAsync();
 
@@ -560,7 +560,7 @@ namespace Repositories.Repository
                 AudioUrl = c.AudioUrl,
                 BookId = c.BookId,
                 BookType = c.BookType,
-                ChaperId = c.ChaperId,
+                ChapterNumber = c.ChapterNumber,
                 ChapterName = c.ChapterName,
                 Content = c.Content,
                 CreateBy = c.CreateBy,
@@ -703,7 +703,7 @@ namespace Repositories.Repository
 
             var update = Builders<BookChapter>.Update
                         .Set(c => c.ChapterName, bookChapter.ChapterName)
-                        .Set(c => c.ChaperId, bookChapter.ChaperId)
+                        .Set(c => c.ChapterNumber, bookChapter.ChapterNumber)
                         .Set(c => c.AudioUrl, bookChapter.AudioUrl)
                         .Set(c => c.Summary, bookChapter.Summary)
                         .Set(c => c.ModifyDate, bookChapter.ModifyDate)
@@ -778,7 +778,7 @@ namespace Repositories.Repository
                             Builders<BookChapter>.Filter.Where(p => p.BookType == BookType.PendingApproval)
                         );
 
-            var sort = Builders<BookChapter>.Sort.Ascending(x => x.ChaperId);
+            var sort = Builders<BookChapter>.Sort.Ascending(x => x.ChapterNumber);
 
             var listBookChapter = await _mongoContext.BookChapters.Find(filter).Sort(sort).ToListAsync();
             //if (listBookChapter.Count < 3)
@@ -932,7 +932,7 @@ namespace Repositories.Repository
         {
             var result = new ReponderModel<StatisticsChapterBook>();
             var listChapter = await GetListBookChapter(bookId);
-            var listChapterBook = listChapter.DataList.OrderBy(c => c.ChaperId).ToList();
+            var listChapterBook = listChapter.DataList.OrderBy(c => c.ChapterNumber).ToList();
 
             var item = new StatisticsChapterBook
             {
@@ -1454,7 +1454,7 @@ namespace Repositories.Repository
                 FileName = bookChapterVoice != null ? bookChapterVoice.FileName : string.Empty,
                 BookId = bookChapter.BookId,
                 BookType = bookChapter.BookType,
-                ChaperId = bookChapter.ChaperId,
+                ChapterNumber = bookChapter.ChapterNumber,
                 ChapterName = bookChapter.ChapterName,
                 Content = bookChapter.Content,
                 CreateBy = bookChapter.CreateBy,
@@ -1666,8 +1666,8 @@ namespace Repositories.Repository
 
         public async Task<ReponderModel<string>> GetListCommentByChapter(string chapterId)
         {
-            var result = new ReponderModel<string>();
-            var reponse = await _lBSDbContext.CommentUsers.Where(c => c.ChapterId == chapterId).ToListAsync();
+            //var result = new ReponderModel<string>();
+            //var reponse = await _lBSDbContext.CommentUsers.Where(c => c.Chapter == chapterId).ToListAsync();
             //foreach (var item in reponse)
             //{
             //    var userComment
@@ -2141,7 +2141,7 @@ namespace Repositories.Repository
                         ChapterName = c.ChapterName,
                         Content = c.Content,
                         BookType = c.BookType,
-                        ChaperId = c.ChaperId,
+                        ChapterNumber = c.ChapterNumber,
                         CreateBy = c.CreateBy,
                         Price = c.Price,
                         Summary = c.Summary,
@@ -2181,7 +2181,7 @@ namespace Repositories.Repository
                         ChapterName = c.ChapterName,
                         Content = c.Content,
                         BookType = c.BookType,
-                        ChaperId = c.ChaperId,
+                        ChapterNumber = c.ChapterNumber,
                         CreateBy = c.CreateBy,
                         Price = c.Price,
                         Summary = c.Summary,
@@ -2217,7 +2217,7 @@ namespace Repositories.Repository
                         ChapterName = c.ChapterName,
                         Content = c.Content,
                         BookType = c.BookType,
-                        ChaperId = c.ChaperId,
+                        ChapterNumber = c.ChapterNumber,
                         CreateBy = c.CreateBy,
                         Price = c.Price,
                         Summary = c.Summary,

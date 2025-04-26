@@ -278,7 +278,7 @@
                     @if (claims.IsInRole("Manager"))
                     {
                         <li class="nav-item">
-                            <a class="nav-link text-white" id="ListNotificationsId" href="/Admin/ListNotifications">
+                            <a class="nav-link text-white" id="ListNotificationsId" href="/Information/ListNotifications">
                                 <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
                                     <i class="material-icons opacity-10">notifications</i>
                                 </div>
@@ -292,7 +292,7 @@
                             <small class="text-secondary text-uppercase">Báo cáo & hỗ trợ</small>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-white" id="UserReport0Id" href="/Admin/UserReport/0">
+                            <a class="nav-link text-white" id="UserReport0Id" href="/Information/UserReport/0">
                                 <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
                                     <i class="material-icons opacity-10">pest_control</i>
                                 </div>
@@ -302,7 +302,7 @@
                         @if (claims.IsInRole("Author"))
                         {
                             <li class="nav-item">
-                                <a class="nav-link text-white" id="UserReport1Id" href="/Admin/UserReport/1">
+                                <a class="nav-link text-white" id="UserReport1Id" href="/Information/UserReport/1">
                                     <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
                                         <i class="material-icons opacity-10">support</i>
                                     </div>
@@ -326,7 +326,7 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-white" id="ListConspectusId" href="/Admin/ListConspectus">
+                            <a class="nav-link text-white" id="ListConspectusId" href="/Information/ListConspectus">
                                 <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
                                     <i class="material-icons opacity-10">receipt_long</i>
                                 </div>
@@ -341,7 +341,7 @@
                             <small class="text-secondary text-uppercase">Thông tin</small>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-white" id="BasicKnowledgeId" href="@(claims.IsInRole("Author") ? "/Admin/BasicKnowledge" : "/Admin/ListBasicKnowledge")">
+                            <a class="nav-link text-white" id="BasicKnowledgeId" href="@(claims.IsInRole("Author") ? "/Information/BasicKnowledge" : "/Information/ListBasicKnowledge")">
                                 <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
                                     <i class="material-icons opacity-10">live_help</i>
                                 </div>
@@ -361,7 +361,7 @@
                     @if (claims.IsInRole("Admin") || claims.IsInRole("Manager"))
                     {
                         <li class="nav-item">
-                            <a class="nav-link text-white" id="ListChatId" href="/Admin/ListChat">
+                            <a class="nav-link text-white" id="ListChatId" href="/Information/ListChat">
                                 <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
                                     <i class="material-icons opacity-10">forum</i>
                                 </div>
@@ -474,7 +474,7 @@
         function getRoomChat(){
             $.ajax(
                 {
-                    url: `/Admin/GetRoomChat`,
+                    url: `/Information/GetRoomChat`,
                     type: "GET",
                     headers:
                     {

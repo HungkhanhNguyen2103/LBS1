@@ -134,7 +134,7 @@
         var htmlotherUl = "";
         $.ajax(
             {
-                url: `/Admin/GetListKnowledge?search=${search}`,
+                url: `/Information/GetListKnowledge?search=${search}`,
                 type: "GET",
                 headers:
                 {
@@ -146,10 +146,10 @@
                 success: function (data) {
                     //console.log(data);
                     data.forEach(item => {
-                        if (item.category == 0) htmldocumentUl += `<li><a href="/Admin/KnowledgeDetail/${item.id}">${item.title}</a></li>`;
-                        if (item.category == 1) htmlcomposeUl += `<li><a href="/Admin/KnowledgeDetail/${item.id}">${item.title}</a></li>`;
-                        if (item.category == 2) htmlpaymentUl += `<li><a href="/Admin/KnowledgeDetail/${item.id}">${item.title}</a></li>`;
-                        if (item.category == 3) htmlotherUl += `<li><a href="/Admin/KnowledgeDetail/${item.id}">${item.title}</a></li>`;
+                        if (item.category == 0) htmldocumentUl += `<li><a href="/Information/KnowledgeDetail/${item.id}">${item.title}</a></li>`;
+                        if (item.category == 1) htmlcomposeUl += `<li><a href="/Information/KnowledgeDetail/${item.id}">${item.title}</a></li>`;
+                        if (item.category == 2) htmlpaymentUl += `<li><a href="/Information/KnowledgeDetail/${item.id}">${item.title}</a></li>`;
+                        if (item.category == 3) htmlotherUl += `<li><a href="/Information/KnowledgeDetail/${item.id}">${item.title}</a></li>`;
                     });
                     $('#documentUl').html(htmldocumentUl);
                     $('#composeUl').html(htmlcomposeUl);

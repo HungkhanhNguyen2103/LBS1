@@ -13,7 +13,7 @@ namespace Repositories.IRepository
         Task<ReponderModel<string>> CreatePaymentLink(PaymentRequestModel model);
         Task<ReponderModel<PaymentItem>> GetListPayment(PaymentItemType type);
         Task<ReponderModel<string>> PaymentSuccess(string email,int type,int paymentKey, long orderId);  
-        Task<ReponderModel<string>> PaymentItem(UserTranscationBook userTranscationBook);
+        Task<ReponderModel<string>> PaymentItem(UserTransactionBook userTranscationBook);
         Task<ReponderModel<UserTranscationBookModel>> GetHistoryPayment(string username);
         Task<ReponderModel<int>> CheckEnoughCoins(string username, int amount);
     }

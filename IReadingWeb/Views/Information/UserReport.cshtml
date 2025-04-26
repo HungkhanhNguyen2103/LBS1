@@ -241,7 +241,7 @@
 
     function ChangeSelect(el) {
         var status = $(el).val();
-        window.location.href = `/Admin/UserReport/${@ViewBag.ReportType}?status=${status}`;
+        window.location.href = `/Information/UserReport/${@ViewBag.ReportType}?status=${status}`;
     }
 
     function ClickOpen() {
@@ -249,7 +249,7 @@
         var formData = new FormData();
         $.ajax(
             {
-                url: `/Admin/OpenUserReport/${id}`,
+                url: `/Information/OpenUserReport/${id}`,
                 type: "GET",
                 headers:
                 {
@@ -263,7 +263,7 @@
                     formData.append("UserReportId", id);
                     $.ajax(
                         {
-                            url: `/Admin/CreateUserReportComment/${@ViewBag.ReportType}`,
+                            url: `/Information/CreateUserReportComment/${@ViewBag.ReportType}`,
                             type: "POST",
                             headers:
                             {
@@ -300,7 +300,7 @@
         var formData = new FormData();
         $.ajax(
             {
-                url: `/Admin/CloseUserReport/${id}`,
+                url: `/Information/CloseUserReport/${id}`,
                 type: "GET",
                 headers:
                 {
@@ -315,7 +315,7 @@
                     formData.append("UserReportId", id);
                     $.ajax(
                         {
-                            url: `/Admin/CreateUserReportComment/${@ViewBag.ReportType}`,
+                            url: `/Information/CreateUserReportComment/${@ViewBag.ReportType}`,
                             type: "POST",
                             headers:
                             {
@@ -348,7 +348,7 @@
         $('#listCommentReport').html('');
         $.ajax(
             {
-                url: `/Admin/GetListUserReportComment?userReportId=${userReportId}`,
+                url: `/Information/GetListUserReportComment?userReportId=${userReportId}`,
                 type: "GET",
                 headers:
                 {
@@ -393,7 +393,7 @@
         formData.append("UserReportId", userReportId);
         $.ajax(
             {
-                url: `/Admin/CreateUserReportComment/${@ViewBag.ReportType}`,
+                url: `/Information/CreateUserReportComment/${@ViewBag.ReportType}`,
                 type: "POST",
                 headers:
                 {
@@ -425,7 +425,7 @@
         //console.log(id);
         $.ajax(
             {
-                url: `/Admin/UserReportDetail/${id}`,
+                url: `/Information/UserReportDetail/${id}`,
                 type: "GET",
                 headers:
                 {

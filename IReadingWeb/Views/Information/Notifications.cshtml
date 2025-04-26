@@ -44,24 +44,24 @@
                 height: 24px;
             }
 
-    .card1 ul {
-        list-style-type: none;
-        padding: 0;
-    }
-
-    .card1 ul li {
-            margin-bottom: 10px;
+        .card1 ul {
+            list-style-type: none;
+            padding: 0;
         }
 
-    .card1 ul li a {
-                text-decoration: none;
-                color: #333;
-                font-size: 14px;
+            .card1 ul li {
+                margin-bottom: 10px;
             }
 
-    .card1 ul li a:hover {
-                    color: #007bff;
+                .card1 ul li a {
+                    text-decoration: none;
+                    color: #333;
+                    font-size: 14px;
                 }
+
+                    .card1 ul li a:hover {
+                        color: #007bff;
+                    }
 </style>
 @* <button type="button" onclick="document.getElementById('formModal').reset();" class="btn btn-success" data-toggle="modal" data-target="#exampleModalPost">
     Tạo mới
@@ -79,7 +79,7 @@
                     <ul>
                         @foreach (Notification item in Model)
                         {
-                            <li><a style="font-size:17px" href="/Admin/NotifiDetail/@item.Id">@item.Name</a><span style="margin-left: 10px;font-size:14px">@item.ModifyDate.ToString("HH:mm dd/MM/yyyy")</span></li>
+                            <li><a style="font-size:17px" href="/Information/NotifiDetail/@item.Id">@item.Name</a><span style="margin-left: 10px;font-size:14px">@item.ModifyDate.AddHours(7).ToString("HH:mm dd/MM/yyyy")</span></li>
                         }
                     </ul>
                 </div>
