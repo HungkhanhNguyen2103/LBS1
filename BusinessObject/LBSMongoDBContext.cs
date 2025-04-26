@@ -15,8 +15,8 @@ namespace BusinessObject
             var client = new MongoClient(connectionString);
             _mongoDatabase = client.GetDatabase(databaseName);
             //BookImages = GetCollection<BookImage>(typeof(BookImage).Name);
-            //BookChapters = GetCollection<BookChapter>(typeof(BookChapter).Name);
-            BookChapters = GetCollection<BookChapter>("BookChapterBackUp");
+            BookChapters = GetCollection<BookChapter>(typeof(BookChapter).Name);
+            //BookChapters = GetCollection<BookChapter>("BookChapterBackUp");
             Messengers = GetCollection<Messenger>(typeof(Messenger).Name);
             BookChapterVoices = GetCollection<BookChapterVoice>(typeof(BookChapterVoice).Name);
             BookChapterLogs = GetCollection<BookChapterLog>(typeof(BookChapterLog).Name);
