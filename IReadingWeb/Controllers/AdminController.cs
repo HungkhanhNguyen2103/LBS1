@@ -95,7 +95,7 @@ namespace LBSWeb.Controllers
 
 
 
-        [Authorize(Roles = $"{Role.Manager},{Role.Author}")]
+        [Authorize(Roles = $"{Role.Manager},{Role.Author},{Role.Admin}")]
         [Route("StatisticsChapterBook/{bookId}")]
         [HttpGet]
         public async Task<IActionResult> StatisticsChapterBook(int bookId)
@@ -104,7 +104,7 @@ namespace LBSWeb.Controllers
             return Json(result.Data);
         }
 
-        [Authorize(Roles = $"{Role.Manager},{Role.Author}")]
+        [Authorize(Roles = $"{Role.Manager},{Role.Author},{Role.Admin}")]
         [Route("Statistics")]
         [HttpGet]
         public IActionResult Statistics()
@@ -112,7 +112,7 @@ namespace LBSWeb.Controllers
             return View();
         }
 
-        [Authorize(Roles = $"{Role.Manager},{Role.Author}")]
+        [Authorize(Roles = $"{Role.Manager},{Role.Author},{Role.Admin}")]
         [Route("StatisticsBook")]
         [HttpGet]
         public async Task<IActionResult> StatisticsBook()
@@ -122,7 +122,7 @@ namespace LBSWeb.Controllers
             return Json(result.Data);
         }
 
-        [Authorize(Roles = $"{Role.Author}")]
+        [Authorize(Roles = $"{Role.Author},{Role.Admin}")]
         [Route("CheckFinishBook")]
         [HttpGet]
         public async Task<IActionResult> CheckFinishBook(int bookId)
@@ -131,7 +131,7 @@ namespace LBSWeb.Controllers
             return Json(result);
         }
 
-        [Authorize(Roles = $"{Role.Author}")]
+        [Authorize(Roles = $"{Role.Author},{Role.Admin}")]
         [Route("UpdateFinishBook")]
         [HttpGet]
         public async Task<IActionResult> UpdateFinishBook(int bookId,int price)
@@ -140,7 +140,7 @@ namespace LBSWeb.Controllers
             return Json(result);
         }
 
-        [Authorize(Roles = $"{Role.Author}")]
+        [Authorize(Roles = $"{Role.Author},{Role.Admin}")]
         [HttpPost]
         [Route("GenerateSummary")]
         public async Task<IActionResult> GenerateSummary(string input)
@@ -164,7 +164,7 @@ namespace LBSWeb.Controllers
         }
 
 
-        [Authorize(Roles = $"{Role.Admin},{Role.Manager}")]
+        [Authorize(Roles = $"{Role.Admin},{Role.Manager},{Role.Admin}")]
         [Route("ListCategories")]
         public async Task<IActionResult> ListCategories()
         {
@@ -174,7 +174,7 @@ namespace LBSWeb.Controllers
         }
 
 
-        [Authorize(Roles = $"{Role.Author}")]
+        [Authorize(Roles = $"{Role.Author},{Role.Admin}")]
         [Route("CreateBook")]
         public async Task<IActionResult> CreateBook()
         {
@@ -183,7 +183,7 @@ namespace LBSWeb.Controllers
             return View();
         }
 
-        [Authorize(Roles = $"{Role.Manager}")]
+        [Authorize(Roles = $"{Role.Manager},{Role.Admin}")]
         [Route("ApproveBook/{id}")]
         public IActionResult ApproveBook(int id)
         {
@@ -193,7 +193,7 @@ namespace LBSWeb.Controllers
             return View();
         }
 
-        [Authorize(Roles = $"{Role.Manager}")]
+        [Authorize(Roles = $"{Role.Manager},{Role.Admin}")]
         [Route("GetListApproveBook/{id}")]
         public async Task<IActionResult> GetListApproveBook(int id)
         {
@@ -203,7 +203,7 @@ namespace LBSWeb.Controllers
             return Json(result);
         }
 
-        [Authorize(Roles = $"{Role.Manager}")]
+        [Authorize(Roles = $"{Role.Manager},{Role.Admin}")]
         [Route("UpdateApproveBook/{id}")]
         [HttpPost]
         public async Task<IActionResult> UpdateApproveBook(int id, string chapterIds)
@@ -254,7 +254,7 @@ namespace LBSWeb.Controllers
 
         }
 
-        [Authorize(Roles = $"{Role.Author}")]
+        [Authorize(Roles = $"{Role.Author},{Role.Admin}")]
         [Route("CreateBook")]
         [HttpPost]
         public async Task<IActionResult> CreateBook(BookModel bookModel)
@@ -277,7 +277,7 @@ namespace LBSWeb.Controllers
 
         }
 
-        [Authorize(Roles = $"{Role.Author},{Role.Manager}")]
+        [Authorize(Roles = $"{Role.Author},{Role.Manager},{Role.Admin}")]
         [Route("UpdateBook/{id}")]
         public async Task<IActionResult> UpdateBook(int id)
         {
@@ -287,7 +287,7 @@ namespace LBSWeb.Controllers
             return View(resultBook.Data);
         }
 
-        [Authorize(Roles = $"{Role.Author},{Role.Manager}")]
+        [Authorize(Roles = $"{Role.Author},{Role.Manager},{Role.Admin}")]
         [Route("QuicklyApproveChapterContent")]
         [HttpPost]
         public async Task<IActionResult> QuicklyApproveChapterContent(RequestModel model)
@@ -296,7 +296,7 @@ namespace LBSWeb.Controllers
             return Json(result.Data);
         }
 
-        [Authorize(Roles = $"{Role.Author}")]
+        [Authorize(Roles = $"{Role.Author},{Role.Admin}")]
         [Route("UpdateBook/{id}")]
         [HttpPost]
         public async Task<IActionResult> UpdateBook(BookModel bookModel)
@@ -318,7 +318,7 @@ namespace LBSWeb.Controllers
 
         }
 
-        [Authorize(Roles = $"{Role.Author}")]
+        [Authorize(Roles = $"{Role.Author},{Role.Admin}")]
         [Route("DeleteBook")]
         public async Task<IActionResult> DeleteBook(int id)
         {
@@ -326,7 +326,7 @@ namespace LBSWeb.Controllers
             return Json(result);
         }
 
-        [Authorize(Roles = $"{Role.Author}")]
+        [Authorize(Roles = $"{Role.Author},{Role.Admin}")]
         [Route("Drafts")]
         public async Task<IActionResult> Drafts()
         {
@@ -336,7 +336,7 @@ namespace LBSWeb.Controllers
             return View();
         }
 
-        [Authorize(Roles = $"{Role.Author}")]
+        [Authorize(Roles = $"{Role.Author},{Role.Admin}")]
         [Route("{id}/CreateChapterBook")]
         public async Task<IActionResult> CreateChapterBook(int id,string returnUrl = "")
         {
@@ -356,7 +356,7 @@ namespace LBSWeb.Controllers
             return View(new BookChapter { BookId = id, ChapterNumber = startChapterId });
         }
 
-        [Authorize(Roles = $"{Role.Author}")]
+        [Authorize(Roles = $"{Role.Author},{Role.Admin}")]
         [Route("DeleteChapterBook/{chapterId}")]
         public async Task<IActionResult> DeleteChapterBook(string chapterId)
         {
@@ -365,7 +365,7 @@ namespace LBSWeb.Controllers
             return Json(result);
         }
 
-        [Authorize(Roles = $"{Role.Author},{Role.Manager}")]
+        [Authorize(Roles = $"{Role.Author},{Role.Manager},{Role.Admin}")]
         [Route("{id}/UpdateChapterBook/{chapterId}")]
         public async Task<IActionResult> UpdateChapterBook(int id,string chapterId, string returnUrl)
         {
@@ -383,7 +383,7 @@ namespace LBSWeb.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = $"{Role.Manager}")]
+        [Authorize(Roles = $"{Role.Manager},{Role.Admin}")]
         [Route("UpdateApproveChapterBook/{id}")]
         public async Task<IActionResult> UpdateApproveChapterBook(int id,string chapterId)
         {
@@ -392,7 +392,7 @@ namespace LBSWeb.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = $"{Role.Manager}")]
+        [Authorize(Roles = $"{Role.Manager},{Role.Admin}")]
         [Route("DeclineChapterBook/{id}")]
         public async Task<IActionResult> DeclineChapterBook(int id, string chapterId)
         {
@@ -400,7 +400,7 @@ namespace LBSWeb.Controllers
             return Json(result);
         }
 
-        [Authorize(Roles = $"{Role.Author},{Role.Manager}")]
+        [Authorize(Roles = $"{Role.Author},{Role.Manager},{Role.Admin}")]
         [Route("ContractAuthor/{bookId}/{chapterId}")]
         public async Task<IActionResult> ContractAuthor(int bookId,string chapterId,string returnUrl = "")
         {
@@ -416,7 +416,7 @@ namespace LBSWeb.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = $"{Role.Author}")]
+        [Authorize(Roles = $"{Role.Author},{Role.Admin}")]
         [Route("UpdateChapterBook")]
         public async Task<IActionResult> UpdateChapterBook(BookChapter bookChapter)
         {
@@ -435,7 +435,7 @@ namespace LBSWeb.Controllers
 
 
         [HttpPost]
-        [Authorize(Roles = $"{Role.Author}")]
+        [Authorize(Roles = $"{Role.Author},{Role.Admin}")]
         [Route("GeneratePoster")]
         public async Task<IActionResult> GeneratePoster(string input,string summary)
         {
@@ -443,7 +443,7 @@ namespace LBSWeb.Controllers
             return Json(result);
         }
 
-        [Authorize(Roles = $"{Role.Author},{Role.Manager}")]
+        [Authorize(Roles = $"{Role.Author},{Role.Manager},{Role.Admin}")]
         [Route("{bookId}/ChapterBooks")]
         public async Task<IActionResult> ChapterBooks(int bookId)
         {
@@ -498,7 +498,7 @@ namespace LBSWeb.Controllers
 
 
         [HttpPost]
-        [Authorize(Roles = $"{Role.Author}")]
+        [Authorize(Roles = $"{Role.Author},{Role.Admin}")]
         [Route("{id}/CreateChapterBook")]
         public async Task<IActionResult> CreateChapterBook(BookChapter bookChapter, string returnUrl = "")
         {

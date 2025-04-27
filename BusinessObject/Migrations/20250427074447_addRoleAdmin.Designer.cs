@@ -4,6 +4,7 @@ using BusinessObject;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BusinessObject.Migrations
 {
     [DbContext(typeof(LBSDbContext))]
-    partial class LBSDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250427074447_addRoleAdmin")]
+    partial class addRoleAdmin
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -113,17 +116,17 @@ namespace BusinessObject.Migrations
                             Id = "7d5002bd-f22f-4c7c-bce1-3d22eed213ff",
                             AccessFailedCount = 0,
                             AccountActive = true,
-                            ConcurrencyStamp = "1c02c821-98b5-4683-8162-5b04ad1462ed",
+                            ConcurrencyStamp = "f0b8b2a3-986a-4b71-889f-d6d8e19a6956",
                             Email = "admin@gmail.com",
                             EmailConfirmed = false,
                             FullName = "Admin",
                             Gender = 0,
                             LockoutEnabled = false,
                             NormalizedUserName = "ADMIN",
-                            PasswordHash = "AQAAAAIAAYagAAAAEPcx+utU2CKUA2247Oozv+b4q8zW0HDvDnhbODufuBWopZC7wCG6iH5bn4ZIUd9Vvg==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEOeHgxvqCDwNwyMlF82I46m569VUMkmxixHv1oPIjqteufPD3E62wOQSq3XZz3KYvA==",
                             PhoneNumberConfirmed = false,
                             ResetPassword = 0,
-                            SecurityStamp = "62ef1d90-087b-402e-86a3-7578ec23db69",
+                            SecurityStamp = "d6e58aec-f564-4ec3-afb8-1a2b373e1e98",
                             SocialAccount = false,
                             TwoFactorEnabled = false,
                             UserName = "admin"
@@ -133,17 +136,17 @@ namespace BusinessObject.Migrations
                             Id = "7d5002bd-f22f-4c7c-bce1-3d22eed213dd",
                             AccessFailedCount = 0,
                             AccountActive = true,
-                            ConcurrencyStamp = "f2b5c7dc-c36b-4c72-93c3-910587348ead",
+                            ConcurrencyStamp = "9d0ed649-7d70-4877-a329-33c1953059c0",
                             Email = "manager@gmail.com",
                             EmailConfirmed = false,
                             FullName = "Manager",
                             Gender = 0,
                             LockoutEnabled = false,
                             NormalizedUserName = "MANAGER",
-                            PasswordHash = "AQAAAAIAAYagAAAAEGOcYalqMJniLYhwl+SZGvg3fAOAKEeONeF8EXvNggnWgoi4JnmetMpc3/ykOCeLVw==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEMLftL2bRMzmuI0p5kbhwkeks1/Mghpjb2y9TzJraLoSwjVzc8FdN6+SxAObJ92ESA==",
                             PhoneNumberConfirmed = false,
                             ResetPassword = 0,
-                            SecurityStamp = "e182f3b6-7104-4dbb-823a-37112d840953",
+                            SecurityStamp = "c96dd6f0-a665-4f37-9183-5dbe24042789",
                             SocialAccount = false,
                             TwoFactorEnabled = false,
                             UserName = "manager"
@@ -153,74 +156,21 @@ namespace BusinessObject.Migrations
                             Id = "7d5002bd-f22f-4c7c-bce1-3d22eff012ef",
                             AccessFailedCount = 0,
                             AccountActive = true,
-                            ConcurrencyStamp = "79f8ed9a-f60f-4651-aa8c-283da75eeb65",
+                            ConcurrencyStamp = "9d2b2975-8d03-4cc4-82a2-9ce5f8a25ce6",
                             Email = "author@gmail.com",
                             EmailConfirmed = false,
                             FullName = "Author",
                             Gender = 0,
                             LockoutEnabled = false,
                             NormalizedUserName = "AUTHOR",
-                            PasswordHash = "AQAAAAIAAYagAAAAEPz3oyadI17mNG6onRw/fQHTmVY0GNovsUd15lwy1cl6oOgPCaSwGrqI/jniRzv5kw==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEMfULuqsx8oSmkiHoBCyvLqEuBwmyXFVgLHkgfYXj5cW3rctmRWnBxGW0fqHU+E4Xw==",
                             PhoneNumberConfirmed = false,
                             ResetPassword = 0,
-                            SecurityStamp = "33b51b5a-920b-434b-94f6-9c4b69937791",
+                            SecurityStamp = "82389a88-b045-41cd-9506-b44f8518ba7c",
                             SocialAccount = false,
                             TwoFactorEnabled = false,
                             UserName = "author"
                         });
-                });
-
-            modelBuilder.Entity("BusinessObject.AuthorTransaction", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("Amount")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Price")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
-
-                    b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("AuthorTransactions", (string)null);
-                });
-
-            modelBuilder.Entity("BusinessObject.Bank", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("BankId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("BankName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Banks", (string)null);
                 });
 
             modelBuilder.Entity("BusinessObject.BasicKnowledge", b =>
@@ -402,7 +352,7 @@ namespace BusinessObject.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("CommentUsers", (string)null);
+                    b.ToTable("CommentUsers");
                 });
 
             modelBuilder.Entity("BusinessObject.Conspectus", b =>
@@ -570,7 +520,7 @@ namespace BusinessObject.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("NotificationManagers", (string)null);
+                    b.ToTable("NotificationManagers");
                 });
 
             modelBuilder.Entity("BusinessObject.PaymentItem", b =>
@@ -737,6 +687,9 @@ namespace BusinessObject.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Author")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ChapterBookId")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Content")
@@ -1034,6 +987,16 @@ namespace BusinessObject.Migrations
                         },
                         new
                         {
+                            UserId = "7d5002bd-f22f-4c7c-bce1-3d22eed213ff",
+                            RoleId = "627ec4a3-646f-455f-b65f-2903f87c19b6"
+                        },
+                        new
+                        {
+                            UserId = "7d5002bd-f22f-4c7c-bce1-3d22eed213ff",
+                            RoleId = "627ec4a3-646f-455f-b65f-2903cf78220f"
+                        },
+                        new
+                        {
                             UserId = "7d5002bd-f22f-4c7c-bce1-3d22eff012ef",
                             RoleId = "627ec4a3-646f-455f-b65f-2903f87c19b6"
                         },
@@ -1071,24 +1034,6 @@ namespace BusinessObject.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens", (string)null);
-                });
-
-            modelBuilder.Entity("BusinessObject.AuthorTransaction", b =>
-                {
-                    b.HasOne("BusinessObject.Account", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId");
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("BusinessObject.Bank", b =>
-                {
-                    b.HasOne("BusinessObject.Account", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId");
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("BusinessObject.Book", b =>

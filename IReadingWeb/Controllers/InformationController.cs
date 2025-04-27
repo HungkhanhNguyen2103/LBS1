@@ -177,7 +177,7 @@ namespace IReadingWeb.Controllers
             return Redirect("/Admin/UserReport/1");
         }
 
-        [Authorize(Roles = $"{Role.Manager},{Role.Author}")]
+        [Authorize(Roles = $"{Role.Manager},{Role.Author},{Role.Admin}")]
         [Route("CreateUserReportComment/{type}")]
         [HttpPost]
         public async Task<IActionResult> CreateUserReportComment(int type, UserReportComment model)
@@ -188,7 +188,7 @@ namespace IReadingWeb.Controllers
             return Json(result);
         }
 
-        [Authorize(Roles = $"{Role.Manager},{Role.Author}")]
+        [Authorize(Roles = $"{Role.Manager},{Role.Author},{Role.Admin}")]
         [Route("GetListUserReportComment")]
         [HttpGet]
         public async Task<IActionResult> GetListUserReportComment(int userReportId)
@@ -234,7 +234,7 @@ namespace IReadingWeb.Controllers
             return View(res.Data);
         }
 
-        [Authorize(Roles = $"{Role.Manager}")]
+        [Authorize(Roles = $"{Role.Manager},{Role.Admin}")]
         [Route("Notificate/{id}")]
         public async Task<IActionResult> Notificate(int id)
         {
@@ -251,7 +251,7 @@ namespace IReadingWeb.Controllers
             return View(res.Data);
         }
 
-        [Authorize(Roles = $"{Role.Manager}")]
+        [Authorize(Roles = $"{Role.Manager},{Role.Admin}")]
         [Route("Knowledge/{id}")]
         public async Task<IActionResult> Knowledge(int id)
         {
@@ -268,7 +268,7 @@ namespace IReadingWeb.Controllers
             return View();
         }
 
-        [Authorize(Roles = $"{Role.Manager}")]
+        [Authorize(Roles = $"{Role.Manager},{Role.Admin}")]
         [Route("ListBasicKnowledge")]
         public async Task<IActionResult> ListBasicKnowledge(int category = 0)
         {
@@ -285,7 +285,7 @@ namespace IReadingWeb.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = $"{Role.Manager}")]
+        [Authorize(Roles = $"{Role.Manager},{Role.Admin}")]
         [Route("UpdateBasicKnowledge")]
         public async Task<IActionResult> UpdateBasicKnowledge(BasicKnowledge model)
         {
@@ -303,7 +303,7 @@ namespace IReadingWeb.Controllers
 
         }
 
-        [Authorize(Roles = $"{Role.Manager}")]
+        [Authorize(Roles = $"{Role.Manager},{Role.Admin}")]
         [Route("DeleteBasicKnowledge")]
         public async Task<IActionResult> DeleteBasicKnowledge(int id)
         {
@@ -312,7 +312,7 @@ namespace IReadingWeb.Controllers
         }
 
 
-        [Authorize(Roles = $"{Role.Manager},{Role.Author}")]
+        [Authorize(Roles = $"{Role.Manager},{Role.Author},{Role.Admin}")]
         [Route("SendMessage")]
         [HttpPost]
         public async Task<IActionResult> SendMessage(Messenger messenger)
@@ -322,7 +322,7 @@ namespace IReadingWeb.Controllers
             return View(result);
         }
 
-        [Authorize(Roles = $"{Role.Manager}")]
+        [Authorize(Roles = $"{Role.Manager},{Role.Admin}")]
         [Route("ListChat")]
         public async Task<IActionResult> ListChat()
         {
@@ -333,7 +333,7 @@ namespace IReadingWeb.Controllers
             return View(result.DataList);
         }
 
-        [Authorize(Roles = $"{Role.Manager}")]
+        [Authorize(Roles = $"{Role.Manager},{Role.Admin}")]
         [Route("GetListMessage")]
         public async Task<IActionResult> GetListMessage(string roomName)
         {
@@ -341,7 +341,7 @@ namespace IReadingWeb.Controllers
             return Json(result.Data);
         }
 
-        [Authorize(Roles = $"{Role.Author}")]
+        [Authorize(Roles = $"{Role.Author},{Role.Admin}")]
         [Route("GetRoomChat")]
         public async Task<IActionResult> GetRoomChat()
         {

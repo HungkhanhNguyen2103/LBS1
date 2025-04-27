@@ -20,6 +20,7 @@ namespace BusinessObject
             Messengers = GetCollection<Messenger>(typeof(Messenger).Name);
             BookChapterVoices = GetCollection<BookChapterVoice>(typeof(BookChapterVoice).Name);
             BookChapterLogs = GetCollection<BookChapterLog>(typeof(BookChapterLog).Name);
+            BookChapterPendings = GetCollection<BookChapterPending>(typeof(BookChapterPending).Name);
         }
 
         //public IMongoCollection<BookImage> BookImages { get; set; }

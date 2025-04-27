@@ -24,7 +24,7 @@
                 else
                 {
                     userName = User.FindFirst(ClaimTypes.NameIdentifier).Value;
-                    isManager = User.IsInRole("Manager");
+                    isManager = User.IsInRole("Manager") || User.IsInRole("Admin");
                 }
 
             }
@@ -226,13 +226,13 @@
         {
             <div class="collapse navbar-collapse  w-auto " id="sidenav-collapse-main">
                 <ul class="navbar-nav">
-                    @if (claims.IsInRole("Author") || claims.IsInRole("Manager"))
+                    @if (claims.IsInRole("Author") || claims.IsInRole("Manager") || claims.IsInRole("Admin"))
                     {
                         <li class="nav-item ml-2" style="padding-left:1.5rem;margin-bottom:0.2rem;margin-top:0.2rem;font-size: 14px;font-weight:bold">
                             <small class="text-secondary">SÁCH @(claims.IsInRole("Author") ? "CỦA TÔI" : "")</small>
                         </li>
                     }
-                    @if (claims.IsInRole("Manager"))
+                    @if (claims.IsInRole("Manager") || claims.IsInRole("Admin"))
                     {
                         <li class="nav-item">
                             <a class="nav-link text-white" id="ListPostCategoryId" href="/Admin/ListCategories">
@@ -243,7 +243,7 @@
                             </a>
                         </li>
                     }
-                    @if (claims.IsInRole("Author") || claims.IsInRole("Manager"))
+                    @if (claims.IsInRole("Author") || claims.IsInRole("Manager") || claims.IsInRole("Admin"))
                     {
                         <li class="nav-item">
                             <a class="nav-link text-white" id="BooksId" href="/Admin/Books">
@@ -253,7 +253,7 @@
                                 <span class="nav-link-text ms-1">@(claims.IsInRole("Manager") ? "Kho sách" : "Đã đăng")</span>
                             </a>
                         </li>
-                        @if (claims.IsInRole("Author"))
+                        @if (claims.IsInRole("Author") || claims.IsInRole("Admin"))
                         {
                             <li class="nav-item">
                                 <a class="nav-link text-white" id="CreatBookId" href="/Admin/CreateBook">
@@ -275,7 +275,7 @@
 
 
                     }
-                    @if (claims.IsInRole("Manager"))
+                    @if (claims.IsInRole("Manager") || claims.IsInRole("Admin"))
                     {
                         <li class="nav-item">
                             <a class="nav-link text-white" id="ListNotificationsId" href="/Information/ListNotifications">
@@ -286,7 +286,7 @@
                             </a>
                         </li>
                     }
-                    @if (claims.IsInRole("Manager") || claims.IsInRole("Author"))
+                    @if (claims.IsInRole("Manager") || claims.IsInRole("Author") || claims.IsInRole("Admin"))
                     {
                         <li class="nav-item ml-2" style="padding-left:1.5rem;margin-bottom:0.2rem;margin-top:0.2rem;font-size: 14px;font-weight:bold">
                             <small class="text-secondary text-uppercase">Báo cáo & hỗ trợ</small>
@@ -299,7 +299,7 @@
                                 <span class="nav-link-text ms-1">Xử lý báo cáo</span>
                             </a>
                         </li>
-                        @if (claims.IsInRole("Author"))
+                        @if (claims.IsInRole("Author") || claims.IsInRole("Admin"))
                         {
                             <li class="nav-item">
                                 <a class="nav-link text-white" id="UserReport1Id" href="/Information/UserReport/1">
@@ -312,7 +312,7 @@
                         }
                     }
 
-                    @if (claims.IsInRole("Author"))
+                    @if (claims.IsInRole("Author") || claims.IsInRole("Admin"))
                     {
                         <li class="nav-item ml-2" style="padding-left:1.5rem;margin-bottom:0.2rem;margin-top:0.2rem;font-size: 14px;font-weight:bold">
                             <small class="text-secondary text-uppercase">Tư liệu</small>
@@ -335,7 +335,7 @@
                         </li>
                     }
 
-                    @if (claims.IsInRole("Manager") || claims.IsInRole("Author"))
+                    @if (claims.IsInRole("Manager") || claims.IsInRole("Author") || claims.IsInRole("Admin"))
                     {
                         <li class="nav-item ml-2" style="padding-left:1.5rem;margin-bottom:0.2rem;margin-top:0.2rem;font-size: 14px;font-weight:bold">
                             <small class="text-secondary text-uppercase">Thông tin</small>
@@ -358,7 +358,7 @@
                         </li> *@
                     }
 
-                    @if (claims.IsInRole("Admin") || claims.IsInRole("Manager"))
+                    @if (claims.IsInRole("Admin") || claims.IsInRole("Manager") || claims.IsInRole("Admin"))
                     {
                         <li class="nav-item">
                             <a class="nav-link text-white" id="ListChatId" href="/Information/ListChat">

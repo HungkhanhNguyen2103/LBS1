@@ -14,7 +14,6 @@ namespace BusinessObject
         public string? Image { get; set; }
         public UserReportType ReportType { get; set; }
         public UserReportStatus UserReportStatus { get; set; }
-        public string? ChapterBookId { get; set; }
         //public BookChapter? BookChapter { get; set; }
         public DateTime ModifyDate { get; set; }
         public string? CreateBy { get; set; }

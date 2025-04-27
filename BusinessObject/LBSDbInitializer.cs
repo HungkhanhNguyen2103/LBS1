@@ -27,12 +27,12 @@ namespace BusinessObject
                     Name = "User",
                     NormalizedName = "USER"
                 },
-                new IdentityRole()
-                {
-                    Id = Guid.Parse("627ec4a3-646f-455f-b65f-2903cf7819b2").ToString(),
-                    Name = "Staff",
-                    NormalizedName = "STAFF"
-                },
+                //new IdentityRole()
+                //{
+                //    Id = Guid.Parse("627ec4a3-646f-455f-b65f-2903cf7819b2").ToString(),
+                //    Name = "Staff",
+                //    NormalizedName = "STAFF"
+                //},
                 new IdentityRole()
                 {
                     Id = Guid.Parse("627ec4a3-646f-455f-b65f-2903cf7820f2").ToString(),
@@ -94,11 +94,6 @@ namespace BusinessObject
                     new IdentityUserRole<string>
                     {
                         RoleId = Guid.Parse("46118fe1-2d15-4c5b-82f9-bc2f19b4a7c3").ToString(),
-                        UserId = Guid.Parse("7d5002bd-f22f-4c7c-bce1-3d22eed213ff").ToString()
-                    },
-                    new IdentityUserRole<string>
-                    {
-                        RoleId = Guid.Parse("627ec4a3-646f-455f-b65f-2903f87c19b6").ToString(),
                         UserId = Guid.Parse("7d5002bd-f22f-4c7c-bce1-3d22eed213ff").ToString()
                     },
                     new IdentityUserRole<string>

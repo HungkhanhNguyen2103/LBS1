@@ -31,6 +31,10 @@ namespace BusinessObject
             builder.Entity<Room>().ToTable("Room").HasKey(x => x.Id);
             builder.Entity<NoteManager>().ToTable("NoteManager").HasKey(x => x.Id);
             builder.Entity<NoteUser>().ToTable("NoteUser").HasKey(x => x.Id);
+            builder.Entity<CommentUser>().ToTable("CommentUsers").HasKey(x => x.Id);
+            builder.Entity<Bank>().ToTable("Banks").HasKey(x => x.Id);
+            builder.Entity<NotificationManager>().ToTable("NotificationManagers").HasKey(x => x.Id);
+            builder.Entity<AuthorTransaction>().ToTable("AuthorTransactions").HasKey(x => x.Id);
         }
 
         public virtual DbSet<TemplateEmail> TemplateEmails { get; set; }
@@ -54,5 +58,7 @@ namespace BusinessObject
         public virtual DbSet<MeilisearchLog> MeilisearchLogs { get; set; }
         public virtual DbSet<CommentUser> CommentUsers { get; set; }
         public virtual DbSet<NotificationManager> NotificationManagers { get; set; }
+        public virtual DbSet<Bank> Banks { get; set; }
+        public virtual DbSet<AuthorTransaction> AuthorTransactions { get; set; }
     }
 }
