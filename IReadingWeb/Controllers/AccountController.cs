@@ -35,11 +35,11 @@ namespace LBSWeb.Controllers
                 var claims = TokenUtil.ValidateToken(res.Data, _configuration["Tokens:Key"], _configuration["Tokens:Issuer"]);
                 if (claims != null)
                 {
-                    var isConfirmEmail = claims.FindFirst(ClaimTypes.Email).Value;
-                    if (isConfirmEmail == "False")
-                    {
-                        return Redirect("/Account/EmailReConfirm");
-                    }
+                    //var isConfirmEmail = claims.FindFirst(ClaimTypes.Email).Value;
+                    //if (isConfirmEmail == "False")
+                    //{
+                    //    return Redirect("/Account/EmailReConfirm");
+                    //}
                     HttpContext.Response.Cookies.Append("token", res.Data, new CookieOptions { MaxAge = TimeSpan.FromDays(365 * 2) });
                     var claimsIdentity = new ClaimsIdentity(
                         claims.Claims, CookieAuthenticationDefaults.AuthenticationScheme);
@@ -48,9 +48,10 @@ namespace LBSWeb.Controllers
                         new ClaimsPrincipal(claimsIdentity));
                     //return Redirect("/Admin");
                 }
+                return Redirect("/Account/EmailReConfirm");
                 //HttpContext.Response.Cookies.Append("confirming", true.ToString());
                 //return RedirectToAction("EmailConfirmSender");
-			}
+            }
             return View();
         }
 
@@ -242,17 +243,18 @@ namespace LBSWeb.Controllers
                 var claims = TokenUtil.ValidateToken(res.Data, _configuration["Tokens:Key"], _configuration["Tokens:Issuer"]);
                 if (claims != null)
                 {
-                    var isConfirmEmail = claims.FindFirst(ClaimTypes.Email).Value;
-                    if (isConfirmEmail == "False")
-                    {
-                        return Redirect("/Account/EmailReConfirm");
-                    }
-                    HttpContext.Response.Cookies.Append("token", res.Data, new CookieOptions { MaxAge = TimeSpan.FromDays(365*2) });
+                    HttpContext.Response.Cookies.Append("token", res.Data, new CookieOptions { MaxAge = TimeSpan.FromDays(365 * 2) });
                     var claimsIdentity = new ClaimsIdentity(
                         claims.Claims, CookieAuthenticationDefaults.AuthenticationScheme);
                     await HttpContext.SignInAsync(
                         CookieAuthenticationDefaults.AuthenticationScheme,
                         new ClaimsPrincipal(claimsIdentity));
+                    var isConfirmEmail = claims.FindFirst(ClaimTypes.Email).Value;
+                    if (isConfirmEmail == "False")
+                    {
+                        return Redirect("/Account/EmailReConfirm");
+                    }
+
                     //return Redirect("/Admin");
                     
                 }

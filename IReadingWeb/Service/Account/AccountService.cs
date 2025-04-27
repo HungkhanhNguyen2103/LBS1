@@ -264,5 +264,23 @@ namespace LBSWeb.Services.Account
             }
             return res;
         }
+
+        public async Task<ReponderModel<AccountModel>> GetListAccount(string role)
+        {
+            var res = new ReponderModel<AccountModel>();
+            try
+            {
+                string url = PathUrl.ACCOUNT_GET_LIST;
+                var param = new Dictionary<string, string>();
+                param.Add("role", role);
+                res = await _api.Get<ReponderModel<AccountModel>>(url, param);
+
+            }
+            catch (Exception ex)
+            {
+                res.Message = "Lỗi gọi api!";
+            }
+            return res;
+        }
     }
 }

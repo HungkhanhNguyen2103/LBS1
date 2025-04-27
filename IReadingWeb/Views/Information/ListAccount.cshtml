@@ -1,0 +1,229 @@
+﻿@{
+    Layout = "~/Views/Admin/_AdminLayout.cshtml";
+    // ViewData["Title"] = "Loại bài viết";
+}
+@model AccountModel
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Xsrf
+@functions {
+    public string GetAntiXsrfRequestToken()
+    {
+        return Xsrf.GetAndStoreTokens(Context).RequestToken;
+    }
+}
+<style>
+    .btn1 {
+        height: 30px;
+        width: 30px;
+        padding: 0;
+        margin: 0;
+    }
+
+    .status-decline {
+        color: #a94442;
+        background-color: #a944423d;
+        padding: 5px 10px;
+        border-radius: 12px;
+        font-size: 12px;
+    }
+
+    .status-pending {
+        color: gray;
+        background-color: #80808069;
+        padding: 5px 10px;
+        border-radius: 12px;
+        font-size: 12px;
+    }
+
+    li.dt-paging-button:hover {
+        background-color: white !important;
+        border: 1px solid white !important;
+        background: white !important;
+    }
+
+    .status-free {
+        color: #42a952;
+        background-color: #dff2de;
+        padding: 5px 10px;
+        border-radius: 12px;
+        font-size: 12px;
+    }
+
+
+</style>
+@* <button type="button" onclick="document.getElementById('formModal').reset();" class="btn btn-success" data-toggle="modal" data-target="#exampleModal">
+    Tạo mới
+</button> *@
+<div class="row">
+    <div class="col-12">
+        <div class="card my-4">
+            <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
+                <div class="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3">
+                    <h6 class="text-white text-capitalize ps-3">Tài khoản người dùng</h6>
+                </div>
+            </div>
+            <div class="card-body px-0 pb-2">
+                <div class="table-responsive table-responsive1 p-0">
+
+                    <div style="width:12rem" class="form-group input-group input-group-outline mt-4">
+                        <select style="width:100%" class="form-select form-control" onchange="ChangeSelect(this)" id="RoleType">
+                            <option value="@Role.Author">Tác giả</option>
+                            <option value="@Role.User">Người dùng</option>
+                        </select>
+                    </div>
+
+                    <table id="tableList" class="table align-items-center mb-0">
+                        <thead>
+                            <tr>
+                                <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Tài khoản</th>
+                                <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">SĐT</th>
+                                <th class="text-uppercase text-secondary text-center text-xxs font-weight-bolder opacity-7">Email</th>  
+                                @* <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Mô tả</th> *@
+                                <th class="text-secondary opacity-7"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (AccountModel item in ViewBag.ListAccount)
+                            {
+                                <tr>
+                                    <td>
+                                        <div class="d-flex">
+                                            <img src="@item.Avatar" class="avatar avatar-sm me-3" style="border-radius:5px;width:50px!important;height:50px!important" alt="">
+                                            <div>
+                                                <p class="text-l font-weight-bold mb-0">@item.FullName</p>
+                                                <span class="text-secondary text-xs">@item.UserName <span style="margin-right:5px" class="@(item.AccountActive == true ? "status-free" : "status-decline")">@(item.AccountActive == true ? "Đang hoạt động" : "Khóa")</span></span>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td style="padding-left:1.5rem">
+                                        <span class="text-secondary text-xs font-weight-bold">@item.PhoneNumber</span>
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="text-secondary text-xs font-weight-bold">@item.Email <span style="margin-right:5px" class="@(item.EmailConfirm == true ? "status-free" : "status-pending")">@(item.EmailConfirm == true ? "Đã xác thực" : "Chưa xác thực")</span></span>
+                                    </td>
+                                    <td class="align-middle">
+                                        @if (item.AccountActive == true)
+                                        {
+                                            <button type="button" title="Khóa tài khoản" onclick="BanAccount('@item.UserName')" class="btn1 btn btn-secondary">
+                                                <i class="fa-solid fa-ban"></i>
+                                            </button>
+                                        }
+                                        else
+                                        {
+                                            <button type="button" title="Mở khóa tài khoản" onclick="UnBanAccount('@item.UserName')" class="btn1 btn btn-secondary">
+                                                <i class="fa-solid fa-check"></i>
+                                            </button>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <form id="formModal" class="modal-content" method="post" asp-action="UpdateCategory">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Thể loại</h5>
+                <button type="button" class="btn close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div style="display:block" class="form-group input-group input-group-outline">
+                    @* <input type="number" asp-for="Id" id="post-cate-id" hidden /> *@
+                    <label for="Name">Tên</label>
+                    @* <input style="width:100%" id="post-cate-name" type="text" class="form-control" asp-for="Name" required placeholder="Tên"> *@
+                </div>
+                @*                 <div style="display:block" class="form-group input-group input-group-outline">
+                    <label for="Description">Mô tả</label>
+                    <input style="width:100%" id="post-cate-des" type="text" asp-for="Description" class="form-control" placeholder="Mô tả">
+                </div> *@
+            </div>
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-primary">Lưu thông tin</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script type="text/javascript">
+    document.getElementById('ListAccountId').classList.add('active');
+    $('#RoleType').val('@ViewBag.Role');
+
+    function ChangeSelect(el) {
+        var status = $(el).val();
+        window.location.href = `/Information/ListAccount?role=${status}`;
+    }
+
+    let table = new DataTable('#tableList', {
+        responsive: true
+    });
+
+
+    function BanAccount(username) {
+        if (confirm("Bạn có muốn khóa tài khoản ?") == false) return;
+        $.ajax(
+            {
+                url: `/Information/BanAccount?username=${username}`,
+                type: "GET",
+                headers:
+                {
+                    "RequestVerificationToken": '@GetAntiXsrfRequestToken()'
+                },
+                //data: formData,
+                //dataType: "json",
+                async: true,
+                processData: false,
+                contentType: false,
+                success: function (data) {
+                    if (data.isSussess == false) {
+                        notyf.error(data.message);
+                        return;
+                    }
+                    notyf.success(data.message);
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 800);
+                }
+            }
+        );
+
+    }
+
+
+    function UnBanAccount(username) {
+        if (confirm("Bạn có muốn mở tài khoản ?") == false) return;
+        $.ajax(
+            {
+                url: `/Information/UnBanAccount?username=${username}`,
+                type: "GET",
+                headers:
+                {
+                    "RequestVerificationToken": '@GetAntiXsrfRequestToken()'
+                },
+                //data: formData,
+                //dataType: "json",
+                async: true,
+                processData: false,
+                contentType: false,
+                success: function (data) {
+                    if (data.isSussess == false) {
+                        notyf.error(data.message);
+                        return;
+                    }
+                    notyf.success(data.message);
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 800);
+                }
+            }
+        );
+
+    }
+</script>

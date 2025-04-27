@@ -357,8 +357,7 @@
                             </a>
                         </li> *@
                     }
-
-                    @if (claims.IsInRole("Admin") || claims.IsInRole("Manager") || claims.IsInRole("Admin"))
+                    @if (claims.IsInRole("Admin") || claims.IsInRole("Manager"))
                     {
                         <li class="nav-item">
                             <a class="nav-link text-white" id="ListChatId" href="/Information/ListChat">
@@ -368,6 +367,28 @@
                                 <span class="nav-link-text ms-1">Đoạn chat</span>
                             </a>
                         </li>
+                    }
+                    @if (claims.IsInRole("Admin"))
+                    {
+                        <li class="nav-item ml-2" style="padding-left:1.5rem;margin-bottom:0.2rem;margin-top:0.2rem;font-size: 14px;font-weight:bold">
+                            <small class="text-secondary text-uppercase">Tài khoản</small>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-white" id="ListAccountId" href="/Information/ListAccount">
+                                <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
+                                    <i class="material-icons opacity-10">manage_accounts</i>
+                                </div>
+                                <span class="nav-link-text ms-1">Tài khoản người dùng</span>
+                            </a>
+                        </li>
+                        @*                         <li class="nav-item">
+                            <a class="nav-link text-white" id="DraftListId" href="/Admin/Drafts">
+                                <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
+                                    <i class="material-icons opacity-10">receipt_long</i>
+                                </div>
+                                <span class="nav-link-text ms-1">Các danh hiệu</span>
+                            </a>
+                        </li> *@
                     }
                 </ul>
             </div>

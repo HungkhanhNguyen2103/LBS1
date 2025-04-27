@@ -1029,6 +1029,9 @@ namespace Repositories.Repository
                 }
                 _lBSDbContext.Books.Remove(model);
                 await _lBSDbContext.SaveChangesAsync();
+
+                
+
                 result.IsSussess = true;
                 result.Message = "Xóa thành công";
                 return result;

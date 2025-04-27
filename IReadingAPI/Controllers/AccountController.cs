@@ -53,6 +53,14 @@ namespace LBSAPI.Controllers
             return rs;
         }
 
+        [Route("GetListAccount")]
+        [HttpGet]
+        public async Task<ReponderModel<AccountModel>> GetListAccount(string role)
+        {
+            var rs = await _accountRepository.GetListAccount(role);
+            return rs;
+        }
+
         [Route("ChangePassword")]
         [HttpPost]
         public async Task<ReponderModel<string>> ChangePassword(AccountModel model)

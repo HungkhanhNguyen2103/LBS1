@@ -368,7 +368,7 @@ namespace Repositories.Repository
 
                 claims.Add(new Claim(ClaimTypes.GroupSid, roomName));
             }
-            else if (role.Contains(Role.Manager))
+            else if (role.Contains(Role.Manager) || role.Contains(Role.Admin))
             {
                 var roomResult = await LBSDbContext.Rooms.Where(c => c.ChapterBookId != "-1").ToListAsync();
                 var rooms = roomResult.Count > 0 ? roomResult.Select(c => c.RoomName).ToList() : null;
@@ -705,6 +705,24 @@ namespace Repositories.Repository
                 return result;
             }
             result.Data = user.EmailConfirmed;
+            result.IsSussess = true;
+            return result;
+        }
+
+        public async Task<ReponderModel<AccountModel>> GetListAccount(string role)
+        {
+            var result = new ReponderModel<AccountModel>();
+            var data = await _userManager.GetUsersInRoleAsync(role);
+            result.DataList = data.Select(c => new AccountModel
+            {
+                UserName =c.UserName,
+                Avatar = !string.IsNullOrEmpty(c.Avatar) ? c.Avatar : "https://i.imgur.com/XHyiaIf.png",
+                EmailConfirm = c.EmailConfirmed,
+                Email = c.Email,
+                FullName = c.FullName,
+                PhoneNumber = c.PhoneNumber,
+                AccountActive = c.AccountActive
+            }).ToList();
             result.IsSussess = true;
             return result;
         }

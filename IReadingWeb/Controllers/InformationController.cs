@@ -1,6 +1,7 @@
 ﻿using AspNetCoreHero.ToastNotification.Abstractions;
 using BusinessObject;
 using LBSWeb.Service.Information;
+using LBSWeb.Services.Account;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -11,11 +12,41 @@ namespace IReadingWeb.Controllers
     public class InformationController : Controller
     {
         private readonly IInformationService _informationService;
+        private readonly IAccountService _accountService;
         private readonly INotyfService _notyf;
-        public InformationController(IInformationService informationService,INotyfService notyf)
+        public InformationController(IAccountService accountService,IInformationService informationService,INotyfService notyf)
         {
+            _accountService = accountService;
             _informationService = informationService;
             _notyf = notyf;
+        }
+
+        [Authorize(Roles = $"{Role.Admin}")]
+        [Route("ListAccount")]
+        public async Task<IActionResult> ListAccount(string role = "Author")
+        {
+            var result = await _accountService.GetListAccount(role);
+            ViewBag.ListAccount = result.DataList;
+            ViewBag.Role = role;
+            return View();
+        }
+
+        [Authorize(Roles = $"{Role.Admin}")]
+        [Route("BanAccount")]
+
+        public async Task<IActionResult> BanAccount(string username)
+        {
+            var result = await _accountService.ToggleLockUser(username,true);
+            return Json(result);
+        }
+
+        [Authorize(Roles = $"{Role.Admin}")]
+        [Route("UnBanAccount")]
+
+        public async Task<IActionResult> UnBanAccount(string username)
+        {
+            var result = await _accountService.ToggleLockUser(username, false);
+            return Json(result);
         }
 
         [Authorize(Roles = $"{Role.Admin},{Role.Author}")]

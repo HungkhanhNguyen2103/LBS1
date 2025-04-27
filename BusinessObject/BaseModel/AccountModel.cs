@@ -21,6 +21,7 @@ namespace BusinessObject.BaseModel
         public string? Status { get; set; }
         public string? ReturnUrl { get; set; }
         public bool AccountActive { get; set; }
+        public bool? EmailConfirm { get; set; }
         public int GrantPermission { get; set; }
 
         // 0 - User

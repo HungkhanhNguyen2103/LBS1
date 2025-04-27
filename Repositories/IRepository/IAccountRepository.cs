@@ -10,6 +10,7 @@ namespace Repositories.Repository
     public interface IAccountRepository
     {
         Task<ReponderModel<string>> Register(AccountModel account);
+        Task<ReponderModel<AccountModel>> GetListAccount(string role);
         Task<ReponderModel<string>> Login(AccountModel account);
         Task<ReponderModel<AccountViewModel>> GetAll(string role);
         Task<ReponderModel<string>> ToggleLockUser(string username,bool lockAccount);

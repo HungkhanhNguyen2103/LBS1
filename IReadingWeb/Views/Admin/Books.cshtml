@@ -120,7 +120,7 @@
                                         <button class="@(User.IsInRole("Author") ? "" : "d-none") btn1 btn btn-secondary" onclick="window.location.href='/Admin/UpdateBook/@item.Id'" title="Chỉnh sửa sách" >
                                             <i class="fa-solid fa-pen-to-square"></i>
                                         </button>
-                                        <button type="button" class="@(User.IsInRole("Author") ? "" : "d-none") @(item.Status == BookStatus.PendingPublication ? "" : "disabled") btn1 btn btn-secondary" onclick="deleteItem(@item.Id)" title="Xóa sách">
+                                        <button type="button" class="d-none @(User.IsInRole("Author") ? "" : "d-none") @(item.Status == BookStatus.PendingPublication ? "" : "disabled") btn1 btn btn-secondary" onclick="deleteItem(@item.Id)" title="Xóa sách">
                                             <i class="fa-solid fa-trash"></i>
                                         </button>
                                         @if(item.Status != BookStatus.Pause)
