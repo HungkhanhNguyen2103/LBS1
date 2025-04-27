@@ -93,17 +93,17 @@ namespace LBSWeb.Controllers
             var claims = TokenUtil.ValidateToken(result.Data, _configuration["Tokens:Key"], _configuration["Tokens:Issuer"]);
             if (claims != null)
             {
-                var isConfirmEmail = claims.FindFirst(ClaimTypes.Email).Value;
-                if (isConfirmEmail == "False")
-                {
-                    return Redirect("/Account/EmailReConfirm");
-                }
                 HttpContext.Response.Cookies.Append("token", result.Data, new CookieOptions { MaxAge = TimeSpan.FromDays(365 * 2) });
                 var claimsIdentity = new ClaimsIdentity(
                     claims.Claims, CookieAuthenticationDefaults.AuthenticationScheme);
                 await HttpContext.SignInAsync(
                     CookieAuthenticationDefaults.AuthenticationScheme,
                     new ClaimsPrincipal(claimsIdentity));
+                var isConfirmEmail = claims.FindFirst(ClaimTypes.Email).Value;
+                if (isConfirmEmail == "False")
+                {
+                    return Redirect("/Account/EmailReConfirm");
+                }
                 return Redirect("/Admin/Index");
 
             }
@@ -180,7 +180,7 @@ namespace LBSWeb.Controllers
         public async Task<IActionResult> EmailReConfirm()
         {
             //var userClaims = User.Claims;
-            var userName = User.FindFirst(ClaimTypes.Email).Value;
+            var userName = User.FindFirst(ClaimTypes.NameIdentifier).Value;
             //var userName = User.FindFirst(ClaimTypes.Name).Value;
             var result = await _accountService.ReConfirmEmail(userName);
             if (!result.IsSussess)

@@ -552,10 +552,10 @@ namespace Repositories.Repository
             return responder;
         }
 
-        public async Task<ReponderModel<string>> ReConfirmEmail(string email)
+        public async Task<ReponderModel<string>> ReConfirmEmail(string username)
         {
             var responder = new ReponderModel<string>();
-            var userExist = await _userManager.FindByEmailAsync(email);
+            var userExist = await _userManager.FindByNameAsync(username);
             if (userExist == null)
             {
                 responder.Message = "Tài khoản không tồn tại";
