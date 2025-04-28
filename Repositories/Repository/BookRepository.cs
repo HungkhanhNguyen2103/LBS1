@@ -101,7 +101,12 @@ namespace Repositories.Repository
                 result.Message = "Không tồn tại dữ liệu";
                 return result;
             }
+
+
+            var listCateBook = await _lBSDbContext.BookCategories.Where(c => c.CategoryId == id).ToListAsync();
+
             _lBSDbContext.Categories.Remove(cate);
+            _lBSDbContext.BookCategories.RemoveRange(listCateBook);
             await _lBSDbContext.SaveChangesAsync();
 
             result.IsSussess = true;
@@ -1109,7 +1114,9 @@ namespace Repositories.Repository
                 _lBSDbContext.Books.Remove(model);
                 await _lBSDbContext.SaveChangesAsync();
 
-                
+                //delete all chapter
+                var filter = Builders<BookChapter>.Filter.Eq(c => c.BookId, id);
+                await _mongoContext.BookChapters.DeleteManyAsync(filter);
 
                 result.IsSussess = true;
                 result.Message = "Xóa thành công";
