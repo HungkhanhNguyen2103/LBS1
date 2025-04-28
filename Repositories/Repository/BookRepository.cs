@@ -2301,7 +2301,7 @@ namespace Repositories.Repository
             {
                 var paidChapters = await _lBSDbContext.UserTranscationBooks.Where(c => c.UserName == username && c.BookId == bookId).ToListAsync();
 
-                listBookChapter = listBookChapter.Where(c => c.Id == "680f2304e802dc172bc88640").ToList();
+                //listBookChapter = listBookChapter.Where(c => c.Id == "680f2304e802dc172bc88640").ToList();
                 foreach (var c in listBookChapter)
                 {
                     var filterVoice = Builders<BookChapterVoice>.Filter.Eq(c => c.ChapterId, c.Id);
