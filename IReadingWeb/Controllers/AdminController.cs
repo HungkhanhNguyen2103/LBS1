@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Bson;
+using Newtonsoft.Json;
 using System.Net;
 using System.Security.Claims;
 using System.Text;
@@ -19,7 +20,7 @@ namespace LBSWeb.Controllers
     {
         private readonly IBookService _bookService;
         //private readonly IInformationService _informationService;
-        private readonly IPaymentService _paymentService;
+        //private readonly IPaymentService _paymentService;
         private readonly INotyfService _notyf;
 
         public AdminController(IBookService bookService,
@@ -30,7 +31,7 @@ namespace LBSWeb.Controllers
             _bookService = bookService;
             //_informationService = informationService;
             _notyf = notyf;
-            _paymentService = paymentService;
+
         }
 
         [Authorize(Roles = $"{Role.Admin},{Role.Author},{Role.Manager}")]
@@ -53,7 +54,8 @@ namespace LBSWeb.Controllers
         {
             var userName = User.FindFirst(ClaimTypes.NameIdentifier).Value;
             var res = await _bookService.GetAllBookByUser(userName);
-            if(User.IsInRole("Manager")){
+            if(User.IsInRole("Manager") || User.IsInRole("Admin"))
+            {
                 if (bookType < 0 || bookType > 5)
                 {
                     return Redirect("/Account/AccessDenied");
@@ -409,7 +411,6 @@ namespace LBSWeb.Controllers
             var resultChapterBook = await _bookService.GetBookChapter(chapterId);
             ViewBag.BookName = result.Data.Name;
             ViewBag.ChapterId = chapterId;
-
             //Admin/ApproveBook/1070
             ViewBag.ReturnUrl = returnUrl;
             return View(resultChapterBook.Data);
@@ -459,21 +460,6 @@ namespace LBSWeb.Controllers
 
         //[Authorize(Roles = $"{Role.Author},{Role.Manager}")]
         //[AllowAnonymous]
-        [HttpGet]
-        [Route("PaymentSuccess")]
-        public async Task<IActionResult> PaymentSuccess(string email, int type, int paymentKey , long orderCode)
-        {
-            var result = await _paymentService.PaymentSuccess(email, type, paymentKey, orderCode);
-            if (!result.IsSussess) return Redirect("/Admin/PaymentCancel");
-            return View();
-        }
-
-        //[AllowAnonymous]
-        [Route("PaymentCancel")]
-        public IActionResult PaymentCancel()
-        {
-            return View();
-        }
 
 
         [Authorize(Roles = $"{Role.Admin},{Role.Manager}")]

@@ -72,7 +72,7 @@ quill.on('text-change', function () {
             checkChapterContentByAI(content);
         }
         //console.log(content);
-    }, 5000);
+    }, 2000);
 });
 
 function getWordNo() {
@@ -103,13 +103,15 @@ function highlightBadWordsPreserveFormat(words) {
         return;
     }
 
+
     words.forEach(word => {
-        let regex = new RegExp(`\\b(${escapeRegExp(word)})\\b`, 'gi');
+        let regex = new RegExp(`(?:^|[^\\p{L}\\p{N}])(${escapeRegExp(word)})(?=[^\\p{L}\\p{N}]|$)`, 'giu');
+        //let regex = new RegExp(`\\b(${escapeRegExp(word)})\\b`, 'gi');
         let match;
 
         while ((match = regex.exec(text)) !== null) {
-            const startIndex = match.index;
-            const length = match[0].length;
+            const startIndex = match.index + match[0].length - match[1].length;
+            const length = match[1].length;
 
             quill.formatText(startIndex, length, {
                 // background: 'yellow',

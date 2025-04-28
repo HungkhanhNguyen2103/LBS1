@@ -47,7 +47,7 @@
             <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
                 <div class="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3">
                     <h6 class="text-white text-capitalize ps-3">Chương nói</h6>
-                    <span class="ps-3 text-white" style="font-size:12px" id="chapterNameText">@Model.ChapterName</span>
+                    <span class="ps-3 text-white" style="font-size:12px" id="chapterNameText"></span>
                 </div>
             </div>
             <div class="card-body px-0 pb-2">
@@ -130,7 +130,7 @@
                 processData: false,
                 contentType: false,
                 success: function (data) {
-                    //console.log(data);
+                    console.log(data);
                     $('#loadingDivAudio').addClass('d-none');
                     $('#chapterNameText').html(data.chapterName);
                     $('#ChapterName').val(data.chapterName);

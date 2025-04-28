@@ -439,9 +439,21 @@ namespace Repositories.Repository
 
                 await _mongoContext.BookChapters.UpdateManyAsync(filter, update);
             }
+
+            //insert to book chapter
+
+
             try
             {
                 await _mongoContext.BookChapters.InsertOneAsync(bookChapter);
+                var bookChapterLog = new BookChapterLog
+                {
+                    ChapterId = bookChapter.Id,
+                    CommentAI = bookChapter.CommentAI,
+                    InappropriateWords = bookChapter.InappropriateWords
+                };
+                await _mongoContext.BookChapterLogs.InsertOneAsync(bookChapterLog);
+
             }
             catch (Exception ex)
             {
@@ -647,6 +659,14 @@ namespace Repositories.Repository
             var result = new ReponderModel<BookChapter>();
             var filter = Builders<BookChapter>.Filter.Eq(c => c.Id, id);
             result.Data = await _mongoContext.BookChapters.Find(filter).FirstOrDefaultAsync();
+
+            var resultChapterLog = await _mongoContext.BookChapterLogs.Find(c => c.ChapterId == id).FirstOrDefaultAsync();
+            if(resultChapterLog != null)
+            {
+                result.Data.CommentAI = resultChapterLog.CommentAI;
+                result.Data.InappropriateWords = resultChapterLog.InappropriateWords;
+            }
+
             result.IsSussess = true;
             return result;
 
@@ -714,6 +734,28 @@ namespace Repositories.Repository
                         .Set(c => c.Type, bookChapter.Type);
 
             await _mongoContext.BookChapters.UpdateOneAsync(filter, update);
+
+            var bookChapterLog = await _mongoContext.BookChapterLogs.Find(c => c.ChapterId == bookChapter.Id).FirstOrDefaultAsync();
+            if(bookChapterLog == null)
+            {
+                bookChapterLog = new BookChapterLog
+                {
+                    ChapterId = bookChapter.Id,
+                    CommentAI = bookChapter.CommentAI,
+                    InappropriateWords = bookChapter.InappropriateWords
+                };
+                await _mongoContext.BookChapterLogs.InsertOneAsync(bookChapterLog);
+            }
+            else
+            {
+                var filterLog = Builders<BookChapterLog>.Filter.Eq(c => c.ChapterId, bookChapter.Id);
+
+                var updateLog = Builders<BookChapterLog>.Update
+                        .Set(c => c.CommentAI, bookChapter.CommentAI)
+                        .Set(c => c.InappropriateWords, bookChapter.InappropriateWords);
+
+                await _mongoContext.BookChapterLogs.UpdateOneAsync(filterLog, updateLog);
+            }
 
 
             result.Message = "Cập nhật thành công";
@@ -787,20 +829,23 @@ namespace Repositories.Repository
             //    return result;
             //}
             resultData.TotalChapterApprove = listBookChapter.Count;
-            if(listBookChapter.Count > 3)
+            if(listBookChapter.Count > 10)
             {
-                listBookChapter = listBookChapter.Take(3).ToList();
+                listBookChapter = listBookChapter.Take(10).ToList();
             }
             resultData.ChapterApprove = listBookChapter.Count;
-
+            var doc = new HtmlDocument();
             foreach (var bookChapter in listBookChapter)
             {
+
+                doc.LoadHtml(bookChapter.Content);
+                string textContent = doc.DocumentNode.InnerText;
                 var promp = $@"Bạn là công cụ kiểm duyệt nội dung. Kiểm tra và phân tích đoạn văn dưới đây giúp tôi đoạn text có chứa từ ngữ hoặc cụm từ không phù hợp (tục tĩu, thù hằn, phân biệt, kích động, bạo lực, tình dục,sai tôn giáo, từ ngữ thuộc chế độ cũ ,v.v.): 
                             (
-                               - Có xuất hiện: format như sau: Chi tiết
-                               - Không xuất hiện từ ngữ: format như sau: Nội dung không chứa từ ngữ không phù hợp
+                               - Có xuất hiện: format như sau: <li style='color:red'>'A' => giải thích</li>
+                               - Không xuất hiện từ ngữ: format như sau: <li style='color:green'>Nội dung không chứa từ ngữ không phù hợp</li>
                             ) 
-                             Bạn chỉ cần trả lời theo format này, Đây là nội dung đoạn văn: {bookChapter.Content}";
+                             Bạn chỉ cần trả lời theo format này, Đây là nội dung đoạn văn: {textContent}";
                 if (bookChapter == null)
                 {
                     result.Message = "Dữ liệu chương sách không tồn tại";
@@ -813,8 +858,42 @@ namespace Repositories.Repository
                     Content = bookChapter.Content,
                     BookId = bookId,
                 };
-                var resultChapter = await _aIGeneration.TextGenerate(promp);
-                chapterApprove.AiFeedback = resultChapter.Data;
+                //var resultChapter = await _aIGeneration.TextGenerate(promp);
+                //var resultChapter = await _aIGeneration.TextGenerate(promp);
+                var bookChapterLog = await _mongoContext.BookChapterLogs.Find(c => c.ChapterId == bookChapter.Id).FirstOrDefaultAsync();
+                if(bookChapterLog == null || string.IsNullOrEmpty(bookChapterLog.CommentAI))
+                {
+                    var resultChapter = await _aIGeneration.TextGenerate(promp);
+                    chapterApprove.AiFeedback = resultChapter.Data;
+
+                    doc.LoadHtml(resultChapter.Data);
+                    var listItems = doc.DocumentNode.SelectNodes("//li");
+                    var htmlLi = string.Empty;
+                    if(listItems != null)
+                    {
+                        foreach (var item in listItems)
+                        {
+                            htmlLi += item.OuterHtml;
+                        }
+                        bookChapterLog = new BookChapterLog
+                        {
+                            ChapterId = bookChapter.Id,
+                            CommentAI = htmlLi,
+
+                        };
+
+                        await _mongoContext.BookChapterLogs.InsertOneAsync(bookChapterLog);
+                    }
+
+
+                }
+                else 
+                {
+                    chapterApprove.AiFeedback = bookChapterLog.CommentAI;
+                    chapterApprove.InappropriateWords = bookChapterLog.InappropriateWords;
+                }
+
+
                 result.DataList.Add(chapterApprove);
             }
             result.Data = resultData;
@@ -1343,6 +1422,7 @@ namespace Repositories.Repository
                 result.DataList.Add(item);
                 i = i.AddDays(1);
             }
+            result.IsSussess = true;
             return result;
         }
 
@@ -2130,12 +2210,12 @@ namespace Repositories.Repository
                 result.Message = "Không có dữ liệu chương";
                 return result;
             }
-
             if (string.IsNullOrEmpty(username))
             {
                 foreach (var c in listBookChapter)
                 {
-                    var bookChapterVoice = await _mongoContext.BookChapterVoices.Find(c => c.ChapterId == c.Id).FirstOrDefaultAsync();
+                    var filterVoice = Builders<BookChapterVoice>.Filter.Eq(c => c.ChapterId, c.Id);
+                    var bookChapterVoice = await _mongoContext.BookChapterVoices.Find(filterVoice).FirstOrDefaultAsync();
                     var bookChapterModel = new BookChapterModel
                     {
                         AudioUrl = c.AudioUrl,
@@ -2209,9 +2289,12 @@ namespace Repositories.Repository
             else
             {
                 var paidChapters = await _lBSDbContext.UserTranscationBooks.Where(c => c.UserName == username && c.BookId == bookId).ToListAsync();
+
+                listBookChapter = listBookChapter.Where(c => c.Id == "680f2304e802dc172bc88640").ToList();
                 foreach (var c in listBookChapter)
                 {
-                    var bookChapterVoice = await _mongoContext.BookChapterVoices.Find(c => c.ChapterId == c.Id).FirstOrDefaultAsync();
+                    var filterVoice = Builders<BookChapterVoice>.Filter.Eq(c => c.ChapterId, c.Id);
+                    var bookChapterVoice = await _mongoContext.BookChapterVoices.Find(filterVoice).FirstOrDefaultAsync();
                     var bookChapterModel = new BookChapterModel
                     {
                         AudioUrl = c.AudioUrl,

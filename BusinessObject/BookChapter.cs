@@ -25,6 +25,10 @@ namespace BusinessObject
         public int ViewNo { get; set; }
         [BsonIgnore]
         public int RatingNo { get; set; }
+        [BsonIgnore]
+        public string? InappropriateWords { get; set; }
+        [BsonIgnore]
+        public string? CommentAI { get; set; }
         public int Price { get; set; }
         public string? CreateBy { get; set; }
         public string? UserId { get; set; }

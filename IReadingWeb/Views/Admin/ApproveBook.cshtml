@@ -155,8 +155,31 @@
         var item = listAifeedbackBackup.find(c => c.chapterId == chapterId);
         $('#requestContent').html('');
         $('#ContentDiv').html(item.content);
-        $('#loadingDivFeedBackrequestContent').removeClass('d-none');
-        checkChapterContentByAI(item.content);
+        //$('#loadingDivFeedBackrequestContent').removeClass('d-none');
+
+        let matches = item.aiFeedback.match(/<li.*?<\/li>/g);
+        //data = data.replace('<ul>', '').replace('</ul>', '').replace('```html', '').replace('```','');
+        if (item.aiFeedback.includes("li")) $('#requestContent').append(matches);
+        //$('#requestContent').append("<br>");
+
+        const matcheWords = [...item.aiFeedback.matchAll(/<li.*?>'(.+?)'\s*=>/g)];
+        const words = matcheWords.map(m => m[1]);
+        //$('#requestContent').append(matches.commentAI);
+
+        const editor = document.getElementById("ContentDiv");
+        const markInstance = new Mark(editor);
+
+        markInstance.unmark({
+              done: function () {
+                    markInstance.mark(words, {
+                          separateWordSearch: false,
+                          element: "span",
+                          className: "highlight-bad-word"
+                    });
+              }
+        });
+
+        //checkChapterContentByAI(item.content);
         //$('#requestContent').html(item.aiFeedback);
     }
 
@@ -237,14 +260,14 @@
                     if(resultInfo != null) $('#infoApprove').html(`${resultInfo.chapterApprove} chương đang xét duyệt / tổng ${resultInfo.totalChapterApprove} chương chờ xét duyệt`);
                     //console.log(listAifeedback);
                     listAifeedback.dataList.forEach(item => {
-                        //console.log(item.aiFeedback)
+                        //console.log(item)
                         html += '<tr>';
                         html += `<td class="text-left">
                                       <p id="${item.chapterId}" class="chapterIdCls mx-3 text-xs font-weight-bold mb-0">${item.chapterName}</p>
                                 </td>`;
                         html += `<td class="text-center">`;
                         if (item.aiFeedback.includes("không chứa từ ngữ"))
-                            html += `<p class="mx-3 text-xs font-weight-bold mb-0">${item.aiFeedback}</p>`;
+                            html += `<p class="mx-3 text-xs font-weight-bold mb-0">Nội dung không chứa từ ngữ không phù hợp</p>`;
                         else html += `<p onclick="Aifeedback('${item.chapterId}')" data-toggle="modal" data-target="#exampleModalFeedback" class="mx-3 text-xs font-weight-bold mb-0" style="color:blue;cursor:pointer">Chi tiết</p>`;
                         html += `</td>`;
                         html += `<td style="padding-left: 1.5rem;" class="align-middle text-center">
@@ -297,7 +320,7 @@
                 processData: false,
                 contentType: false,
                 success: function (data) {
-                    if (data.IsSussess == false) {
+                    if (data.isSussess == false) {
                         notyf.error(data.message);
                         return;
                     }
@@ -328,7 +351,7 @@
                 processData: false,
                 contentType: false,
                 success: function (data) {
-                    if (data.IsSussess == false) {
+                    if (data.isSussess == false) {
                         notyf.error(data.message);
                         return;
                     }
@@ -367,7 +390,7 @@
                 processData: false,
                 contentType: false,
                 success: function (data) {
-                    if (data.IsSussess == false) {
+                    if (data.isSussess == false) {
                         notyf.error(data.message);
                         return;
                     }

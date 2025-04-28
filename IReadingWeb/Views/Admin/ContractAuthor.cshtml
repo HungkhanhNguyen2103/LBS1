@@ -89,18 +89,24 @@
                         <input style="width:100%" type="number" asp-for="BookId" value="@ViewBag.BookId" class="form-control" hidden>
                         <div style="display:block" class="form-group input-group input-group-outline mt-0">
                             <label for="Name">Tên chương:</label>
-                            <input style="width:100%" type="text" asp-for="ChapterName" class="form-control" autofocus>
+                            <input style="width:100%" disabled type="text" asp-for="ChapterName" class="form-control" autofocus>
                         </div>
                         <div class="row input-group input-group-outline mt-4">
                             <div style="display:block">
                                 <label for="Content">Nội dung chương:</label>
                                 <div class="row" style="display:flex">
-                                    <div class="col-12">
+                                    <div class="col-9">
                                         @* contenteditable="true" *@
                                         <div style="height:19rem;overflow: auto;" id="ContentDiv" class="form-control"></div>
                                         <textarea oninput="getWordNo()" asp-for="Content" type="text" class="d-none form-control" rows="18"></textarea>
                                         @* <label>Số từ: <span id="wordNoCount">0</span></label> *@
                                         @* <input type="number" hidden asp-for="WordNo" /> *@
+                                    </div>
+                                    <div class="col-3 ai-feedback" style="position:relative;margin-bottom:0">
+                                        <ul id="requestContent" style="height:18rem;max-height:18rem;overflow: auto;padding-left:16px">
+                                            @Html.Raw(@Model.CommentAI)
+                                        </ul>
+                                        @* <div id="loadingDivFeedBack" class="dot-elastic loadingDiv"></div> *@
                                     </div>
                                 </div>
                             </div>
@@ -110,7 +116,7 @@
                         <div style="position:relative">
                             <div style="display:block" class="input-group input-group-outline mt-4">
                                 <label for="Summary">Tóm tắt chương:</label>
-                                <textarea style="width:100%" asp-for="Summary" type="text" class=" form-control" rows="8"></textarea>
+                                <textarea style="width:100%" disabled asp-for="Summary" type="text" class=" form-control" rows="8"></textarea>
                             </div>
                             <div id="loadingSumary" class="loader"></div>
                         </div>
@@ -145,7 +151,7 @@
 <script src="https://cdn.jsdelivr.net/npm/mark.js@8.11.1/dist/mark.min.js" asp-append-version="true"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js" asp-append-version="true"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.4.2/mammoth.browser.min.js" asp-append-version="true"></script>
-@* <script src="~/js/chapter.js" asp-append-version="true"></script> *@
+@* <script src="~/js/chapterv1.js" asp-append-version="true"></script> *@
 <script type="text/javascript">
     document.getElementById('loadingSumary').classList.add('d-none');
     // document.getElementById('loadingDivFeedBack').classList.add('d-none');
@@ -251,7 +257,48 @@
     const htmlContent = '@Html.Raw(Model.Content)';
     quill.clipboard.dangerouslyPasteHTML(htmlContent);
 
-    //getWordNo();
+
+    highlightBadWordsPreserveFormat();
+
+    function escapeRegExp(string) {
+        return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    }
+
+    function highlightBadWordsPreserveFormat() {
+        let data = $('#requestContent').html();
+        data = data.replaceAll('=&gt;','=>')
+        //console.log(data);
+        const matcheWords = [...data.matchAll(/<li.*?>'(.+?)'\s*=>/g)];
+        const words = matcheWords.map(m => m[1]);
+        //console.log(words);
+        const text = quill.getText();
+        const delta = quill.getContents();
+        if (!words || words.length === 0) {
+            quill.formatText(0, text.length, {
+                color: false,
+                underline: false
+            }, 'user');
+            return;
+        }
+
+        words.forEach(word => {
+            let regex = new RegExp(`(?:^|[^\\p{L}\\p{N}])(${escapeRegExp(word)})(?=[^\\p{L}\\p{N}]|$)`, 'giu');
+            let match;
+
+            while ((match = regex.exec(text)) !== null) {
+            const startIndex = match.index + match[0].length - match[1].length;
+            const length = match[1].length;
+
+                quill.formatText(startIndex, length, {
+                    // background: 'yellow',
+                    color: 'red',
+                    underline: true
+                }, 'user');
+            }
+        });
+        quill.disable();
+    }
+
 
 
 </script>

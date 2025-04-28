@@ -61,7 +61,7 @@ namespace Repositories.Repository
                     var item = new ItemData(item1.name, item1.quantity, item1.price);
                     items.Add(item);
                 }
-                var domain = model.domain + "/Admin";
+                var domain = model.domain + "/Payment";
                 var cancelUrl = $"{domain}/CancelPayment";
                 var successUrl = $"{domain}/PaymentSuccess?email={model.buyerEmail}&type={model.type}&paymentKey={model.paymentKey}";
                 PaymentData paymentData = new PaymentData(orderCode, model.amount, model.description, items, cancelUrl, successUrl);

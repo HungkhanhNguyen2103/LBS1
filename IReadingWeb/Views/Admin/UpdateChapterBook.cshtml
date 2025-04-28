@@ -147,6 +147,8 @@
 
                         <div style="display:block" class="form-group input-group input-group-outline mt-4">
                             <label for="Name">Thu phí:</label>
+                            <input type="text" asp-for="CommentAI" class="form-control d-none">
+                            <input type="text" asp-for="InappropriateWords" class="form-control d-none">
                             @if (ViewBag.PaidChapter == true)
                             {
                                 <input style="width:100%" type="number" asp-for="Price" class="form-control">
@@ -219,11 +221,15 @@
                     //console.log(data);
                     let matches = data.match(/<li.*?<\/li>/g);
                     //data = data.replace('<ul>', '').replace('</ul>', '').replace('```html', '').replace('```','');
-                    if (data.includes("li")) $('#requestContent').prepend(matches);
+                    if (data.includes("li")){
+                        $('#requestContent').prepend(matches);
+                        $('#CommentAI').val(matches);
+                    }
                     $('#requestContent').prepend("<br>");
 
                     const matcheWords = [...data.matchAll(/<li.*?>'(.+?)'\s*=>/g)];
                     const words = matcheWords.map(m => m[1]);
+                    //$('#InappropriateWords').val(words);
                     //console.log(words);
                     highlightBadWordsPreserveFormat(words);
 
