@@ -349,6 +349,10 @@ namespace Repositories.Repository
             {
                 listBook = await _lBSDbContext.Books.ToListAsync();
             }
+            else if (roles.Contains(Role.Admin))
+            {
+                listBook = await _lBSDbContext.Books.ToListAsync();
+            }
             else if (roles.Contains(Role.Visitor))
             {
                 listBook = await _lBSDbContext.Books.Where(c => c.Status == BookStatus.Done || c.Status == BookStatus.Published || c.Status == BookStatus.Continue).ToListAsync();

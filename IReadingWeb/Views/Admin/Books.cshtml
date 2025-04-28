@@ -70,7 +70,8 @@
                         <thead>
                             <tr>
                                 <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Truyện</th>
-                                @if(User.IsInRole("Manager")){
+                                @if (User.IsInRole("Manager") || User.IsInRole("Admin"))
+                                {
                                     <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Tác giả</th>
                                 }
                                 <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Mới xuất bản</th>
