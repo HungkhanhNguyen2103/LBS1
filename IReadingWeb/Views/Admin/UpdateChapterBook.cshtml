@@ -160,12 +160,12 @@
                             @* <input style="width:100%" type="number" disabled asp-for="Price" class="form-control"> *@
                         </div>
                         @if(User.IsInRole("Author")){
-                            <button type="submit" class="btn btn-success mt-4">Lưu thông tin</button>   
+                            <button type="button" onclick="SaveData()" class="btn btn-success mt-4">Lưu thông tin</button>
+                            <button type="button" onclick="SaveDraft()" class="btn btn-warning mt-4 ml-2">Lưu bản thảo</button>
                         }
                         
                         @if(ViewBag.ReturnUrl == "Drafts")
                         {
-                            <button type="button" onclick="SaveDraft()" class="btn btn-warning mt-4 ml-2">Lưu bản thảo</button>
                             <button type="button" onclick="window.location.href='/Admin/Drafts'" class="btn btn-secondary mt-4 ml-2">Quay lại</button>
                         }
                         else
@@ -193,6 +193,11 @@
     quill.clipboard.dangerouslyPasteHTML(htmlContent);
 
     getWordNo();
+
+    function SaveData() {
+        $('#Type').val('1');
+        $('#formBody').submit();
+    }
 
     function SaveDraft() {
         $('#Type').val('3');

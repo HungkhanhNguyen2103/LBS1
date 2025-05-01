@@ -205,7 +205,7 @@ namespace IReadingWeb.Controllers
             var result = await _informationService.CreateUserReport(model);
             if (result.IsSussess) _notyf.Success(result.Message);
             else _notyf.Error(result.Message);
-            return Redirect("/Admin/UserReport/1");
+            return Redirect("/Information/UserReport/1");
         }
 
         [Authorize(Roles = $"{Role.Manager},{Role.Author},{Role.Admin}")]

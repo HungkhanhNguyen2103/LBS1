@@ -724,11 +724,69 @@ namespace Repositories.Repository
                 //var res = await _aIGeneration.TextGenerateToSpeech(bookChapter.Summary);
                 //if (res.IsSussess) bookChapter.AudioUrl = res.Data;
             }
+
+
             //else bookChapter.AudioUrl = bookChapterRow.AudioUrl;
             //bookChapter.Type = 1;
             bookChapter.Content = await UploadImageContent(bookChapter.Content);
             bookChapter.ModifyDate = DateTime.Now;
             bookChapter.BookType = BookType.PendingApproval;
+
+            // chuyen trang thai dang cap nhat
+            if (bookChapter.Type == 3)
+            {
+                if(bookChapterRow.BookType == BookType.Free || bookChapterRow.BookType == BookType.Payment)
+                {
+                    bookChapter.BookType = BookType.LoadingEdit;
+
+                    var bookChapterPending = new BookChapterPending
+                    {
+                        ChapterId = bookChapter.Id,
+                        ChapterNumber = bookChapter.ChapterNumber,
+                        ChapterName = bookChapter.ChapterName,
+                        Content = bookChapter.Content,
+                        ModifyDate = DateTime.UtcNow,
+                        Summary = bookChapter.Summary,
+                        WordNo = bookChapter.WordNo
+                    };
+
+                    await _mongoContext.BookChapterPendings.InsertOneAsync(bookChapterPending);
+
+                    var bookChapterLog1 = await _mongoContext.BookChapterLogs.Find(c => c.ChapterId == bookChapter.Id).FirstOrDefaultAsync();
+                    if (bookChapterLog1 == null)
+                    {
+                        bookChapterLog1 = new BookChapterLog
+                        {
+                            ChapterId = bookChapter.Id,
+                            CommentAI = bookChapter.CommentAI,
+                            InappropriateWords = bookChapter.InappropriateWords
+                        };
+                        await _mongoContext.BookChapterLogs.InsertOneAsync(bookChapterLog1);
+                    }
+                    else
+                    {
+                        var filterLog1 = Builders<BookChapterLog>.Filter.Eq(c => c.ChapterId, bookChapter.Id);
+
+                        var updateLog1 = Builders<BookChapterLog>.Update
+                                .Set(c => c.CommentAI, bookChapter.CommentAI)
+                                .Set(c => c.InappropriateWords, bookChapter.InappropriateWords);
+
+                        await _mongoContext.BookChapterLogs.UpdateOneAsync(filterLog1, updateLog1);
+                    }
+
+
+                    result.Message = "Cập nhật thành công";
+                    result.IsSussess = true;
+
+                    return result;
+                }
+            }
+
+            // chuyen trang thai dang cap nhat
+            //if (bookChapter.Type == 3 && (bookChapterRow.BookType == BookType.Free || bookChapterRow.BookType == BookType.Payment))
+            //{
+
+            //}
 
             var update = Builders<BookChapter>.Update
                         .Set(c => c.ChapterName, bookChapter.ChapterName)
@@ -1352,7 +1410,7 @@ namespace Repositories.Repository
                         result.Message = "Dữ liệu không hợp lệ";
                         return result;
                     }
-                    item.EndDate = DateTime.UtcNow;
+                    item.EndDate = DateTime.UtcNow.AddHours(7);
                 }
                 var data = new UserBookView
                 {
@@ -1361,7 +1419,7 @@ namespace Repositories.Repository
                     ChapterId = model.ChapterId,
                     CreateBy = model.CreateBy,
                     UserId = model.UserId,
-                    CreateDate = DateTime.UtcNow,
+                    CreateDate = DateTime.UtcNow.AddHours(7),
                     EndDate = DateTime.MinValue
                 };
 
@@ -1377,7 +1435,7 @@ namespace Repositories.Repository
                     result.Message = "Dữ liệu không hợp lệ";
                     return result;
                 }
-                resultData.EndDate = DateTime.UtcNow;
+                resultData.EndDate = DateTime.UtcNow.AddHours(7);
                 await _lBSDbContext.SaveChangesAsync();
                 result.Data = resultData.Id;
             }
@@ -1399,7 +1457,7 @@ namespace Repositories.Repository
         {
             var result = new ReponderModel<UserMinuteModel>();
 
-            var now = DateTime.UtcNow;
+            var now = DateTime.UtcNow.AddHours(7);
             var dayOfweek = now.DayOfWeek;
             var dateNow = now.Date;
             var startOfWeek = dateNow.AddDays(-(int)dayOfweek + 1);
@@ -2266,7 +2324,9 @@ namespace Repositories.Repository
                 var paidChapters = await _lBSDbContext.UserTranscationBooks.Where(c => c.UserName == username && c.Type == TranscationBookType.Voice).ToListAsync();
                 foreach (var c in listBookChapter)
                 {
-                    var bookChapterVoice = await _mongoContext.BookChapterVoices.Find(c => c.ChapterId == c.Id).FirstOrDefaultAsync();
+                    var filterVoice = Builders<BookChapterVoice>.Filter.Eq(c => c.ChapterId, c.Id);
+                    var bookChapterVoice = await _mongoContext.BookChapterVoices.Find(filterVoice).FirstOrDefaultAsync();
+                    //var bookChapterVoice = await _mongoContext.BookChapterVoices.Find(c => c.ChapterId == c.Id).FirstOrDefaultAsync();
                     var bookChapterModel = new BookChapterModel
                     {
                         AudioUrl = c.AudioUrl,

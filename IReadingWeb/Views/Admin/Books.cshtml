@@ -92,7 +92,7 @@
                                             </div>
                                         </div>                                  
                                     </td>
-                                    @if (User.IsInRole("Manager"))
+                                    @if (User.IsInRole("Manager") || User.IsInRole("Admin"))
                                     {
                                         <td style="padding-left:1.5rem">
                                             <span class="text-secondary text-xs font-weight-bold">@item.Author</span>
