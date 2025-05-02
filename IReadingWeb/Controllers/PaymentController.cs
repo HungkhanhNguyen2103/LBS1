@@ -15,7 +15,7 @@ namespace IReadingWeb.Controllers
             _paymentService = paymentService;
         }
 
-        [HttpGet]
+        //[HttpGet]
         [Route("PaymentSuccess")]
         public async Task<IActionResult> PaymentSuccess(string email, int type, int paymentKey, long orderCode)
         {

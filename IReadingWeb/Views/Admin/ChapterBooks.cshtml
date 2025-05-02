@@ -89,8 +89,8 @@
                                     </td>
                                     <td class="text-left align-middle" style="padding-left:1.5rem">
                                         <span class="text-secondary text-xs font-weight-bold">@(item.ChapterName.Length > 35 ? item.ChapterName.Substring(0, 35) + "..." : item.ChapterName)
-                                        <span style="margin-left:5px" class="@(item.BookType == BookType.Payment ? "status-payment" : item.BookType == BookType.Free ? "status-free" : item.BookType == BookType.PendingApproval || item.BookType == BookType.Hidden ? "status-pending" : "status-decline")">
-                                            @(item.BookType == BookType.Payment ? "Trả phí" : item.BookType == BookType.Free ? "Miễn phí" : item.BookType == BookType.PendingApproval ? "Chờ duyệt" : item.BookType == BookType.Hidden ? "Ẩn chương" : "Hủy duyệt")
+                                            <span style="margin-left:5px" class="@(item.BookType == BookType.Payment ? "status-payment" : item.BookType == BookType.Free ? "status-free" : item.BookType == BookType.PendingApproval || item.BookType == BookType.Hidden || item.BookType == BookType.Draft ? "status-pending" : "status-decline")">
+                                            @(item.BookType == BookType.Payment ? "Trả phí" : item.BookType == BookType.Free ? "Miễn phí" : item.BookType == BookType.PendingApproval ? "Chờ duyệt" : item.BookType == BookType.Hidden ? "Ẩn chương" : item.BookType == BookType.Draft ? "Bản thảo" : "Hủy duyệt")
                                         </span>
                                         <span style="margin-left:5px" class="@(item.AudioUrl == "Audio" ? "status-free" : "d-none")">
                                             @item.AudioUrl
@@ -112,10 +112,10 @@
                                             <button onclick="window.location.href='/Admin/@ViewBag.BookId/UpdateChapterBook/@item.Id'" title="Sửa" class="btn1 btn btn-secondary">
                                                 <i class="fa-solid fa-pen-to-square"></i>
                                             </button>
-                                            <button onclick="deleteItem('@item.Id')" title="Xóa" class="@(item.BookType == BookType.PendingApproval || item.BookType == BookType.Decline || item.BookType == BookType.Hidden ? "" : "disabled") btn1 btn btn-secondary">
+                                            <button onclick="deleteItem('@item.Id')" title="Xóa" class="@(item.BookType == BookType.PendingApproval || item.BookType == BookType.Hidden ? "" : "disabled") btn1 btn btn-secondary">
                                                 <i class="fa-solid fa-trash"></i>
                                             </button>
-                                            <button onclick="hiddenItem('@item.Id','@item.BookType')" title="@(item.BookType == BookType.Hidden ? "Mở lại" : "Ẩn")" class="@(item.BookType == BookType.PendingApproval || item.BookType == BookType.Decline || item.BookType == BookType.Hidden ? "" : "disabled") btn1 btn btn-secondary">
+                                            <button onclick="hiddenItem('@item.Id','@item.BookType')" title="@(item.BookType == BookType.Hidden ? "Mở lại" : "Ẩn")" class="@(item.BookType == BookType.PendingApproval || item.BookType == BookType.Hidden ? "" : "disabled") btn1 btn btn-secondary">
                                                 <i class="fa-solid @(item.BookType == BookType.Hidden ? "fa-eye" : "fa-eye-slash")"></i>
                                             </button>
                                         </td>

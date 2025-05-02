@@ -449,6 +449,8 @@ namespace Repositories.Repository
                 await _mongoContext.BookChapters.UpdateManyAsync(filter, update);
             }
 
+            if (bookChapter.Type == 3 && (book.Status == BookStatus.PendingPublication || book.Status == BookStatus.PendingApproval)) bookChapter.BookType = BookType.Draft;
+
             //insert to book chapter
 
 
@@ -568,8 +570,8 @@ namespace Repositories.Repository
         {
             var result = new ReponderModel<BookChapter>();
             var filter = Builders<BookChapter>.Filter.And(
-                            Builders<BookChapter>.Filter.Where(p => p.BookId == bookId),
-                            Builders<BookChapter>.Filter.Where(p => p.Type != 3)
+                            Builders<BookChapter>.Filter.Where(p => p.BookId == bookId)
+                            //Builders<BookChapter>.Filter.Where(p => p.Type != 3)
                         );
 
             var sort = Builders<BookChapter>.Sort.Descending(x => x.ChapterNumber);
@@ -730,12 +732,21 @@ namespace Repositories.Repository
             //bookChapter.Type = 1;
             bookChapter.Content = await UploadImageContent(bookChapter.Content);
             bookChapter.ModifyDate = DateTime.Now;
-            bookChapter.BookType = BookType.PendingApproval;
 
+            //if(bookChapterRow.BookType )
+            //bookChapter.BookType = BookType.PendingApproval;
+
+            var book = await _lBSDbContext.Books.FirstOrDefaultAsync(c => c.Id == bookChapter.BookId);
+            if(book == null)
+            {
+                result.Message = "Sách không tồn tại";
+                return result;
+            }
+            
             // chuyen trang thai dang cap nhat
             if (bookChapter.Type == 3)
             {
-                if(bookChapterRow.BookType == BookType.Free || bookChapterRow.BookType == BookType.Payment)
+                if (book.Status != BookStatus.PendingPublication && book.Status != BookStatus.PendingPublication && (bookChapterRow.BookType == BookType.Free || bookChapterRow.BookType == BookType.Payment))
                 {
                     bookChapter.BookType = BookType.LoadingEdit;
 
@@ -780,6 +791,8 @@ namespace Repositories.Repository
 
                     return result;
                 }
+
+                else bookChapter.BookType = BookType.Draft;
             }
 
             // chuyen trang thai dang cap nhat
@@ -1474,7 +1487,7 @@ namespace Repositories.Repository
                     + readMinute.Where(c => c.CreateDate.Date.CompareTo(i.Date) == 0 && c.EndDate.Date.CompareTo(i.Date) > 0).Sum(c => (int)c.EndDate.Date.Subtract(c.CreateDate).TotalMinutes)
                     + readMinute.Where(c => c.CreateDate.Date.CompareTo(i.Date) == -1 && c.EndDate.Date.CompareTo(i.Date) == 0).Sum(c => (int)c.EndDate.Subtract(c.EndDate.Date).TotalMinutes);
 
-                var listenMinuteInt = voiceMinute.Where(c => c.CreateDate.Date.CompareTo(i.Date) == 0 && c.EndDate.CompareTo(i.Date) == 0).Sum(c => (int)c.EndDate.Subtract(c.CreateDate).TotalMinutes)
+                var listenMinuteInt = voiceMinute.Where(c => c.CreateDate.Date.CompareTo(i.Date) == 0 && c.EndDate.Date.CompareTo(i.Date) == 0).Sum(c => (int)c.EndDate.Subtract(c.CreateDate).TotalMinutes)
                     + voiceMinute.Where(c => c.CreateDate.Date.CompareTo(i.Date) == 0 && c.EndDate.Date.CompareTo(i.Date) > 0).Sum(c => (int)c.EndDate.Date.Subtract(c.CreateDate).TotalMinutes)
                     + voiceMinute.Where(c => c.CreateDate.Date.CompareTo(i.Date) == -1 && c.EndDate.Date.CompareTo(i.Date) == 0).Sum(c => (int)c.EndDate.Subtract(c.EndDate.Date).TotalMinutes);
 

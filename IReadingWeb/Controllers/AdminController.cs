@@ -455,6 +455,7 @@ namespace LBSWeb.Controllers
             ViewBag.ButtonFinish = item.Status == BookStatus.Done || (item.BookTypePrice == BookTypePrice.PayByBook && item.Status == BookStatus.PendingApproval) ? "disabled" : "";
             var result = await _bookService.GetListBookChapter(bookId);
             ViewBag.ChapterBooks = result.DataList;
+            ViewBag.HiddenOrRemoveChapter = item.Status == BookStatus.PendingPublication || item.Status == BookStatus.PendingApproval ? true : false;
             return View();
         }
 

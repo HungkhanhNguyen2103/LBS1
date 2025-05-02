@@ -47,6 +47,9 @@ namespace BusinessObject
         AwaitApproval = 5,
         //dang cap nhat
         LoadingEdit = 6,
+
+        // Ban thao
+        Draft = 7
     }
 
     public enum BookTypePrice
