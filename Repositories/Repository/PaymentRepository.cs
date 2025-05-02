@@ -90,7 +90,8 @@ namespace Repositories.Repository
                     PaymentName = item.PaymentItem.PaymentName,
                     PaymentNameEnum = PaymentNameEnum.Deposit,
                     Price = item.PaymentItem.Amount,
-                    CreateDate = item.CreateDate.ToString("HH:mm dd-MM-yyyy"),
+                    CreateDate = item.CreateDate.AddHours(7).ToString("HH:mm dd-MM-yyyy"),
+                    CreateDateFormat = item.CreateDate.AddHours(7),
                 });
             }
 
@@ -121,8 +122,8 @@ namespace Repositories.Repository
                     PaymentName = paymentName,
                     PaymentNameEnum = PaymentNameEnum.Pay,
                     Price = item.Amount,
-                    CreateDate = item.CreateDate.ToString("HH:mm dd-MM-yyyy"),
-                    CreateDateFormat = item.CreateDate,
+                    CreateDate = item.CreateDate.AddHours(7).ToString("HH:mm dd-MM-yyyy"),
+                    CreateDateFormat = item.CreateDate.AddHours(7),
                 });
             }
             result.DataList = result.DataList.OrderByDescending(c => c.CreateDateFormat).ToList();    
