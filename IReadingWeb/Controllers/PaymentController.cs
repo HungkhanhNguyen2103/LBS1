@@ -20,7 +20,7 @@ namespace IReadingWeb.Controllers
         public async Task<IActionResult> PaymentSuccess(string email, int type, int paymentKey, long orderCode)
         {
             var result = await _paymentService.PaymentSuccess(email, type, paymentKey, orderCode);
-            if (!result.IsSussess) return Redirect("/Payment/PaymentCancel");
+            //if (!result.IsSussess) return Redirect("/Payment/PaymentCancel");
             return View();
         }
 
