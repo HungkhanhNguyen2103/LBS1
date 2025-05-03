@@ -574,5 +574,10 @@ namespace Repositories.Repository
             var text = doc.DocumentNode.InnerText;
             return !string.IsNullOrWhiteSpace(text);
         }
+
+        public Task<ReponderModel<StatisticBookModel>> StatisticAuthorBook(int id)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
