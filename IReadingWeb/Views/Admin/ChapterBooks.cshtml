@@ -112,10 +112,10 @@
                                             <button onclick="window.location.href='/Admin/@ViewBag.BookId/UpdateChapterBook/@item.Id'" title="Sửa" class="btn1 btn btn-secondary">
                                                 <i class="fa-solid fa-pen-to-square"></i>
                                             </button>
-                                            <button onclick="deleteItem('@item.Id')" title="Xóa" class="@(item.BookType == BookType.PendingApproval || item.BookType == BookType.Hidden || item.BookType == BookType.Draft ? "" : "disabled") btn1 btn btn-secondary">
+                                            <button onclick="deleteItem('@item.Id')" title="Xóa" class="@(ViewBag.HiddenOrRemoveChapter && (item.BookType == BookType.PendingApproval || item.BookType == BookType.Hidden || item.BookType == BookType.Draft) ? "" : "disabled") btn1 btn btn-secondary">
                                                 <i class="fa-solid fa-trash"></i>
                                             </button>
-                                            <button onclick="hiddenItem('@item.Id','@item.BookType')" title="@(item.BookType == BookType.Hidden ? "Mở lại" : "Ẩn")" class="@(item.BookType == BookType.PendingApproval || item.BookType == BookType.Hidden || item.BookType == BookType.Draft ? "" : "disabled") btn1 btn btn-secondary">
+                                            <button onclick="hiddenItem('@item.Id','@item.BookType')" title="@(item.BookType == BookType.Hidden ? "Mở lại" : "Ẩn")" class="@(ViewBag.HiddenOrRemoveChapter && (item.BookType == BookType.PendingApproval || item.BookType == BookType.Hidden || item.BookType == BookType.Draft) ? "" : "disabled") btn1 btn btn-secondary">
                                                 <i class="fa-solid @(item.BookType == BookType.Hidden ? "fa-eye" : "fa-eye-slash")"></i>
                                             </button>
                                         </td>

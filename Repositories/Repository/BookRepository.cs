@@ -1489,7 +1489,11 @@ namespace Repositories.Repository
             var now = DateTime.UtcNow.AddHours(7);
             var dayOfweek = now.DayOfWeek;
             var dateNow = now.Date;
-            var startOfWeek = dateNow.AddDays(-(int)dayOfweek + 1);
+            var startOfWeek = dateNow.AddDays(-(int)dayOfweek + 1);  
+            if (dayOfweek == DayOfWeek.Sunday)
+            {
+                startOfWeek = dateNow.AddDays(-7);
+            }
             var endOfWeek = startOfWeek.AddDays(7);
 
             var asQuery = _lBSDbContext.UserBookViews.Where(c => c.CreateBy == userName && c.EndDate != DateTime.MinValue && c.CreateDate >= startOfWeek && c.CreateDate < endOfWeek).AsQueryable();
