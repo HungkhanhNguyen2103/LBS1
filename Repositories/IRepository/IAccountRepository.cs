@@ -26,6 +26,8 @@ namespace Repositories.Repository
         Task<ReponderModel<ReportModel>> ShortReport();
         Task<List<string>> GetRolesByUserName(string userName);
         Task<ReponderModel<bool>> CheckConfirmEmail(string userName);
+        Task<ReponderModel<string>> UpdateBankAccount(BankModel bank);
+        Task<ReponderModel<BankModel>> GetBankAccount(string userId);
 
     }
 }

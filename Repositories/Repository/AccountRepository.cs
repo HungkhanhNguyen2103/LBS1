@@ -726,6 +726,55 @@ namespace Repositories.Repository
             result.IsSussess = true;
             return result;
         }
+
+        public async Task<ReponderModel<string>> UpdateBankAccount(BankModel bank)
+        {
+            var result = new ReponderModel<string>();
+            if(bank == null || string.IsNullOrEmpty(bank.BankName))
+            {
+                result.Message = "Dữ liệu không hợp lệ";
+                return result;
+            }
+            var bankRow = await LBSDbContext.Banks.FirstOrDefaultAsync(c => c.UserId == bank.UserId);
+            if(bankRow == null)
+            {
+                bankRow = new Bank
+                {
+                    UserId = bank.UserId,
+                    BankName = bank.BankName,
+                    BankId = bank.BankId
+                };
+                LBSDbContext.Banks.Add(bankRow);
+            }
+            else
+            {
+                bankRow.BankId = bank.BankId;
+                bankRow.BankName = bank.BankName;   
+            }
+            await LBSDbContext.SaveChangesAsync();
+            result.Message = "Cập nhật thành công";
+            result.IsSussess = true;
+            return result;
+        }
+
+        public async Task<ReponderModel<BankModel>> GetBankAccount(string userId)
+        {
+            var result = new ReponderModel<BankModel>();
+            var item = await LBSDbContext.Banks.FirstOrDefaultAsync(c => c.UserId == userId);
+            if (item == null)
+            {
+                result.Message = "Không có dữ liệu";
+                return result;
+            }
+            result.Data = new BankModel
+            {
+                UserId = item.UserId,
+                BankId = item.BankId,
+                BankName = item.BankName
+            };
+            result.IsSussess = true;
+            return result;
+        }
     }
 
 

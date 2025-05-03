@@ -347,11 +347,11 @@ namespace Repositories.Repository
             else roomName = result.RoomName;
 
             var filter = Builders<Messenger>.Filter.And(
-                            Builders<Messenger>.Filter.Eq(c => c.RoomId, roomName),
-                            Builders<Messenger>.Filter.Or(
-                                Builders<Messenger>.Filter.Where(p => p.CreateBy == username),
-                                Builders<Messenger>.Filter.Where(p => p.To == username)
-                            )
+                            Builders<Messenger>.Filter.Eq(c => c.RoomId, roomName)
+                            //Builders<Messenger>.Filter.Or(
+                            //    Builders<Messenger>.Filter.Where(p => p.CreateBy == username),
+                            //    Builders<Messenger>.Filter.Where(p => p.To == username)
+                            //)
             );
             var messengers = await _mongoContext.Messengers.Find(filter).ToListAsync();
 
@@ -439,11 +439,11 @@ namespace Repositories.Repository
             }
 
             var filter = Builders<Messenger>.Filter.And(
-                                 Builders<Messenger>.Filter.Eq(c => c.RoomId, result.RoomName),
-                                 Builders<Messenger>.Filter.Or(
-                                     Builders<Messenger>.Filter.Where(p => p.CreateBy == result.AuthorUser),
-                                     Builders<Messenger>.Filter.Where(p => p.To == result.AuthorUser)
-                                 )
+                                 Builders<Messenger>.Filter.Eq(c => c.RoomId, result.RoomName)
+                                 //Builders<Messenger>.Filter.Or(
+                                 //    Builders<Messenger>.Filter.Where(p => p.CreateBy == result.AuthorUser),
+                                 //    Builders<Messenger>.Filter.Where(p => p.To == result.AuthorUser)
+                                 //)
                              );
             var messengers = await _mongoContext.Messengers.Find(filter).ToListAsync();
 

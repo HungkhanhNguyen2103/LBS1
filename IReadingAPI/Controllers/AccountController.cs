@@ -53,6 +53,22 @@ namespace LBSAPI.Controllers
             return rs;
         }
 
+        [Route("UpdateBankAccount")]
+        [HttpPost]
+        public async Task<ReponderModel<string>> UpdateBankAccount(BankModel bank)
+        {
+            var rs = await _accountRepository.UpdateBankAccount(bank);
+            return rs;
+        }
+
+        [Route("GetBankAccount")]
+        [HttpGet]
+        public async Task<ReponderModel<BankModel>> GetBankAccount(string userId)
+        {
+            var rs = await _accountRepository.GetBankAccount(userId);
+            return rs;
+        }
+
         [Route("GetListAccount")]
         [HttpGet]
         public async Task<ReponderModel<AccountModel>> GetListAccount(string role)

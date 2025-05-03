@@ -120,6 +120,15 @@ namespace LBSWeb.Controllers
         }
 
         [Authorize]
+        public async Task<IActionResult> BankInformation()
+        {
+            //var userName = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            //var result = await _accountService.GetInformation(userName);
+            //if (!result.IsSussess) _notyf.Error(result.Message);
+            return View();
+        }
+
+        [Authorize]
         [HttpPost]
         public async Task<IActionResult> UpdateInformation(AccountModel account)
         {

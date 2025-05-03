@@ -20,9 +20,9 @@
         margin-left:2rem;
     }
 </style>
-@* <button type="button" onclick="document.getElementById('formModal').reset();" class="btn btn-success" data-toggle="modal" data-target="#exampleModalPost">
-    Tạo mới
-</button> *@
+<button type="button" class="btn btn-success" data-toggle="modal" data-target="#exampleModal">
+    Đổi xu
+</button>
 <div class="row">
     <div class="col-12">
         <div class="card my-4">
@@ -39,51 +39,76 @@
         </div>
     </div>
 </div>
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <form id="formModal" class="modal-content" method="post" asp-action="UpdateCategory">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Quy đổi xu</h5>
+                <button type="button" class="btn close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div style="display:block" class="form-group input-group input-group-outline">
+                    <input style="width:100%" id="revenue" type="number" class="form-control" value="0" required>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-primary">Quy đổi</button>
+            </div>
+        </form>
+    </div>
+</div>
+
 <script type="text/javascript">
     document.getElementById('StatisticsId').classList.add('active');
-    GetChart();
-    function GetChart() {
-        let ctx = document.getElementById('myChart');
-        $.ajax(
-            {
-                url: `/Admin/StatisticsBook`,
-                type: "GET",
-                headers:
-                {
-                    "RequestVerificationToken": '@GetAntiXsrfRequestToken()'
-                },
-                //data: formData,
-                //dataType: "json",
-                async: true,
-                processData: false,
-                contentType: false,
-                success: function (data) {
-                    //console.log(data);
+    // function GetTotalRevenue(){
 
-                    new Chart(ctx, {
-                        type: 'bar',
-                        data: {
-                            labels: data.label,
-                            datasets: [{
-                                label: data.title,
-                                data: data.data,
-                                borderWidth: 1
-                            }]
-                        },
-                        options: {
-                            scales: {
-                                y: {
-                                    beginAtZero: true,
-                                    ticks: {
-                                        stepSize: 1
-                                    }
-                                }
-                            }
-                        }
-                    });
-                }
-            }
-        );
+    // }
+    // GetChart();
+    // function GetChart() {
+    //     let ctx = document.getElementById('myChart');
+    //     $.ajax(
+    //         {
+    //             url: `/Admin/StatisticsBook`,
+    //             type: "GET",
+    //             headers:
+    //             {
+    //                 "RequestVerificationToken": '@GetAntiXsrfRequestToken()'
+    //             },
+    //             //data: formData,
+    //             //dataType: "json",
+    //             async: true,
+    //             processData: false,
+    //             contentType: false,
+    //             success: function (data) {
+    //                 //console.log(data);
 
-    }
+    //                 new Chart(ctx, {
+    //                     type: 'bar',
+    //                     data: {
+    //                         labels: data.label,
+    //                         datasets: [{
+    //                             label: data.title,
+    //                             data: data.data,
+    //                             borderWidth: 1
+    //                         }]
+    //                     },
+    //                     options: {
+    //                         scales: {
+    //                             y: {
+    //                                 beginAtZero: true,
+    //                                 ticks: {
+    //                                     stepSize: 1
+    //                                 }
+    //                             }
+    //                         }
+    //                     }
+    //                 });
+    //             }
+    //         }
+    //     );
+
+    // }
 </script>

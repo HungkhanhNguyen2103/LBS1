@@ -89,8 +89,8 @@
                                     </td>
                                     <td class="text-left align-middle" style="padding-left:1.5rem">
                                         <span class="text-secondary text-xs font-weight-bold">@(item.ChapterName.Length > 35 ? item.ChapterName.Substring(0, 35) + "..." : item.ChapterName)
-                                            <span style="margin-left:5px" class="@(item.BookType == BookType.Payment ? "status-payment" : item.BookType == BookType.Free ? "status-free" : item.BookType == BookType.PendingApproval || item.BookType == BookType.Hidden || item.BookType == BookType.Draft ? "status-pending" : "status-decline")">
-                                            @(item.BookType == BookType.Payment ? "Trả phí" : item.BookType == BookType.Free ? "Miễn phí" : item.BookType == BookType.PendingApproval ? "Chờ duyệt" : item.BookType == BookType.Hidden ? "Ẩn chương" : item.BookType == BookType.Draft ? "Bản thảo" : "Hủy duyệt")
+                                            <span style="margin-left:5px" class="@(item.BookType == BookType.Payment ? "status-payment" : item.BookType == BookType.Free ? "status-free" : item.BookType == BookType.PendingApproval || item.BookType == BookType.Hidden || item.BookType == BookType.Draft || item.BookType == BookType.LoadingEdit ? "status-pending" : "status-decline")">
+                                            @(item.BookType == BookType.Payment ? "Trả phí" : item.BookType == BookType.Free ? "Miễn phí" : item.BookType == BookType.PendingApproval ? "Chờ duyệt" : item.BookType == BookType.Hidden ? "Ẩn chương" : item.BookType == BookType.Draft ? "Bản thảo" : item.BookType == BookType.LoadingEdit ? "Chờ cập nhật" : "Hủy duyệt")
                                         </span>
                                         <span style="margin-left:5px" class="@(item.AudioUrl == "Audio" ? "status-free" : "d-none")">
                                             @item.AudioUrl

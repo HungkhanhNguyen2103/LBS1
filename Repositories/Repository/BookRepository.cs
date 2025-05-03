@@ -742,58 +742,64 @@ namespace Repositories.Repository
                 result.Message = "Sách không tồn tại";
                 return result;
             }
-            
+
+            bookChapter.BookType = BookType.PendingApproval;
+
             // chuyen trang thai dang cap nhat
-            if (bookChapter.Type == 3)
-            {
-                if (book.Status != BookStatus.PendingPublication && book.Status != BookStatus.PendingPublication && (bookChapterRow.BookType == BookType.Free || bookChapterRow.BookType == BookType.Payment))
-                {
-                    bookChapter.BookType = BookType.LoadingEdit;
+            //if (bookChapter.Type == 3)
+            //{
+            //    if (book.Status != BookStatus.PendingPublication && book.Status != BookStatus.PendingPublication && (bookChapterRow.BookType == BookType.Free || bookChapterRow.BookType == BookType.Payment))
+            //    {
+            //        bookChapter.BookType = BookType.LoadingEdit;
 
-                    var bookChapterPending = new BookChapterPending
-                    {
-                        ChapterId = bookChapter.Id,
-                        ChapterNumber = bookChapter.ChapterNumber,
-                        ChapterName = bookChapter.ChapterName,
-                        Content = bookChapter.Content,
-                        ModifyDate = DateTime.UtcNow,
-                        Summary = bookChapter.Summary,
-                        WordNo = bookChapter.WordNo
-                    };
+            //        var bookChapterPending = new BookChapterPending
+            //        {
+            //            ChapterId = bookChapter.Id,
+            //            ChapterNumber = bookChapter.ChapterNumber,
+            //            ChapterName = bookChapter.ChapterName,
+            //            Content = bookChapter.Content,
+            //            ModifyDate = DateTime.UtcNow,
+            //            Summary = bookChapter.Summary,
+            //            WordNo = bookChapter.WordNo
+            //        };
 
-                    await _mongoContext.BookChapterPendings.InsertOneAsync(bookChapterPending);
+            //        await _mongoContext.BookChapterPendings.InsertOneAsync(bookChapterPending);
 
-                    var bookChapterLog1 = await _mongoContext.BookChapterLogs.Find(c => c.ChapterId == bookChapter.Id).FirstOrDefaultAsync();
-                    if (bookChapterLog1 == null)
-                    {
-                        bookChapterLog1 = new BookChapterLog
-                        {
-                            ChapterId = bookChapter.Id,
-                            CommentAI = bookChapter.CommentAI,
-                            InappropriateWords = bookChapter.InappropriateWords
-                        };
-                        await _mongoContext.BookChapterLogs.InsertOneAsync(bookChapterLog1);
-                    }
-                    else
-                    {
-                        var filterLog1 = Builders<BookChapterLog>.Filter.Eq(c => c.ChapterId, bookChapter.Id);
+            //        var bookChapterLog1 = await _mongoContext.BookChapterLogs.Find(c => c.ChapterId == bookChapter.Id).FirstOrDefaultAsync();
+            //        if (bookChapterLog1 == null)
+            //        {
+            //            bookChapterLog1 = new BookChapterLog
+            //            {
+            //                ChapterId = bookChapter.Id,
+            //                CommentAI = bookChapter.CommentAI,
+            //                InappropriateWords = bookChapter.InappropriateWords
+            //            };
+            //            await _mongoContext.BookChapterLogs.InsertOneAsync(bookChapterLog1);
+            //        }
+            //        else
+            //        {
+            //            var filterLog1 = Builders<BookChapterLog>.Filter.Eq(c => c.ChapterId, bookChapter.Id);
 
-                        var updateLog1 = Builders<BookChapterLog>.Update
-                                .Set(c => c.CommentAI, bookChapter.CommentAI)
-                                .Set(c => c.InappropriateWords, bookChapter.InappropriateWords);
+            //            var updateLog1 = Builders<BookChapterLog>.Update
+            //                    .Set(c => c.CommentAI, bookChapter.CommentAI)
+            //                    .Set(c => c.InappropriateWords, bookChapter.InappropriateWords);
 
-                        await _mongoContext.BookChapterLogs.UpdateOneAsync(filterLog1, updateLog1);
-                    }
+            //            await _mongoContext.BookChapterLogs.UpdateOneAsync(filterLog1, updateLog1);
+            //        }
 
+            //        var updateChapterType = Builders<BookChapter>.Update
+            //                .Set(c => c.BookType, bookChapter.BookType);
 
-                    result.Message = "Cập nhật thành công";
-                    result.IsSussess = true;
+            //        await _mongoContext.BookChapters.UpdateOneAsync(filter, updateChapterType);
 
-                    return result;
-                }
+            //        result.Message = "Cập nhật thành công";
+            //        result.IsSussess = true;
 
-                else bookChapter.BookType = BookType.Draft;
-            }
+            //        return result;
+            //    }
+
+            //    else bookChapter.BookType = BookType.Draft;
+            //}
 
             // chuyen trang thai dang cap nhat
             //if (bookChapter.Type == 3 && (bookChapterRow.BookType == BookType.Free || bookChapterRow.BookType == BookType.Payment))
@@ -877,6 +883,16 @@ namespace Repositories.Repository
                 };
                 result.DataList.Add(draft);
             }
+
+            //var resultBookChapterPending = new ReponderModel<DraftModel>();
+            //var filterBcp = Builders<BookChapterPending>.Filter.And(
+            //    Builders<BookChapterPending>.Filter.Where(p => p.CreateBy == userName)
+            //);
+            ////var sort = Builders<BookChapter>.Sort.Descending(x => x.ModifyDate);
+            //var resBcp = await _mongoContext.BookChapterPendings.Find(filterBcp).ToListAsync();
+
+            //for
+
             return result;
         }
 
@@ -2329,7 +2345,7 @@ namespace Repositories.Repository
             }
 
             var isExpireMemberShip = await CheckExpireMemberShip(username);
-            var paidBook = await _lBSDbContext.UserTranscationBooks.FirstOrDefaultAsync(c => c.BookId == bookId && string.IsNullOrEmpty(c.ChapterId));
+            var paidBook = await _lBSDbContext.UserTranscationBooks.FirstOrDefaultAsync(c => c.BookId == bookId && string.IsNullOrEmpty(c.ChapterId) && c.UserName == username);
             
             //mua full sách
             if(paidBook != null)

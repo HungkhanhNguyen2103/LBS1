@@ -16,6 +16,8 @@
         public static string ACCOUNT_RE_CONFIRM_EMAIL = "api/Account/ReConfirmEmail";
         public static string ACCOUNT_LOGIN_WITH_GOOGLE = "api/Account/LoginWithGoogle";
         public static string ACCOUNT_GET_LIST = "api/Account/GetListAccount";
+        public static string ACCOUNT_UPDATE_BANK = "api/Account/UpdateBankAccount";
+        public static string ACCOUNT_GET_BANK = "api/Account/GetBankAccount";
 
         //Book
         public static string CATEGORY_GET_ALL = "api/Book/GetCategories";

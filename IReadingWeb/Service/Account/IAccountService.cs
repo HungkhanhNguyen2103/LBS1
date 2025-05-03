@@ -17,5 +17,7 @@ namespace LBSWeb.Services.Account
         Task<ReponderModel<string>> UpdateInformation(AccountModel account);
         Task<ReponderModel<string>> LoginWithGoogle(string email,string fullname);
         Task<ReponderModel<AccountModel>> GetListAccount(string role);
+        Task<ReponderModel<string>> UpdateBankAccount(BankModel bank);
+        Task<ReponderModel<BankModel>> GetBankAccount(string userId);
     }
 }

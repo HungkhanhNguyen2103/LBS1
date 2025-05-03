@@ -411,6 +411,7 @@
                         </button>
                         <div class="dropdown-menu">
                             <a class="dropdown-item" href="/Account/AccountInformation">Thông tin cá nhân</a>
+                            <a class="dropdown-item d-none" href="/Account/BankInformation">Liên kết ngân hàng</a>
                             <a class="dropdown-item" href="/Account/ChangeAccount">Đổi mật khẩu</a>
                             <a class="dropdown-item" href="/Account/Logout">Đăng xuất</a>
                             @* <button class="dropdown-item" onclick="disconnect($('#RoomName').val())">Đăng xuất</button> *@
@@ -508,10 +509,11 @@
                         //console.log(data);
                         let container = document.getElementById("chatMessages");
                         data.messagers.forEach(item => {
+                            //console.log(item);
                             if (item.createBy == userName) {
                                 clientMessageDiv(item.content);
                             }
-                            else if (item.to == userName) {
+                            else if (item.createBy == "manager" || item.createBy == "admin") {
                                 retriveMessageDiv(item.content);
                             }
                         });

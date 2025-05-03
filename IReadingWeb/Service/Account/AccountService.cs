@@ -4,6 +4,7 @@ using LBSWeb.API;
 using LBSWeb.Common;
 using Newtonsoft.Json.Linq;
 using System.Data;
+using static OpenAI.ObjectModels.StaticValues.AssistantsStatics.MessageStatics;
 
 namespace LBSWeb.Services.Account
 {
@@ -274,6 +275,45 @@ namespace LBSWeb.Services.Account
                 var param = new Dictionary<string, string>();
                 param.Add("role", role);
                 res = await _api.Get<ReponderModel<AccountModel>>(url, param);
+
+            }
+            catch (Exception ex)
+            {
+                res.Message = "Lỗi gọi api!";
+            }
+            return res;
+        }
+
+        public async Task<ReponderModel<string>> UpdateBankAccount(BankModel model)
+        {
+            var res = new ReponderModel<string>();
+            if (model == null)
+            {
+                res.Message = "Thông tin không hợp lệ!";
+                return res;
+            }
+            try
+            {
+                string url = PathUrl.ACCOUNT_UPDATE_BANK;
+                res = await _api.Post<ReponderModel<string>>(url, model);
+
+            }
+            catch (Exception ex)
+            {
+                res.Message = "Lỗi gọi api!";
+            }
+            return res;
+        }
+
+        public async Task<ReponderModel<BankModel>> GetBankAccount(string userId)
+        {
+            var res = new ReponderModel<BankModel>();
+            try
+            {
+                string url = PathUrl.ACCOUNT_GET_BANK;
+                var param = new Dictionary<string, string>();
+                param.Add("userId", userId);
+                res = await _api.Get<ReponderModel<BankModel>>(url, param);
 
             }
             catch (Exception ex)
