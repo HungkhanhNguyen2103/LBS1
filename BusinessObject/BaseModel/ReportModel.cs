@@ -10,7 +10,8 @@ namespace BusinessObject.BaseModel
     {
         public int TotalAccount { get; set; }
         public int TotalCategory { get; set; }
-        public int TotalBookPending { get; set; }
-        public int TotalBookPublish { get; set; }
+        public int TotalBook { get; set; }
+        public int Revenue { get; set; }
+        public string RevenueFormat { get; set; }
     }
 }

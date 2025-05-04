@@ -368,6 +368,24 @@ namespace LBSWeb.Service.Information
             return res;
         }
 
+        public async Task<ReponderModel<StatisticBookModel>> StatisticBook(string username)
+        {
+            var res = new ReponderModel<StatisticBookModel>();
+            try
+            {
+                string url = PathUrl.INFO_STATISTIC_BOOK;
+                var param = new Dictionary<string, string>();
+                param.Add("username", username);
+                res = await _api.Get<ReponderModel<StatisticBookModel>>(url, param);
+
+            }
+            catch (Exception ex)
+            {
+                res.Message = "Lỗi gọi api!";
+            }
+            return res;
+        }
+
         public async Task<ReponderModel<string>> UpdateBasicKnowledge(BasicKnowledge model)
         {
             var res = new ReponderModel<string>();

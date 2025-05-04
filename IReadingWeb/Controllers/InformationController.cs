@@ -324,7 +324,7 @@ namespace IReadingWeb.Controllers
             if (result.IsSussess)
             {
                 _notyf.Success(result.Message);
-                return RedirectToAction("ListBasicKnowledge");
+                return Redirect($"/Information/ListBasicKnowledge?category={model.Category}");
             }
             else
             {
@@ -371,6 +371,18 @@ namespace IReadingWeb.Controllers
             var result = await _informationService.GetListMessageByRoom(roomName);
             return Json(result.Data);
         }
+
+        [Authorize(Roles = $"{Role.Manager},{Role.Author},{Role.Admin}")]
+        [Route("Statistics")]
+        public async Task<IActionResult> Statistics()
+        {
+            var username = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            var result = await _informationService.StatisticBook(username);
+            ViewBag.Statistics = result.DataList;
+            ViewBag.SumRevenue = result.DataList.Sum(c => c.Revenue);
+            return View();
+        }
+
 
         [Authorize(Roles = $"{Role.Author},{Role.Admin}")]
         [Route("GetRoomChat")]

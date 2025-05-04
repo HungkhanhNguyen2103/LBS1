@@ -11,6 +11,7 @@ using System.Net;
 using System.Reflection.Metadata;
 using MongoDB.Driver;
 using HtmlAgilityPack;
+using Org.BouncyCastle.Crypto;
 
 namespace Repositories.Repository
 {
@@ -575,9 +576,75 @@ namespace Repositories.Repository
             return !string.IsNullOrWhiteSpace(text);
         }
 
-        public Task<ReponderModel<StatisticBookModel>> StatisticAuthorBook(int id)
+        public async Task<ReponderModel<StatisticBookModel>> StatisticBook(string username)
         {
-            throw new NotImplementedException();
+            var result = new ReponderModel<StatisticBookModel>();
+            var roles = await _accountRepository.GetRolesByUserName(username);
+            var books = new List<Book>();
+            if (roles.Contains("Author"))
+            {
+                books = await _lBSDbContext.Books.Where(c => c.CreateBy == username).ToListAsync();
+            }
+            else if (roles.Contains("Manager") || roles.Contains("Admin"))
+            {
+                books = await _lBSDbContext.Books.ToListAsync();
+            }
+            else
+            {
+                result.Message = "Bạn không có quyền truy cập";
+                return result;
+            }
+            try
+            {
+                //var books = await _lBSDbContext.Books.Where(c => c.CreateBy == username).ToListAsync();
+                var ids = books.Select(c => c.Id).ToList();
+                var userBookNos = await _lBSDbContext.UserBooks.Where(c => ids.Contains(c.BookId) && c.BookType == UserBookType.Favourite).ToListAsync();
+                var viewNos = await _lBSDbContext.UserBookViews.Where(c => ids.Contains(c.BookId) && c.EndDate != DateTime.MinValue).ToListAsync();
+                var ratings = await _lBSDbContext.Comments.Where(c => ids.Contains(c.BookId)).ToListAsync();
+
+                var revenueBooks = await _lBSDbContext.UserTranscationBooks.Where(c => ids.Contains(c.BookId.Value)).ToListAsync();
+
+                foreach (var item in books)
+                {
+                    var userBookNo = userBookNos.Where(c => c.BookId == item.Id).Count();
+                    var viewNo = viewNos.Where(c => c.BookId == item.Id).ToList();
+                    var rating = ratings.Where(c => c.BookId == item.Id).ToList();
+
+                    var filter = Builders<BookChapter>.Filter.And(
+                            Builders<BookChapter>.Filter.Where(p => p.BookId == item.Id)
+                            );
+
+                    var listChapter = await _mongoContext.BookChapters.Find(filter).ToListAsync();
+
+                    var revenueBook = revenueBooks.Where(c => c.BookId == item.Id).Sum(c => c.Amount);
+                    var statistic = new StatisticBookModel
+                    {
+                        BookId = item.Id,
+                        BookName = item.Name,
+                        Poster = item.Poster,
+                        Author = item.CreateBy,
+                        Status = BookStatusName.ListBookStatus[(int)item.Status],
+                        UserName = username,
+                        FavouriteNo = userBookNo,
+                        ViewReadNo = viewNo.Where(c => c.BookTypeStatus == BookTypeStatus.Read).Count(),
+                        ViewListenNo = viewNo.Where(c => c.BookTypeStatus == BookTypeStatus.Voice).Count(),
+                        RatingNo = rating.Count(),
+                        SumRating = rating.Sum(c => c.Rating),
+                        Rating = rating.Count > 0 ? rating.Average(c => c.Rating) : rating.Count,
+                        TotalChapter = listChapter.Count(),
+                        Revenue = revenueBook
+                    };
+                    result.DataList.Add(statistic);
+                }
+                result.DataList = result.DataList.OrderByDescending(c => c.Revenue).ToList();
+                result.IsSussess = true;
+            }
+            catch (Exception ex)
+            {
+                result.Message = ex.Message;
+            }
+
+            return result;
         }
     }
 }

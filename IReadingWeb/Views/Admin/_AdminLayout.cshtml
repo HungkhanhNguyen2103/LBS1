@@ -253,6 +253,14 @@
                                 <span class="nav-link-text ms-1">@(claims.IsInRole("Manager") || claims.IsInRole("Admin") ? "Kho sách" : "Đã đăng")</span>
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-white" id="StatisticsId" href="/Information/Statistics">
+                                <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
+                                    <i class="material-icons opacity-10">pie_chart</i>
+                                </div>
+                                <span class="nav-link-text ms-1">Thống kê</span>
+                            </a>
+                        </li>
                         @if (claims.IsInRole("Author") || claims.IsInRole("Admin"))
                         {
                             <li class="nav-item">
@@ -261,14 +269,6 @@
                                         <i class="material-icons opacity-10">upload_file</i>
                                     </div>
                                     <span class="nav-link-text ms-1">Thêm mới</span>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-white" id="StatisticsId" href="/Admin/Statistics">
-                                    <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
-                                        <i class="material-icons opacity-10">pie_chart</i>
-                                    </div>
-                                    <span class="nav-link-text ms-1">Thống kê</span>
                                 </a>
                             </li>
                         }

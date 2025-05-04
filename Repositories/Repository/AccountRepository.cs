@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Repositories.IRepository;
 using System.Data;
+using System.Globalization;
 using System.Security.Claims;
 
 namespace Repositories.Repository
@@ -678,8 +679,11 @@ namespace Repositories.Repository
             var result = new ReportModel();
             result.TotalCategory = await LBSDbContext.Categories.CountAsync();
             result.TotalAccount = await _userManager.Users.CountAsync();
-            result.TotalBookPending = await LBSDbContext.Books.Where(c => c.Status == BookStatus.PendingPublication).CountAsync();
-            result.TotalBookPublish = await LBSDbContext.Books.Where(c => c.Status == BookStatus.Published).CountAsync();
+            result.TotalBook = await LBSDbContext.Books.CountAsync();
+            result.Revenue = await LBSDbContext.UserTranscations.SumAsync(c => c.Price);
+
+            CultureInfo cul = CultureInfo.GetCultureInfo("vi-VN");
+            result.RevenueFormat = double.Parse(result.Revenue.ToString()).ToString("#,###", cul.NumberFormat);
             res.Data = result;
             res.IsSussess = true;
             return res;

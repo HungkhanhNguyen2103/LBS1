@@ -1,0 +1,131 @@
+﻿@{
+    Layout = "~/Views/Admin/_AdminLayout.cshtml";
+}
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Xsrf
+@functions {
+    public string GetAntiXsrfRequestToken()
+    {
+        return Xsrf.GetAndStoreTokens(Context).RequestToken;
+    }
+}
+<style>
+    .btn1 {
+        height: 30px;
+        width: 30px;
+        padding: 0;
+        margin: 0;
+    }
+
+    .title{
+        margin-left:2rem;
+    }
+</style>
+<button type="button" class="btn btn-success d-none" data-toggle="modal" data-target="#exampleModal">
+    Đổi xu
+</button>
+<div class="row">
+    <div class="col-12">
+        <div class="card my-4">
+            <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
+                <div class="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3">
+                    <h6 class="text-white text-capitalize ps-3">Thống kê</h6>
+                    <span class="ps-3 text-white" style="font-size:12px">Tổng doanh thu: @ViewBag.SumRevenue xu</span>
+                </div>
+            </div>
+            <div class="card-body px-0 pb-2">
+                <div class="table-responsive p-0" style="padding:1rem !important">
+                    <table id="table" class="table align-items-center mb-0">
+                        <thead>
+                            <tr>
+                                <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Sách</th>
+                                @if (User.IsInRole("Manager") || User.IsInRole("Admin"))
+                                {
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Tác giả</th>
+                                }
+                                <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Lượt xem ( Đọc - Nghe )</th>
+                                <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Lượt thích</th>
+                                <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Đánh giá</th>
+                                <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Tổng số chương</th>
+                                <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Doanh thu (xu)</th>
+                                @* <th class="text-uppercase text-center text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Thời gian</th> *@
+                                @* <th class="text-center text-secondary opacity-7"></th> *@
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (StatisticBookModel item in ViewBag.Statistics)
+                            {
+                                <tr>
+                                    <td>
+                                        <div class="d-flex">
+                                            <img src="@item.Poster" class="avatar avatar-sm me-3" style="border-radius:5px;width:50px!important;height:50px!important" alt="">
+                                            <div>
+                                                <p id="name-@item.BookId" class="text-l font-weight-bold mb-0">@(item.BookName.Length > 35 ? item.BookName.Substring(0, 35) + "..." : item.BookName)</p>
+                                                <span class="text-secondary text-xs">@item.Status </span>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    @if (User.IsInRole("Manager") || User.IsInRole("Admin"))
+                                    {
+                                        <td style="padding-left:1.5rem">
+                                            <span class="text-secondary text-xs font-weight-bold">@item.Author</span>
+                                        </td>
+                                    }
+
+                                    <td class="text-center">
+                                        <span class="text-secondary text-xs font-weight-bold">@(item.ViewReadNo + item.ViewListenNo) ( @item.ViewReadNo - @item.ViewListenNo )</span>
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="text-secondary text-xs font-weight-bold">@item.FavouriteNo</span>
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="text-secondary text-xs font-weight-bold">@item.Rating ( @item.SumRating - @item.RatingNo )</span>
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="text-secondary text-xs font-weight-bold">@item.TotalChapter</span>
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="text-secondary text-xs font-weight-bold">@item.Revenue</span>
+                                    </td>
+@*                                     <td class="align-middle text-center">
+                                    </td> *@
+                                </tr>
+                            }
+
+                        </tbody>
+                    </table>
+                    @* <canvas id="myChart"></canvas> *@
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <form id="formModal" class="modal-content" method="post" asp-action="UpdateCategory">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Quy đổi xu</h5>
+                <button type="button" class="btn close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div style="display:block" class="form-group input-group input-group-outline">
+                    <input style="width:100%" id="revenue" type="number" class="form-control" value="0" required>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-primary">Quy đổi</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script type="text/javascript">
+    document.getElementById('StatisticsId').classList.add('active');
+
+    new DataTable('#table', {
+        responsive: true,
+        order: [[6, 'desc']]
+    })
+</script>

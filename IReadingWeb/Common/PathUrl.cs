@@ -74,6 +74,7 @@
         public static string INFO_CREATE_USERREPORT = "api/Information/CreateUserReport";
         public static string INFO_SEND_MESSAGE = "api/Information/SendMessage";
         public static string INFO_DETAIL_USERREPORT = "api/Information/UserReport";
+        public static string INFO_STATISTIC_BOOK = "api/Information/StatisticBook";
         public static string INFO_CLOSE_USERREPORT = "api/Information/CloseUserReport";
         public static string INFO_OPEN_USERREPORT = "api/Information/OpenUserReport";
         public static string INFO_GET_LISTMESSAGE = "api/Information/GetListMessageByRoom";

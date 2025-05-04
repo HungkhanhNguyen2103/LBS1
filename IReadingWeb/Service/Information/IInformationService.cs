@@ -28,5 +28,6 @@ namespace LBSWeb.Service.Information
         Task<ReponderModel<RoomModel>> GetListMessageByRoom(string roomName);
         Task<ReponderModel<string>> CreateUserReportComment(UserReportComment comment);
         Task<ReponderModel<UserReportCommentModel>> GetListUserReportComment(int userReportId);
+        Task<ReponderModel<StatisticBookModel>> StatisticBook(string username);
     }
 }

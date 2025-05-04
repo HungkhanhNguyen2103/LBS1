@@ -29,6 +29,8 @@ namespace BusinessObject
         public string? InappropriateWords { get; set; }
         [BsonIgnore]
         public string? CommentAI { get; set; }
+        [BsonIgnore]
+        public int Revenue { get; set; }
         public int Price { get; set; }
         public string? CreateBy { get; set; }
         public string? UserId { get; set; }

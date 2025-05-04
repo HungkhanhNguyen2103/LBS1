@@ -37,7 +37,7 @@ namespace Repositories.IRepository
         Task<ReponderModel<NoteManager>> GetListNoteManager();
         Task<ReponderModel<UserProfileModel>> GetUserProfile(string username);
         //Task<ReponderModel<NoteManager>> UpdateNoteManager(NoteManager model);
-        Task<ReponderModel<StatisticBookModel>> StatisticAuthorBook(int id);
+        Task<ReponderModel<StatisticBookModel>> StatisticBook(string username);
 
 
     }

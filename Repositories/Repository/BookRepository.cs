@@ -332,48 +332,64 @@ namespace Repositories.Repository
         public async Task<ReponderModel<BookViewModel>> GetAllBookByUser(string userName)
         {
             var result = new ReponderModel<BookViewModel>();
-            var roles = await _accountRepository.GetRolesByUserName(userName);
-
-            if (roles.Count == 0)
+            try
             {
-                roles = new List<string> { Role.Visitor };
+                var roles = await _accountRepository.GetRolesByUserName(userName);
+
+                if (roles.Count == 0)
+                {
+                    roles = new List<string> { Role.Visitor };
+                }
+
+                var listBook = new List<Book>();
+
+                if (roles.Contains(Role.Author))
+                {
+                    listBook = await _lBSDbContext.Books.Where(c => c.CreateBy == userName).ToListAsync();
+                }
+                else if (roles.Contains(Role.Manager))
+                {
+                    listBook = await _lBSDbContext.Books.ToListAsync();
+                }
+                else if (roles.Contains(Role.Admin))
+                {
+                    listBook = await _lBSDbContext.Books.ToListAsync();
+                }
+                else if (roles.Contains(Role.Visitor))
+                {
+                    listBook = await _lBSDbContext.Books.Where(c => c.Status == BookStatus.Done || c.Status == BookStatus.Published || c.Status == BookStatus.Continue).ToListAsync();
+                }
+
+
+                result.DataList = new List<BookViewModel>();
+                foreach (var item in listBook)
+                {
+                    try
+                    {
+                        var bookChapter = await GetNewChapterPulished(item);
+                        bookChapter.Id = item.Id;
+                        bookChapter.Name = item.Name;
+                        bookChapter.Poster = item.Poster;
+                        bookChapter.Author = item.CreateBy;
+                        bookChapter.Status = item.Status;
+                        //bookChapter.
+                        result.DataList.Add(bookChapter);
+                    }
+                    catch (Exception)
+                    {
+                        continue;
+                    }
+
+                }
+                result.DataList = result.DataList.OrderByDescending(c => c.NewPulishedDateTimeFormat).ToList();
+
+                result.IsSussess = true;
+            }
+            catch (Exception ex)
+            {
+                result.Message = ex.Message;
             }
 
-            var listBook = new List<Book>();
-
-            if (roles.Contains(Role.Author))
-            {
-                listBook = await _lBSDbContext.Books.Where(c => c.CreateBy == userName).ToListAsync();
-            }
-            else if (roles.Contains(Role.Manager))
-            {
-                listBook = await _lBSDbContext.Books.ToListAsync();
-            }
-            else if (roles.Contains(Role.Admin))
-            {
-                listBook = await _lBSDbContext.Books.ToListAsync();
-            }
-            else if (roles.Contains(Role.Visitor))
-            {
-                listBook = await _lBSDbContext.Books.Where(c => c.Status == BookStatus.Done || c.Status == BookStatus.Published || c.Status == BookStatus.Continue).ToListAsync();
-            }
-
-
-            result.DataList = new List<BookViewModel>();
-            foreach (var item in listBook)
-            {
-                var bookChapter = await GetNewChapterPulished(item);
-                bookChapter.Id = item.Id;
-                bookChapter.Name = item.Name;
-                bookChapter.Poster = item.Poster;
-                bookChapter.Author = item.CreateBy;
-                bookChapter.Status = item.Status;
-                //bookChapter.
-                result.DataList.Add(bookChapter);
-            }
-            result.DataList = result.DataList.OrderByDescending(c => c.NewPulishedDateTimeFormat).ToList();
-
-            result.IsSussess = true;
 
             return result;
         }
@@ -594,6 +610,7 @@ namespace Repositories.Repository
                 Type = c.Type,
                 UserId = c.UserId,
                 ViewNo = GetViewNo(c.Id),
+                Revenue = GetRevenueChapter(c.Id),
                 WordNo = c.WordNo
             }).ToList();
 
@@ -602,6 +619,11 @@ namespace Repositories.Repository
             return result;
         }
 
+        private int GetRevenueChapter(string chapterId)
+        {
+            var data = _lBSDbContext.UserTranscationBooks.Where(c => c.ChapterId == chapterId).Sum(c => c.Amount);
+            return data;
+        }
         private int GetViewNo(string chapterId)
         {
             var data = _lBSDbContext.UserBookViews.Where(c => c.ChapterId == chapterId).Count();
