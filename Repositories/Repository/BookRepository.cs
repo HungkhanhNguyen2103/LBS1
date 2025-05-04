@@ -1373,6 +1373,7 @@ namespace Repositories.Repository
                 BookId = c.BookId,
                 Content = c.Content,
                 FullName = c.User.FullName,
+                Avatar = string.IsNullOrEmpty(c.User.Avatar) ? "https://i.imgur.com/XHyiaIf.png" : c.User.Avatar,
                 CreateDate = GetRelativeTime(c.CreateDate),
                 Rating = c.Rating
             }).ToList();
