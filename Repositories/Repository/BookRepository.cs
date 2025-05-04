@@ -2312,8 +2312,14 @@ namespace Repositories.Repository
             var filter = Builders<BookChapterVoice>.Filter.Eq(c => c.ChapterId, model.ChapterId);
             var update = Builders<BookChapterVoice>.Update
                         .Set(c => c.Price, model.Price);
-
+                        
             await _mongoContext.BookChapterVoices.UpdateOneAsync(filter, update);
+
+            var filterBookChapter = Builders<BookChapter>.Filter.Eq(c => c.Id, model.ChapterId);
+            var updateBookChapter = Builders<BookChapter>.Update
+                        .Set(c => c.AudioUrl, "Audio");
+            await _mongoContext.BookChapters.UpdateOneAsync(filterBookChapter, updateBookChapter);
+
             result.Message = "Cập nhật thành công";
             result.IsSussess = true;
             return result;
