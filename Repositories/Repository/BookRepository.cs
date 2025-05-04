@@ -465,7 +465,9 @@ namespace Repositories.Repository
                 await _mongoContext.BookChapters.UpdateManyAsync(filter, update);
             }
 
-            if (bookChapter.Type == 3 && (book.Status == BookStatus.PendingPublication || book.Status == BookStatus.PendingApproval)) bookChapter.BookType = BookType.Draft;
+            if(bookChapter.Type == 3) bookChapter.BookType = BookType.Draft;
+
+            //if (bookChapter.Type == 3 && (book.Status == BookStatus.PendingPublication || book.Status == BookStatus.PendingApproval)) bookChapter.BookType = BookType.Draft;
 
             //insert to book chapter
 
@@ -828,7 +830,7 @@ namespace Repositories.Repository
             //{
 
             //}
-
+            if (bookChapter.Type == 3) bookChapter.BookType = BookType.Draft;
             var update = Builders<BookChapter>.Update
                         .Set(c => c.ChapterName, bookChapter.ChapterName)
                         .Set(c => c.ChapterNumber, bookChapter.ChapterNumber)

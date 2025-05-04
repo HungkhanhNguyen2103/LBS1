@@ -452,7 +452,7 @@ namespace LBSWeb.Controllers
             var book = await _bookService.GetBook(bookId);
             var item = book.Data;
             ViewBag.ButtonAddChapter = item.Status == BookStatus.Done || (item.BookTypePrice == BookTypePrice.PayByBook && item.Status == BookStatus.PendingApproval) ? "disabled" : "";
-            ViewBag.ButtonFinish = item.Status == BookStatus.Done || (item.BookTypePrice == BookTypePrice.PayByBook && item.Status == BookStatus.PendingApproval) ? "disabled" : "";
+            ViewBag.ButtonFinish = item.BookTypePrice == BookTypePrice.PayByChapter || item.Status == BookStatus.Done || (item.BookTypePrice == BookTypePrice.PayByBook && item.Status == BookStatus.PendingApproval) ? "disabled" : "";
             var result = await _bookService.GetListBookChapter(bookId);
             ViewBag.ChapterBooks = result.DataList;
             ViewBag.HiddenOrRemoveChapter = item.Status == BookStatus.PendingPublication || item.Status == BookStatus.PendingApproval ? true : false;
