@@ -189,7 +189,7 @@
     document.getElementById('loadingDivFeedBack').classList.add('d-none');
     // document.getElementById('CreatBookId').classList.add('active');
     
-    const htmlContent = '@Html.Raw(Model.Content)';
+    const htmlContent = '@Html.Raw(Json.Serialize(Model.Content))';
     quill.clipboard.dangerouslyPasteHTML(htmlContent);
 
     getWordNo();
