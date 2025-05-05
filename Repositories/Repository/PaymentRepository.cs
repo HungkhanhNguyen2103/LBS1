@@ -261,7 +261,7 @@ namespace Repositories.Repository
             {
                 PaymentItemId = paymentKey,
                 Type = typeEnum,
-                Price = paymentItem.Amount,
+                Price = paymentItem.AmountMoney,
                 UserId = user.Id,
                 OrderId = orderId,
                 UserName = user.UserName,
