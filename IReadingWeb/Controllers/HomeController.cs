@@ -46,10 +46,7 @@ namespace LBSWeb.Controllers
 
         public async Task<IActionResult> Index()
 		{
-            //    var _openAiService = new OpenAIService(new OpenAiOptions()
-            //    {
-            //        ApiKey = ""
-            //    });
+            
             //    var httpClient = new HttpClient();
             //    var audioStream = await httpClient.GetStreamAsync("https://ireading.store/api/Book/Audio/4f215c61-15c7-463d-b235-377715584567.mp3");
             //    using var memoryStream = new MemoryStream();
