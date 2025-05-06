@@ -55,14 +55,28 @@ namespace Repositories.Repository
                 return result;
             }
 
-            var cateExist = await _lBSDbContext.Categories.FirstOrDefaultAsync(c => c.Name == model.Name);
-            if (cateExist != null)
+            var cateExist = await _lBSDbContext.Categories.FirstOrDefaultAsync(c => c.Name.ToLower() == model.Name.ToLower());
+            if (model.Id == 0)
             {
-                result.Message = "Danh mục đã được tạo trước đó";
-                return result;
+                if (cateExist != null)
+                {
+                    result.Message = "Danh mục đã được tạo trước đó";
+                    return result;
+                }
+            }
+            else
+            {
+                var cateExist2 = await _lBSDbContext.Categories.FirstOrDefaultAsync(c => c.Name.ToLower() == model.Name.ToLower() && c.Id != model.Id);
+                if (cateExist2 != null)
+                {
+                    result.Message = "Danh mục đã được tạo trước đó";
+                    return result;
+                }
             }
 
-            var cate = await _lBSDbContext.Categories.FirstOrDefaultAsync(c => c.Id == model.Id);
+
+
+                var cate = await _lBSDbContext.Categories.FirstOrDefaultAsync(c => c.Id == model.Id);
             if (cate == null) _lBSDbContext.Categories.Add(model);
             else
             {
