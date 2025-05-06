@@ -90,7 +90,7 @@
                         <div class="row input-group input-group-outline mt-4">
                             <div style="display:block">
                                 <label for="Content">Nội dung chương:</label>
-                                <input type="file" style="width:30%;margin-bottom:10px" onchange="changeFile(this)" accept=".docx,.txt,.pdf" class="form-control">
+                                <input type="file" style="width:30%;margin-bottom:10px" onclick="this.value = ''" onchange="changeFile(this)" accept=".docx,.txt,.pdf" class="form-control">
                                 <div class="row" style="display:flex">
                                     <div class="col-9">
                                         @* contenteditable="true" *@
